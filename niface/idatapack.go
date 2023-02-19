@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:33:54
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-19 01:35:11
+ * @LastEditTime: 2023-02-19 11:31:59
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/idatapack.go
  * @Description:
  *
@@ -10,7 +10,7 @@
  */
 package niface
 
-// IDataPack
+// IDataPack 包接口
 type IDataPack interface {
 	GetHeadLen() uint32                // 获取包头长度
 	Pack(msg IMessage) ([]byte, error) // 封包
