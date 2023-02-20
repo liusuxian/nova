@@ -17,6 +17,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
+	"log"
 	"time"
 )
 
@@ -239,6 +240,7 @@ func init() {
 	defaultConfig = &Config{
 		v: v,
 	}
+	log.Println("Default Config Load Succ")
 }
 
 // Get 获取 value
