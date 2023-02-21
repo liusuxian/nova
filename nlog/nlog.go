@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 19:32:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 02:02:48
+ * @LastEditTime: 2023-02-21 17:46:51
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/nlog.go
  * @Description:
  *
@@ -11,6 +11,7 @@
 package nlog
 
 import (
+	"context"
 	"fmt"
 	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/utils"
@@ -27,22 +28,21 @@ import (
 
 // LogConfig 日志配置
 type LogConfig struct {
-	Level      string   // 日志打印级别 debug、info、warn、error、dpanic、panic、fatal
-	CtxKeys    []string // 自定义Context上下文变量名称，自动打印Context的变量到日志中。默认为空
-	Format     string   // 输出日志格式 logfmt、json
-	Path       string   // 输出日志文件路径
-	Filename   string   // 输出日志文件名称
-	MaxSize    int      // 单个日志文件最多存储量，单位(mb)
-	MaxBackups int      // 日志备份文件最多数量
-	MaxAge     int      // 日志保留时间，单位:天(day)
-	Compress   bool     // 是否压缩日志
-	Stdout     bool     // 是否输出到控制台
+	Level      string // 日志打印级别 debug、info、warn、error、dpanic、panic、fatal
+	Format     string // 输出日志格式 logfmt、json
+	Path       string // 输出日志文件路径
+	Filename   string // 输出日志文件名称
+	MaxSize    int    // 单个日志文件最多存储量，单位(mb)
+	MaxBackups int    // 日志备份文件最多数量
+	MaxAge     int    // 日志保留时间，单位:天(day)
+	Compress   bool   // 是否压缩日志
+	Stdout     bool   // 是否输出到控制台
 }
 
 // 默认输出日志文件路径
 const defaultPath = "logs"
 
-// TODO 日志打印级别 （ctx）（日志打印级别区分）
+// 日志打印级别
 var logLevel = map[string]zapcore.Level{
 	"debug":  zapcore.DebugLevel,
 	"info":   zapcore.InfoLevel,
@@ -56,26 +56,28 @@ var logLevel = map[string]zapcore.Level{
 // 只能输出结构化日志，但是性能要高于SugaredLogger
 var logger *zap.Logger
 
-// 可以输出结构化日志、非结构化日志。性能差于zap.Logger
-var sugarLogger *zap.SugaredLogger
-
 func init() {
 	// 读取配置
 	var err error
 	confSlice := []LogConfig{}
-	if err = nconf.GetStructs("logger", &confSlice); err != nil {
-		log.Fatalf("Get Logger Config  Error: %+v\n", err)
+	if err = nconf.StructKey("logger", &confSlice); err != nil {
+		log.Fatalf("Get Logger Config Error: %+v\n", err)
 	}
-	// 创建日志
-	if err = newLogger(confSlice); err != nil {
-		log.Fatalf("New Logger Error: %+v\n", err)
+	// 初始化日志
+	if err = initLogger(confSlice); err != nil {
+		log.Fatalf("Init Logger Error: %+v\n", err)
 	}
-	log.Println("New Logger Succ")
+	log.Println("Init Logger Succeed !!!")
 }
 
-// 创建日志
-func newLogger(confSlice []LogConfig) (err error) {
-	coreSlice := make([]zapcore.Core, 0, len(confSlice))
+// 初始化日志
+func initLogger(confSlice []LogConfig) (err error) {
+	confSliceLen := len(confSlice)
+	if confSliceLen == 0 {
+		err = errors.Errorf("Logger Config Empty: %+v", confSlice)
+		return
+	}
+	coreSlice := make([]zapcore.Core, 0, confSliceLen)
 	for _, conf := range confSlice {
 		// 获取日志输出方式
 		var writeSyncer zapcore.WriteSyncer
@@ -90,29 +92,25 @@ func newLogger(confSlice []LogConfig) (err error) {
 		if level, ok = logLevel[conf.Level]; !ok {
 			level = logLevel["info"]
 		}
-		// 创建 Core
+		// 新建Core
 		core := zapcore.NewCore(encoder, writeSyncer, level)
 		coreSlice = append(coreSlice, core)
 	}
-	if len(coreSlice) == 0 {
-		err = errors.Errorf("New Logger Error, confSlice: %+v", confSlice)
-		return
-	}
-	// 创建Logger
+	// 新建Logger
 	coreTee := zapcore.NewTee(coreSlice...)
 	logger = zap.New(coreTee, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel)) // zap.Addcaller()输出日志打印文件和行数
-	sugarLogger = logger.Sugar()
 	return
 }
 
 // 获取编码器(如何写入日志)
 func getEncoder(conf LogConfig) zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig() // NewJSONEncoder()输出json格式，NewConsoleEncoder()输出普通文本格式
-	encoderConfig.MessageKey = "msg"
 	encoderConfig.LevelKey = "level"
 	encoderConfig.TimeKey = "time"
 	encoderConfig.CallerKey = "file"
+	encoderConfig.MessageKey = "msg"
 	encoderConfig.StacktraceKey = "stack"
+	encoderConfig.FunctionKey = "func"
 	encoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString(t.Format("2006-01-02 15:04:05"))
 	} // 指定时间格式
@@ -162,107 +160,58 @@ func getWriter(conf LogConfig) (writeSyncer zapcore.WriteSyncer, err error) {
 	return
 }
 
-// DebugFields
-func DebugFields(msg string, fields ...zap.Field) {
-	logger.Debug(msg, fields...)
-}
-
-// InfoFields
-func InfoFields(msg string, fields ...zap.Field) {
-	logger.Info(msg, fields...)
-}
-
-// WarnFields
-func WarnFields(msg string, fields ...zap.Field) {
-	logger.Warn(msg, fields...)
-}
-
-// ErrorFields
-func ErrorFields(msg string, fields ...zap.Field) {
-	logger.Error(msg, fields...)
-}
-
-// DPanicFields
-func DPanicFields(msg string, fields ...zap.Field) {
-	logger.DPanic(msg, fields...)
-}
-
-// PanicFields
-func PanicFields(msg string, fields ...zap.Field) {
-	logger.Panic(msg, fields...)
-}
-
-// FatalFields
-func FatalFields(msg string, fields ...zap.Field) {
-	logger.Fatal(msg, fields...)
-}
-
 // Debug
-func Debug(args ...interface{}) {
-	sugarLogger.Debug(args...)
-}
-
-// Debugf
-func Debugf(template string, args ...interface{}) {
-	sugarLogger.Debugf(template, args...)
+func Debug(ctx context.Context, msg string, fields ...zap.Field) {
+	withCtxLogger(ctx, fields...).Debug(msg)
 }
 
 // Info
-func Info(args ...interface{}) {
-	sugarLogger.Info(args...)
-}
-
-// Infof
-func Infof(template string, args ...interface{}) {
-	sugarLogger.Infof(template, args...)
+func Info(ctx context.Context, msg string, fields ...zap.Field) {
+	withCtxLogger(ctx, fields...).Info(msg)
 }
 
 // Warn
-func Warn(args ...interface{}) {
-	sugarLogger.Warn(args...)
-}
-
-// Warnf
-func Warnf(template string, args ...interface{}) {
-	sugarLogger.Warnf(template, args...)
+func Warn(ctx context.Context, msg string, fields ...zap.Field) {
+	withCtxLogger(ctx, fields...).Warn(msg)
 }
 
 // Error
-func Error(args ...interface{}) {
-	sugarLogger.Error(args...)
-}
-
-// Errorf
-func Errorf(template string, args ...interface{}) {
-	sugarLogger.Errorf(template, args...)
+func Error(ctx context.Context, msg string, fields ...zap.Field) {
+	withCtxLogger(ctx, fields...).Error(msg)
 }
 
 // DPanic
-func DPanic(args ...interface{}) {
-	sugarLogger.DPanic(args...)
-}
-
-// DPanicf
-func DPanicf(template string, args ...interface{}) {
-	sugarLogger.DPanicf(template, args...)
+func DPanic(ctx context.Context, msg string, fields ...zap.Field) {
+	withCtxLogger(ctx, fields...).DPanic(msg)
 }
 
 // Panic
-func Panic(args ...interface{}) {
-	sugarLogger.Panic(args...)
-}
-
-// Panicf
-func Panicf(template string, args ...interface{}) {
-	sugarLogger.Panicf(template, args...)
+func Panic(ctx context.Context, msg string, fields ...zap.Field) {
+	withCtxLogger(ctx, fields...).Panic(msg)
 }
 
 // Fatal
-func Fatal(args ...interface{}) {
-	sugarLogger.Fatal(args...)
+func Fatal(ctx context.Context, msg string, fields ...zap.Field) {
+	withCtxLogger(ctx, fields...).Fatal(msg)
 }
 
-// Fatalf
-func Fatalf(template string, args ...interface{}) {
-	sugarLogger.Fatalf(template, args...)
+// Level
+func Level() zapcore.Level {
+	return logger.Level()
+}
+
+// LevelEnabled
+func LevelEnabled(lvl zapcore.Level) bool {
+	return logger.Level().Enabled(lvl)
+}
+
+func withCtxLogger(ctx context.Context, fields ...zap.Field) *zap.Logger {
+	if ctx == nil {
+		return logger.With(fields...)
+	}
+	var customCtxKey string
+	if customCtxKey = nconf.GetString("customCtxKey"); customCtxKey == "" {
+		return logger.With(fields...)
+	}
+	return logger.With(zap.Reflect(customCtxKey, ctx.Value(customCtxKey))).With(fields...)
 }

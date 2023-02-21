@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 16:30:45
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 00:37:49
+ * @LastEditTime: 2023-02-21 15:55:49
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/nconf.go
  * @Description:
  *
@@ -13,21 +13,19 @@ package nconf
 import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/liusuxian/nova/utils"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
-	"github.com/spf13/cast"
 	"github.com/spf13/viper"
 	"log"
 	"time"
 )
 
-// Config 配置类
+// Config 配置结构
 type Config struct {
 	v *viper.Viper
 }
 
-// New 创建Config
-func New(path string) (cfg *Config, err error) {
+// NewConfig 新建Config
+func NewConfig(path string) (cfg *Config, err error) {
 	v := viper.New()
 	v.SetConfigFile(path)
 	configType := utils.ExtName(path)
@@ -45,8 +43,8 @@ func New(path string) (cfg *Config, err error) {
 	return
 }
 
-// NewRemote 创建远程Config
-func NewRemote(provider, endpoint, path, configType string) (cfg *Config, err error) {
+// NewRemoteConfig 新建远程Config
+func NewRemoteConfig(provider, endpoint, path, configType string) (cfg *Config, err error) {
 	v := viper.New()
 	v.AddRemoteProvider(provider, endpoint, path)
 	v.SetConfigType(configType)
@@ -63,8 +61,8 @@ func NewRemote(provider, endpoint, path, configType string) (cfg *Config, err er
 	return
 }
 
-// NewSecureRemote 创建远程Config
-func NewSecureRemote(provider, endpoint, path, secretkeyring, configType string) (cfg *Config, err error) {
+// NewSecureRemoteConfig 新建远程Config
+func NewSecureRemoteConfig(provider, endpoint, path, secretkeyring, configType string) (cfg *Config, err error) {
 	v := viper.New()
 	v.AddSecureRemoteProvider(provider, endpoint, path, secretkeyring)
 	v.SetConfigType(configType)
@@ -176,16 +174,6 @@ func (c *Config) GetUint64(key string) uint64 {
 	return c.v.GetUint64(key)
 }
 
-// GetStruct 获取 Struct
-func (c *Config) GetStruct(key string, output interface{}) error {
-	return mapstructure.Decode(c.v.GetStringMap(key), output)
-}
-
-// GetStructs 获取 Structs
-func (c *Config) GetStructs(key string, output interface{}) error {
-	return mapstructure.Decode(cast.ToSlice(c.v.Get(key)), output)
-}
-
 // InConfig 检查给定的键(或别名)是否在配置文件中
 func (c *Config) InConfig(key string) bool {
 	return c.v.InConfig(key)
@@ -201,14 +189,29 @@ func (c *Config) OnConfigChange(run func(in fsnotify.Event)) {
 	c.v.OnConfigChange(run)
 }
 
-// WatchConfig 监视配置文件的变化
-func (c *Config) WatchConfig() {
-	c.v.WatchConfig()
-}
-
 // Sub 返回一个新的Config实例，表示这个实例的子树，对键不区分大小写
 func (c *Config) Sub(key string) *Config {
 	return &Config{v: c.v.Sub(key)}
+}
+
+// Struct 将配置解析为结构体，确保标签正确设置该结构的字段
+func (c *Config) Struct(rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+	return c.v.Unmarshal(rawVal, opts...)
+}
+
+// StructExact 将配置解析为结构体，如果在目标结构体中字段不存在则报错
+func (c *Config) StructExact(rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+	return c.v.UnmarshalExact(rawVal, opts...)
+}
+
+// StructKey 接收一个键并将其解析到结构体中
+func (c *Config) StructKey(key string, rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+	return c.v.UnmarshalKey(key, rawVal, opts...)
+}
+
+// WatchConfig 监视配置文件的变化
+func (c *Config) WatchConfig() {
+	c.v.WatchConfig()
 }
 
 // WatchRemoteConfig 监视远程配置文件的变化
@@ -240,7 +243,7 @@ func init() {
 	defaultConfig = &Config{
 		v: v,
 	}
-	log.Println("Default Config Load Succ")
+	log.Println("Default Config Load Succeed !!!")
 }
 
 // Get 获取 value
@@ -338,16 +341,6 @@ func GetUint64(key string) uint64 {
 	return defaultConfig.v.GetUint64(key)
 }
 
-// GetStruct 获取 Struct
-func GetStruct(key string, output interface{}) error {
-	return mapstructure.Decode(defaultConfig.v.GetStringMap(key), output)
-}
-
-// GetStructs 获取 Structs
-func GetStructs(key string, output interface{}) error {
-	return mapstructure.Decode(cast.ToSlice(defaultConfig.v.Get(key)), output)
-}
-
 // InConfig 检查给定的键(或别名)是否在配置文件中
 func InConfig(key string) bool {
 	return defaultConfig.v.InConfig(key)
@@ -363,12 +356,27 @@ func OnConfigChange(run func(in fsnotify.Event)) {
 	defaultConfig.v.OnConfigChange(run)
 }
 
-// WatchConfig 监视配置文件的变化
-func WatchConfig() {
-	defaultConfig.v.WatchConfig()
-}
-
 // Sub 返回一个新的Config实例，表示这个实例的子树，对键不区分大小写
 func Sub(key string) *Config {
 	return &Config{v: defaultConfig.v.Sub(key)}
+}
+
+// Struct 将配置解析为结构体，确保标签正确设置该结构的字段
+func Struct(rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+	return defaultConfig.v.Unmarshal(rawVal, opts...)
+}
+
+// StructExact 将配置解析为结构体，如果在目标结构体中字段不存在则报错
+func StructExact(rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+	return defaultConfig.v.UnmarshalExact(rawVal, opts...)
+}
+
+// StructKey 接收一个键并将其解析到结构体中
+func StructKey(key string, rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+	return defaultConfig.v.UnmarshalKey(key, rawVal, opts...)
+}
+
+// WatchConfig 监视配置文件的变化
+func WatchConfig() {
+	defaultConfig.v.WatchConfig()
 }
