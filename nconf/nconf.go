@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 16:30:45
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 15:55:49
+ * @LastEditTime: 2023-02-21 18:18:21
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/nconf.go
  * @Description:
  *
@@ -12,7 +12,7 @@ package nconf
 
 import (
 	"github.com/fsnotify/fsnotify"
-	"github.com/liusuxian/nova/utils"
+	"github.com/liusuxian/nova/utils/file"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"log"
@@ -28,7 +28,7 @@ type Config struct {
 func NewConfig(path string) (cfg *Config, err error) {
 	v := viper.New()
 	v.SetConfigFile(path)
-	configType := utils.ExtName(path)
+	configType := file.ExtName(path)
 	v.SetConfigType(configType)
 	// 加载配置文件内容
 	if err = v.ReadInConfig(); err != nil {
@@ -80,7 +80,7 @@ func NewSecureRemoteConfig(provider, endpoint, path, secretkeyring, configType s
 }
 
 // Get 获取 value
-func (c *Config) Get(key string) interface{} {
+func (c *Config) Get(key string) any {
 	return c.v.Get(key)
 }
 
@@ -129,8 +129,8 @@ func (c *Config) GetString(key string) string {
 	return c.v.GetString(key)
 }
 
-// GetStringMap 获取 map[string]interface{}
-func (c *Config) GetStringMap(key string) map[string]interface{} {
+// GetStringMap 获取 map[string]any
+func (c *Config) GetStringMap(key string) map[string]any {
 	return c.v.GetStringMap(key)
 }
 
@@ -195,17 +195,17 @@ func (c *Config) Sub(key string) *Config {
 }
 
 // Struct 将配置解析为结构体，确保标签正确设置该结构的字段
-func (c *Config) Struct(rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+func (c *Config) Struct(rawVal any, opts ...viper.DecoderConfigOption) error {
 	return c.v.Unmarshal(rawVal, opts...)
 }
 
 // StructExact 将配置解析为结构体，如果在目标结构体中字段不存在则报错
-func (c *Config) StructExact(rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+func (c *Config) StructExact(rawVal any, opts ...viper.DecoderConfigOption) error {
 	return c.v.UnmarshalExact(rawVal, opts...)
 }
 
 // StructKey 接收一个键并将其解析到结构体中
-func (c *Config) StructKey(key string, rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+func (c *Config) StructKey(key string, rawVal any, opts ...viper.DecoderConfigOption) error {
 	return c.v.UnmarshalKey(key, rawVal, opts...)
 }
 
@@ -247,7 +247,7 @@ func init() {
 }
 
 // Get 获取 value
-func Get(key string) interface{} {
+func Get(key string) any {
 	return defaultConfig.v.Get(key)
 }
 
@@ -296,8 +296,8 @@ func GetString(key string) string {
 	return defaultConfig.v.GetString(key)
 }
 
-// GetStringMap 获取 map[string]interface{}
-func GetStringMap(key string) map[string]interface{} {
+// GetStringMap 获取 map[string]any
+func GetStringMap(key string) map[string]any {
 	return defaultConfig.v.GetStringMap(key)
 }
 
@@ -362,17 +362,17 @@ func Sub(key string) *Config {
 }
 
 // Struct 将配置解析为结构体，确保标签正确设置该结构的字段
-func Struct(rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+func Struct(rawVal any, opts ...viper.DecoderConfigOption) error {
 	return defaultConfig.v.Unmarshal(rawVal, opts...)
 }
 
 // StructExact 将配置解析为结构体，如果在目标结构体中字段不存在则报错
-func StructExact(rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+func StructExact(rawVal any, opts ...viper.DecoderConfigOption) error {
 	return defaultConfig.v.UnmarshalExact(rawVal, opts...)
 }
 
 // StructKey 接收一个键并将其解析到结构体中
-func StructKey(key string, rawVal interface{}, opts ...viper.DecoderConfigOption) error {
+func StructKey(key string, rawVal any, opts ...viper.DecoderConfigOption) error {
 	return defaultConfig.v.UnmarshalKey(key, rawVal, opts...)
 }
 

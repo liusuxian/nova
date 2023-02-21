@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 12:05:05
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 17:58:55
+ * @LastEditTime: 2023-02-21 18:32:02
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/tcp_demo/server/server.go
  * @Description:
  *
@@ -15,6 +15,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/nlog"
+	"github.com/liusuxian/nova/utils/ctx"
 	"go.uber.org/zap"
 )
 
@@ -36,8 +37,8 @@ type TestConfig struct {
 
 // Context 上下文结构
 type Context struct {
-	User ContextUser            // 上下文用户信息
-	Data map[string]interface{} // 自定义KV变量，业务模块根据需要设置，不固定
+	User ContextUser    // 上下文用户信息
+	Data map[string]any // 自定义KV变量，业务模块根据需要设置，不固定
 }
 
 // ContextUser 上下文中的用户信息
@@ -48,14 +49,13 @@ type ContextUser struct {
 }
 
 func main() {
-	customCtxKey := nconf.GetString("customCtxKey")
-	ctx := context.WithValue(context.Background(), customCtxKey, Context{
+	ctx := ctx.SetCtxGlobalVal(context.Background(), Context{
 		User: ContextUser{
 			Id:     1,
 			Appid:  "111",
 			Openid: "222",
 		},
-		Data: map[string]interface{}{"traceId": "333", "reqId": "444"},
+		Data: map[string]any{"traceId": "333", "reqId": "444"},
 	})
 	nlog.Debug(ctx, "Log Level", zap.String("level", nlog.Level().String()))
 	var err error

@@ -26,6 +26,3 @@ logger:
     maxAge: 7 # 日志保留时间，单位:天(day)
     compress: false # 是否压缩日志
     stdout: true # 是否输出到控制台
-
-# 自定义Context上下文变量名称
-customCtxKey: "CustomCtxKey"

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 19:32:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 17:46:51
+ * @LastEditTime: 2023-02-21 18:13:35
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/nlog.go
  * @Description:
  *
@@ -14,7 +14,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/liusuxian/nova/nconf"
-	"github.com/liusuxian/nova/utils"
+	"github.com/liusuxian/nova/utils/file"
 	"github.com/natefinch/lumberjack"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -128,7 +128,7 @@ func getEncoder(conf LogConfig) zapcore.Encoder {
 // 获取日志输出方式
 func getWriter(conf LogConfig) (writeSyncer zapcore.WriteSyncer, err error) {
 	// 判断日志路径是否存在，如果不存在就创建
-	if !utils.PathExists(conf.Path) {
+	if !file.PathExists(conf.Path) {
 		if conf.Path == "" {
 			conf.Path = defaultPath
 		}
