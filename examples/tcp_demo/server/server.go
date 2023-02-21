@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 12:05:05
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 18:32:02
+ * @LastEditTime: 2023-02-21 19:10:15
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/tcp_demo/server/server.go
  * @Description:
  *
@@ -15,7 +15,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/nlog"
-	"github.com/liusuxian/nova/utils/ctx"
+	"github.com/liusuxian/nova/utils/ctxglobal"
 	"go.uber.org/zap"
 )
 
@@ -49,7 +49,7 @@ type ContextUser struct {
 }
 
 func main() {
-	ctx := ctx.SetCtxGlobalVal(context.Background(), Context{
+	ctx := ctxglobal.SetCtxGlobalVal(context.Background(), Context{
 		User: ContextUser{
 			Id:     1,
 			Appid:  "111",

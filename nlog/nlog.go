@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 19:32:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 18:13:35
+ * @LastEditTime: 2023-02-21 19:09:42
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/nlog.go
  * @Description:
  *
@@ -14,6 +14,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/liusuxian/nova/nconf"
+	"github.com/liusuxian/nova/utils/ctxglobal"
 	"github.com/liusuxian/nova/utils/file"
 	"github.com/natefinch/lumberjack"
 	"github.com/pkg/errors"
@@ -209,9 +210,5 @@ func withCtxLogger(ctx context.Context, fields ...zap.Field) *zap.Logger {
 	if ctx == nil {
 		return logger.With(fields...)
 	}
-	var customCtxKey string
-	if customCtxKey = nconf.GetString("customCtxKey"); customCtxKey == "" {
-		return logger.With(fields...)
-	}
-	return logger.With(zap.Reflect(customCtxKey, ctx.Value(customCtxKey))).With(fields...)
+	return logger.With(zap.Reflect("CtxGlobal", ctxglobal.GetCtxGlobalVal(ctx))).With(fields...)
 }
