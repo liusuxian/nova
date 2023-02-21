@@ -1,0 +1,4 @@
+# 单元测试用
+# 服务器配置
+server:
+  maxPacketSize: 4096 # 数据包的最大值

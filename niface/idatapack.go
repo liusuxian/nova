@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:33:54
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-19 11:31:59
+ * @LastEditTime: 2023-02-21 21:18:20
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/idatapack.go
  * @Description:
  *
@@ -16,3 +16,14 @@ type IDataPack interface {
 	Pack(msg IMessage) ([]byte, error) // 封包
 	Unpack([]byte) (IMessage, error)   // 拆包
 }
+
+const (
+	// 默认封包和拆包方式
+	DefaultDataPack string = "default_pack"
+	// 自定义封包方式在此添加
+)
+
+const (
+	// 默认报文协议格式
+	DefaultMessage string = "default_message"
+)

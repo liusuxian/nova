@@ -1,12 +1,4 @@
-# 服务器配置
-server:
-  name: "Nova" # 服务器应用名称
-  host: "0.0.0.0" # 服务器IP
-  port: 8989 # 服务器监听端口
-  maxConn: 10000 # 允许的客户端连接最大数量
-  workerPoolSize: 100000 # 工作任务池最大工作Goroutine数量
-  maxPacketSize: 4096 # 数据包的最大值
-
+# 单元测试用
 # 日志配置
 logger:
   - level: "debug" # 日志打印级别 debug、info、warn、error、dpanic、panic、fatal

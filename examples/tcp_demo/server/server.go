@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 12:05:05
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 19:10:15
+ * @LastEditTime: 2023-02-21 21:43:23
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/tcp_demo/server/server.go
  * @Description:
  *
@@ -26,6 +26,7 @@ type ServerConfig struct {
 	Port           uint16 // 服务器监听端口
 	MaxConn        uint32 // 允许的客户端连接最大数量
 	WorkerPoolSize uint32 // 工作任务池最大工作Goroutine数量
+	MaxPacketSize  uint32 // 数据包的最大值
 }
 
 // TestConfig 测试配置
