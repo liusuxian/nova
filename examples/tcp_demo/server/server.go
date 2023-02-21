@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 12:05:05
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 21:43:23
+ * @LastEditTime: 2023-02-21 22:22:22
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/tcp_demo/server/server.go
  * @Description:
  *
@@ -27,6 +27,7 @@ type ServerConfig struct {
 	MaxConn        uint32 // 允许的客户端连接最大数量
 	WorkerPoolSize uint32 // 工作任务池最大工作Goroutine数量
 	MaxPacketSize  uint32 // 数据包的最大值
+	MaxMsgChanLen  uint32 // SendBuffMsg发送消息的缓冲最大长度
 }
 
 // TestConfig 测试配置

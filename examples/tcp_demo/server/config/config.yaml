@@ -6,6 +6,7 @@ server:
   maxConn: 10000 # 允许的客户端连接最大数量
   workerPoolSize: 100000 # 工作任务池最大工作Goroutine数量
   maxPacketSize: 4096 # 数据包的最大值
+  maxMsgChanLen: 1024 # SendBuffMsg发送消息的缓冲最大长度
 
 # 日志配置
 logger:
