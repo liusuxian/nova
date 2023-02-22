@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 20:58:27
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 22:00:04
+ * @LastEditTime: 2023-02-22 15:26:58
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/datapack.go
  * @Description:
  *
@@ -18,8 +18,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-var defaultHeaderLen uint32 = 8
-
 // DataPack 封包拆包类实例，暂时不需要成员
 type DataPack struct{}
 
@@ -29,25 +27,34 @@ func NewDataPack() niface.IDataPack {
 }
 
 // GetHeadLen 获取包头长度方法
-func (dp *DataPack) GetHeadLen() uint32 {
-	// ID uint32(4字节) + DataLen uint32(4字节)
-	return defaultHeaderLen
+func (dp *DataPack) GetHeadLen() uint8 {
+	return nconf.GetUint8("server.packageHeadIDLen") + nconf.GetUint8("server.packageHeadDataLen")
 }
 
 // Pack 封包方法(压缩数据)
 func (dp *DataPack) Pack(msg niface.IMessage) (data []byte, err error) {
 	// 创建一个存放bytes字节的缓冲
 	dataBuff := bytes.NewBuffer([]byte{})
+	// 获取字节存储次序
+	var endianOrder binary.ByteOrder
+	endian := nconf.GetUint8("server.endian")
+	if endian == 1 {
+		// 小端
+		endianOrder = binary.LittleEndian
+	} else {
+		// 大端
+		endianOrder = binary.BigEndian
+	}
 	// 写dataLen
-	if err = binary.Write(dataBuff, binary.LittleEndian, msg.GetDataLen()); err != nil {
+	if err = binary.Write(dataBuff, endianOrder, msg.GetDataLen()); err != nil {
 		return
 	}
 	// 写msgID
-	if err = binary.Write(dataBuff, binary.LittleEndian, msg.GetMsgID()); err != nil {
+	if err = binary.Write(dataBuff, endianOrder, msg.GetMsgID()); err != nil {
 		return
 	}
 	// 写data数据
-	if err = binary.Write(dataBuff, binary.LittleEndian, msg.GetData()); err != nil {
+	if err = binary.Write(dataBuff, endianOrder, msg.GetData()); err != nil {
 		return
 	}
 	data = dataBuff.Bytes()
@@ -60,12 +67,22 @@ func (dp *DataPack) Unpack(binaryData []byte) (data niface.IMessage, err error) 
 	dataBuff := bytes.NewReader(binaryData)
 	// 只解压head的信息，得到dataLen和msgID
 	msg := &Message{}
+	// 获取字节存储次序
+	var endianOrder binary.ByteOrder
+	endian := nconf.GetUint8("server.endian")
+	if endian == 1 {
+		// 小端
+		endianOrder = binary.LittleEndian
+	} else {
+		// 大端
+		endianOrder = binary.BigEndian
+	}
 	// 读dataLen
-	if err = binary.Read(dataBuff, binary.LittleEndian, &msg.DataLen); err != nil {
+	if err = binary.Read(dataBuff, endianOrder, &msg.DataLen); err != nil {
 		return
 	}
 	// 读msgID
-	if err = binary.Read(dataBuff, binary.LittleEndian, &msg.ID); err != nil {
+	if err = binary.Read(dataBuff, endianOrder, &msg.ID); err != nil {
 		return
 	}
 	// 判断dataLen的长度是否超出我们允许的最大包长度

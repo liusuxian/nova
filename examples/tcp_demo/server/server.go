@@ -21,18 +21,18 @@ import (
 
 // ServerConfig 服务器配置
 type ServerConfig struct {
-	Name                 string // 服务器应用名称
+	Name                 string // 服务器应用名称，默认"Nova"
 	Host                 string // 服务器IP
 	Port                 uint16 // 服务器监听端口（uint16）
-	MaxConn              uint32 // 允许的客户端连接最大数量（uint32）
-	WorkerPoolSize       uint32 // 工作任务池最大工作Goroutine数量（uint32）
-	PackageHeadIDLen     uint8  // 包头中消息ID长度（单位:字节 uint8）
-	PackageHeadDataLen   uint8  // 包头中消息数据段长度（单位:字节 uint8）
-	MaxPacketSize        uint32 // 数据包的最大值（单位:字节 uint32）
-	PacketMethod         uint8  // 封包和拆包方式 1:默认（单位:字节 uint8）
-	PacketProtocolFormat uint8  // 报文协议格式 1:默认（单位:字节 uint8）
-	Endian               uint8  // 字节存储次序 1:小端 2:大端（单位:字节 uint8）
-	MaxMsgChanLen        uint32 // SendBuffMsg发送消息的缓冲最大长度
+	MaxConn              uint32 // 允许的客户端连接最大数量，默认3（uint32）
+	WorkerPoolSize       uint32 // 工作任务池最大工作Goroutine数量，默认10（uint32）
+	PackageHeadIDLen     uint8  // 包头中消息ID长度，默认4（单位:字节 uint8）
+	PackageHeadDataLen   uint8  // 包头中消息数据段长度，默认4（单位:字节 uint8）
+	MaxPacketSize        uint32 // 数据包的最大值，默认4096（单位:字节 uint32）
+	PacketMethod         uint8  // 封包和拆包方式，默认1，1:默认（单位:字节 uint8）
+	PacketProtocolFormat uint8  // 报文协议格式，默认1，1:默认（单位:字节 uint8）
+	Endian               uint8  // 字节存储次序，默认小端，1:小端 2:大端（单位:字节 uint8）
+	MaxMsgChanLen        uint32 // SendBuffMsg发送消息的缓冲最大长度，默认1024（单位:字节 uint32）
 }
 
 // TestConfig 测试配置

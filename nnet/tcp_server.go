@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-19 01:58:09
+ * @LastEditTime: 2023-02-21 21:01:34
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/tcp_server.go
  * @Description:
  *
@@ -11,12 +11,15 @@
 package nnet
 
 import (
+	"context"
 	"fmt"
 	"github.com/liusuxian/nova/niface"
+	"github.com/liusuxian/nova/nlog"
+	"go.uber.org/zap"
 	"net"
 )
 
-// TCPServer TCP服务器类
+// TCPServer TCP服务器结构
 type TCPServer struct {
 	Name        string                        // 服务器的名称
 	IPVersion   string                        // tcp4 or other
@@ -30,30 +33,32 @@ type TCPServer struct {
 	packet      niface.IDataPack
 }
 
+var ctx = context.Background()
+
 // Start 启动服务器
 func (s *TCPServer) Start() {
-	fmt.Printf("TCPServer Listener at IP: %s Port: %d is starting\n", s.IP, s.Port)
+	nlog.Info(ctx, "TCPServer Listener Is Starting", zap.String("Ip", s.IP), zap.Uint16("Port", s.Port))
 	go func() {
 		// 获取一个TCP的Addr
 		var addr *net.TCPAddr
 		var err error
 		if addr, err = net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port)); err != nil {
-			_ = fmt.Errorf("resolve tcp addr error: %v\n", err)
+			nlog.Error(ctx, "TCPServer Resolve Tcp Addr Error", zap.Error(err))
 			return
 		}
 		// 监听服务器的地址
 		var listener *net.TCPListener
 		if listener, err = net.ListenTCP(s.IPVersion, addr); err != nil {
-			_ = fmt.Errorf("listen %s error: %v\n", s.IPVersion, err)
+			nlog.Error(ctx, "TCPServer Listen Error", zap.String("IPVersion", s.IPVersion), zap.Error(err))
 			return
 		}
-		fmt.Printf("nova server listening %s succ\n", s.Name)
+		nlog.Info(ctx, "TCPServer Listen Succeed", zap.String("Name", s.Name))
 		// 阻塞的等待客户端连接，处理客户端连接业务（读写）
 		for {
 			// 如果有客户端连接过来，阻塞会返回
 			var conn *net.TCPConn
 			if conn, err = listener.AcceptTCP(); err != nil {
-				_ = fmt.Errorf("accept error: %v\n", err)
+				nlog.Error(ctx, "TCPServer Accept Error", zap.Error(err))
 				continue
 			}
 			// 已经与客户端建立连接
@@ -62,13 +67,13 @@ func (s *TCPServer) Start() {
 					buf := make([]byte, 512)
 					var cnt int
 					if cnt, err = conn.Read(buf); err != nil {
-						_ = fmt.Errorf("recv buf error: %v\n", err)
+						nlog.Error(ctx, "TCPServer Recv Buf Error", zap.Error(err))
 						continue
 					}
-					fmt.Printf("recv client buf: %s cnt: %d\n", buf, cnt)
+					nlog.Debug(ctx, "TCPServer Recv Client", zap.ByteString("Buf", buf), zap.Int("cnt", cnt))
 					// 回复
 					if _, err := conn.Write(buf[:cnt]); err != nil {
-						_ = fmt.Errorf("write buf error: %v\n", err)
+						nlog.Error(ctx, "TCPServer Write Buf Error", zap.Error(err))
 						continue
 					}
 				}
@@ -90,7 +95,7 @@ func (s *TCPServer) Server() {
 	select {}
 }
 
-// NewTCPServer 创建一个TCP服务器句柄
+// NewTCPServer 创建一个TCP服务器
 func NewTCPServer(name string, ip string, port uint16) niface.IServer {
 	s := &TCPServer{
 		Name:      name,
