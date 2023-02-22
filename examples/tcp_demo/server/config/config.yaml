@@ -5,9 +5,13 @@ server:
   port: 9999 # 服务器监听端口（uint16）
   maxConn: 10000 # 允许的客户端连接最大数量（uint32）
   workerPoolSize: 100000 # 工作任务池最大工作Goroutine数量（uint32）
-  packageHeaderLen: 8 # 包头的长度（字节 uint8）
-  maxPacketSize: 4096 # 数据包的最大值（字节 uint32）
-  maxMsgChanLen: 1024 # SendBuffMsg发送消息的缓冲最大长度（字节 uint32）
+  packageHeadIDLen: 4 # 包头中消息ID长度（单位:字节 uint8）
+  packageHeadDataLen: 4 # 包头中消息数据段长度（单位:字节 uint8）
+  maxPacketSize: 4096 # 数据包的最大值（单位:字节 uint32）
+  packetMethod: 1 # 封包和拆包方式 1:默认（单位:字节 uint8）
+  packetProtocolFormat: 1 # 报文协议格式 1:默认（单位:字节 uint8）
+  endian: 1 # 字节存储次序 1:小端 2:大端（单位:字节 uint8）
+  maxMsgChanLen: 1024 # SendBuffMsg发送消息的缓冲最大长度（单位:字节 uint32）
 
 # 日志配置
 logger:
@@ -15,17 +19,17 @@ logger:
     format: "json" # 输出日志格式 logfmt、json
     path: "logs" # 输出日志文件路径
     filename: "info.log" # 输出日志文件名称
-    maxSize: 10 # 单个日志文件最多存储量，单位(mb)
-    maxBackups: 10 # 日志备份文件最多数量
-    maxAge: 7 # 日志保留时间，单位:天(day)
+    maxSize: 10 # 单个日志文件最多存储量（单位:MB int）
+    maxBackups: 10 # 日志备份文件最多数量（int）
+    maxAge: 7 # 日志保留时间（单位:天 int）
     compress: false # 是否压缩日志
     stdout: true # 是否输出到控制台
   - level: "error" # 日志打印级别 debug、info、warn、error、dpanic、panic、fatal
     format: "json" # 输出日志格式 logfmt、json
     path: "logs" # 输出日志文件路径
     filename: "error.log" # 输出日志文件名称
-    maxSize: 10 # 单个日志文件最多存储量，单位(mb)
-    maxBackups: 10 # 日志备份文件最多数量
-    maxAge: 7 # 日志保留时间，单位:天(day)
+    maxSize: 10 # 单个日志文件最多存储量（单位:MB int）
+    maxBackups: 10 # 日志备份文件最多数量（int）
+    maxAge: 7 # 日志保留时间（单位:天 int）
     compress: false # 是否压缩日志
     stdout: true # 是否输出到控制台

@@ -3,7 +3,7 @@ package nlog_test
 import (
 	"context"
 	"github.com/liusuxian/nova/nlog"
-	"github.com/liusuxian/nova/utils/ctxglobal"
+	"github.com/liusuxian/nova/nutils/nctx"
 	"testing"
 )
 
@@ -21,7 +21,7 @@ type ContextUser struct {
 }
 
 func TestLog(t *testing.T) {
-	ctx := ctxglobal.SetCtxGlobalVal(context.Background(), Context{
+	ctx := nctx.SetCtxGlobalVal(context.Background(), Context{
 		User: ContextUser{
 			Id:     1,
 			Appid:  "111",

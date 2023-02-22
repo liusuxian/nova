@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 19:32:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 19:09:42
+ * @LastEditTime: 2023-02-22 14:54:48
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/nlog.go
  * @Description:
  *
@@ -14,8 +14,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/liusuxian/nova/nconf"
-	"github.com/liusuxian/nova/utils/ctxglobal"
-	"github.com/liusuxian/nova/utils/file"
+	"github.com/liusuxian/nova/nutils/nctx"
+	"github.com/liusuxian/nova/nutils/nfile"
+	"github.com/liusuxian/nova/nutils/nstr"
 	"github.com/natefinch/lumberjack"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -129,7 +130,8 @@ func getEncoder(conf LogConfig) zapcore.Encoder {
 // 获取日志输出方式
 func getWriter(conf LogConfig) (writeSyncer zapcore.WriteSyncer, err error) {
 	// 判断日志路径是否存在，如果不存在就创建
-	if !file.PathExists(conf.Path) {
+	conf.Path = strings.TrimSpace(conf.Path)
+	if !nfile.PathExists(conf.Path) {
 		if conf.Path == "" {
 			conf.Path = defaultPath
 		}
@@ -141,8 +143,16 @@ func getWriter(conf LogConfig) (writeSyncer zapcore.WriteSyncer, err error) {
 		}
 	}
 	// 日志文件与日志切割配置
-	filenameList := strings.Split(conf.Filename, ".")
-	filename := fmt.Sprintf("%s-%s.%s", filenameList[0], time.Now().Format("2006-01-02"), filenameList[1])
+	filenameList := nstr.Split(conf.Filename, ".")
+	filenameListLen := len(filenameList)
+	filename := ""
+	if filenameListLen == 1 {
+		filename = fmt.Sprintf("%s-%s.log", filenameList[0], time.Now().Format("2006-01-02"))
+	} else if filenameListLen >= 2 {
+		filename = fmt.Sprintf("%s-%s.%s", strings.Join(filenameList[:filenameListLen-1], "-"), time.Now().Format("2006-01-02"), filenameList[filenameListLen-1])
+	} else {
+		filename = fmt.Sprintf("nova-%s.log", time.Now().Format("2006-01-02"))
+	}
 	lumberJackLogger := &lumberjack.Logger{
 		Filename:   filepath.Join(conf.Path, filename),
 		MaxSize:    conf.MaxSize,    // 单个日志文件最多存储量，单位(mb)，超过则切割
@@ -210,5 +220,5 @@ func withCtxLogger(ctx context.Context, fields ...zap.Field) *zap.Logger {
 	if ctx == nil {
 		return logger.With(fields...)
 	}
-	return logger.With(zap.Reflect("CtxGlobal", ctxglobal.GetCtxGlobalVal(ctx))).With(fields...)
+	return logger.With(zap.Reflect("CtxGlobal", nctx.GetCtxGlobalVal(ctx))).With(fields...)
 }

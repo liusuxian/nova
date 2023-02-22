@@ -2,13 +2,13 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 18:14:44
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 19:08:53
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/ctxglobal/ctxglobal.go
+ * @LastEditTime: 2023-02-22 12:27:13
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nutils/nctx/nctx.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
-package ctxglobal
+package nctx
 
 import "context"
 

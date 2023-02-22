@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 22:01:24
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 11:01:35
+ * @LastEditTime: 2023-02-22 15:07:54
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/nconf_test.go
  * @Description:
  *
@@ -17,14 +17,18 @@ import (
 
 // ServerConfig 服务器配置
 type ServerConfig struct {
-	Name             string // 服务器应用名称
-	Host             string // 服务器IP
-	Port             uint16 // 服务器监听端口（uint16）
-	MaxConn          uint32 // 允许的客户端连接最大数量（uint32）
-	WorkerPoolSize   uint32 // 工作任务池最大工作Goroutine数量（uint32）
-	PackageHeaderLen uint8  // 包头的长度（字节 uint8）
-	MaxPacketSize    uint32 // 数据包的最大值（字节 uint32）
-	MaxMsgChanLen    uint32 // SendBuffMsg发送消息的缓冲最大长度（字节 uint32）
+	Name                 string // 服务器应用名称
+	Host                 string // 服务器IP
+	Port                 uint16 // 服务器监听端口（uint16）
+	MaxConn              uint32 // 允许的客户端连接最大数量（uint32）
+	WorkerPoolSize       uint32 // 工作任务池最大工作Goroutine数量（uint32）
+	PackageHeadIDLen     uint8  // 包头中消息ID长度（单位:字节 uint8）
+	PackageHeadDataLen   uint8  // 包头中消息数据段长度（单位:字节 uint8）
+	MaxPacketSize        uint32 // 数据包的最大值（单位:字节 uint32）
+	PacketMethod         uint8  // 封包和拆包方式 1:默认（单位:字节 uint8）
+	PacketProtocolFormat uint8  // 报文协议格式 1:默认（单位:字节 uint8）
+	Endian               uint8  // 字节存储次序 1:小端 2:大端（单位:字节 uint8）
+	MaxMsgChanLen        uint32 // SendBuffMsg发送消息的缓冲最大长度
 }
 
 // LogConfig 日志配置
@@ -33,9 +37,9 @@ type LogConfig struct {
 	Format     string // 输出日志格式 logfmt、json
 	Path       string // 输出日志文件路径
 	Filename   string // 输出日志文件名称
-	MaxSize    int    // 单个日志文件最多存储量，单位(mb)
-	MaxBackups int    // 日志备份文件最多数量
-	MaxAge     int    // 日志保留时间，单位:天(day)
+	MaxSize    int    // 单个日志文件最多存储量（单位:MB int）
+	MaxBackups int    // 日志备份文件最多数量（int）
+	MaxAge     int    // 日志保留时间（单位:天 int）
 	Compress   bool   // 是否压缩日志
 	Stdout     bool   // 是否输出到控制台
 }
