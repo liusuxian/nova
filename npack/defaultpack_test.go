@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 21:24:06
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 19:46:21
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/datapack_test.go
+ * @LastEditTime: 2023-02-22 20:05:36
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack_test.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-// 只测试datapack拆包，封包功能
+// 只测试封包拆包功能
 func TestDataPack(t *testing.T) {
 	// 创建socket TCP Server
 	var listener net.Listener
