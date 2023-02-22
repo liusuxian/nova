@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 16:30:45
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 18:18:21
+ * @LastEditTime: 2023-02-22 11:05:56
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/nconf.go
  * @Description:
  *
@@ -189,6 +189,11 @@ func (c *Config) OnConfigChange(run func(in fsnotify.Event)) {
 	c.v.OnConfigChange(run)
 }
 
+// SetDefault 设置配置项的默认值，对键不区分大小写，仅当通过flag, config或ENV没有提供值时使用默认值
+func (c *Config) SetDefault(key string, value any) {
+	c.v.SetDefault(key, value)
+}
+
 // Sub 返回一个新的Config实例，表示这个实例的子树，对键不区分大小写
 func (c *Config) Sub(key string) *Config {
 	return &Config{v: c.v.Sub(key)}
@@ -234,16 +239,22 @@ func init() {
 	v.AddConfigPath("config") // 设置配置文件的搜索目录
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			err = errors.Wrapf(err, "No Such Default Config File")
+			log.Println("No Such Default Config File")
 		} else {
-			err = errors.Wrapf(err, "Read Default Config Error")
+			panic(errors.Wrapf(err, "Read Default Config Error"))
 		}
-		panic(err)
 	}
 	defaultConfig = &Config{
 		v: v,
 	}
-	log.Println("Default Config Load Succeed !!!")
+	// 设置默认值
+	SetDefault("server.name", "Nova")        // 服务器应用名称
+	SetDefault("server.maxConn", 3)          // 允许的客户端连接最大数量（uint32）
+	SetDefault("server.workerPoolSize", 10)  // 工作任务池最大工作Goroutine数量（uint32）
+	SetDefault("server.packageHeaderLen", 8) // 包头的长度（字节 uint8）
+	SetDefault("server.maxPacketSize", 4096) // 数据包的最大值（字节 uint32）
+	SetDefault("server.maxMsgChanLen", 1024) // SendBuffMsg发送消息的缓冲最大长度（字节 uint32）
+	log.Println("Default Config Create Or Load Succeed !!!")
 }
 
 // Get 获取 value
@@ -354,6 +365,11 @@ func IsSet(key string) bool {
 // OnConfigChange 设置当配置文件更改时调用的事件处理程序
 func OnConfigChange(run func(in fsnotify.Event)) {
 	defaultConfig.v.OnConfigChange(run)
+}
+
+// SetDefault 设置配置项的默认值，对键不区分大小写，仅当通过flag, config或ENV没有提供值时使用默认值
+func SetDefault(key string, value any) {
+	defaultConfig.v.SetDefault(key, value)
 }
 
 // Sub 返回一个新的Config实例，表示这个实例的子树，对键不区分大小写

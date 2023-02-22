@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 22:01:24
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 22:11:20
+ * @LastEditTime: 2023-02-22 11:01:35
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/nconf_test.go
  * @Description:
  *
@@ -17,12 +17,14 @@ import (
 
 // ServerConfig 服务器配置
 type ServerConfig struct {
-	Name           string // 服务器应用名称
-	Host           string // 服务器IP
-	Port           uint16 // 服务器监听端口
-	MaxConn        uint32 // 允许的客户端连接最大数量
-	WorkerPoolSize uint32 // 工作任务池最大工作Goroutine数量
-	MaxPacketSize  uint32 // 数据包的最大值
+	Name             string // 服务器应用名称
+	Host             string // 服务器IP
+	Port             uint16 // 服务器监听端口（uint16）
+	MaxConn          uint32 // 允许的客户端连接最大数量（uint32）
+	WorkerPoolSize   uint32 // 工作任务池最大工作Goroutine数量（uint32）
+	PackageHeaderLen uint8  // 包头的长度（字节 uint8）
+	MaxPacketSize    uint32 // 数据包的最大值（字节 uint32）
+	MaxMsgChanLen    uint32 // SendBuffMsg发送消息的缓冲最大长度（字节 uint32）
 }
 
 // LogConfig 日志配置
