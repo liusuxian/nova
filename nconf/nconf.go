@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 16:30:45
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 14:56:44
+ * @LastEditTime: 2023-02-22 18:22:38
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/nconf.go
  * @Description:
  *
@@ -304,9 +304,9 @@ func init() {
 	SetDefault("server.maxConn", 3)              // 允许的客户端连接最大数量，默认3（uint32）
 	SetDefault("server.workerPoolSize", 10)      // 工作任务池最大工作Goroutine数量，默认10（uint32）
 	SetDefault("server.packageHeadIDLen", 4)     // 包头中消息ID长度，默认4（单位:字节 uint8）
-	SetDefault("server.packageHeadDataLen", 4)   // 包头中消息数据段长度，默认4（单位:字节 uint8）
+	SetDefault("server.packageHeadDataLen", 4)   // 包头中消息体长度，默认4（单位:字节 uint8）
 	SetDefault("server.maxPacketSize", 4096)     // 数据包的最大值，默认4096（单位:字节 uint32）
-	SetDefault("server.packetMethod", 1)         // 封包和拆包方式，默认1，1:默认（单位:字节 uint8）
+	SetDefault("server.packetMethod", 1)         // 封包和拆包方式，默认1，1:消息ID-消息体长度-消息内容（单位:字节 uint8）
 	SetDefault("server.packetProtocolFormat", 1) // 报文协议格式，默认1，1:默认（单位:字节 uint8）
 	SetDefault("server.endian", 1)               // 字节存储次序，默认小端，1:小端 2:大端（单位:字节 uint8）
 	SetDefault("server.maxMsgChanLen", 1024)     // SendBuffMsg发送消息的缓冲最大长度，默认1024（单位:字节 uint32）
