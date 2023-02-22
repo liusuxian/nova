@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 21:24:06
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-21 22:02:44
+ * @LastEditTime: 2023-02-22 19:46:21
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/datapack_test.go
  * @Description:
  *
@@ -37,23 +37,24 @@ func TestDataPack(t *testing.T) {
 			}
 			// 处理客户端请求
 			go func(conn net.Conn) {
-				// 创建封包拆包对象dp
-				dp := npack.Factory().NewPack(niface.DefaultDataPack)
+				// 创建封包拆包对象
+				dp := npack.Factory().NewPack()
 				for {
 					// 先读出流中的head部分
 					headData := make([]byte, dp.GetHeadLen())
-					// ReadFull 会把msg填充满为止
+					// ReadFull会把msg填充满为止
 					if _, err = io.ReadFull(conn, headData); err != nil {
 						t.Log("Read Head Error")
+						return
 					}
-					// 将headData字节流 拆包到msg中
+					// 将headData字节流拆包到msg中
 					var msgHead niface.IMessage
 					if msgHead, err = dp.Unpack(headData); err != nil {
 						t.Log("Server Unpack Error: ", err)
 						return
 					}
 					if msgHead.GetDataLen() > 0 {
-						// msg 是有data数据的，需要再次读取data数据
+						// msg是有data数据的，需要再次读取data数据
 						msg := msgHead.(*npack.Message)
 						msg.Data = make([]byte, msg.GetDataLen())
 						// 根据dataLen从io中读取字节流
@@ -75,36 +76,35 @@ func TestDataPack(t *testing.T) {
 			t.Log("Client Dial Error: ", err)
 			return
 		}
-		// 创建一个封包对象 dp
-		dp := npack.Factory().NewPack(niface.DefaultDataPack)
+		// 创建一个封包对象
+		dp := npack.Factory().NewPack()
 		// 封装一个msg1包
 		msg1 := &npack.Message{
 			ID:      0,
-			DataLen: 5,
-			Data:    []byte{'h', 'e', 'l', 'l', 'o'},
+			DataLen: uint32(len("hello")),
+			Data:    []byte("hello"),
 		}
 		var sendData1 []byte
 		if sendData1, err = dp.Pack(msg1); err != nil {
 			t.Log("Client Pack Msg1 Error: ", err)
 			return
 		}
+		// 封装一个msg2包
 		msg2 := &npack.Message{
 			ID:      1,
-			DataLen: 7,
-			Data:    []byte{'w', 'o', 'r', 'l', 'd', '!', '!'},
+			DataLen: uint32(len("world!!")),
+			Data:    []byte("world!!"),
 		}
 		var sendData2 []byte
 		if sendData2, err = dp.Pack(msg2); err != nil {
 			t.Log("Client Pack Msg2 Error: ", err)
 			return
 		}
-		// 将sendData1，和 sendData2 拼接一起，组成粘包
+		// 将sendData1和sendData2拼接一起，组成粘包
 		sendData1 = append(sendData1, sendData2...)
-
 		// 向服务器端写数据
 		conn.Write(sendData1)
 	}()
-
 	// 客户端阻塞
 	select {
 	case <-time.After(time.Second):

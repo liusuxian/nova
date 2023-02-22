@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 21:08:37
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 18:30:04
+ * @LastEditTime: 2023-02-22 18:59:33
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/message.go
  * @Description:
  *
@@ -17,7 +17,7 @@ type Message struct {
 	Data    []byte // 消息的内容
 }
 
-// NewMsgPackage 创建一个Message消息包
+// NewMsgPackage 创建Message消息包
 func NewMsgPackage(ID uint32, data []byte) *Message {
 	return &Message{
 		ID:      ID,
