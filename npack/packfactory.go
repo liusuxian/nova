@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 21:13:41
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 19:02:09
+ * @LastEditTime: 2023-02-22 19:58:08
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/packfactory.go
  * @Description:
  *
@@ -40,7 +40,7 @@ func (pf *packFactory) NewPack() (dataPack niface.IDataPack) {
 	switch packetMethod {
 	case 1:
 		// 默认封包拆包方式
-		// 消息ID-消息体长度-消息内容
+		// 消息ID(4字节)-消息体长度(4字节)-消息内容
 		dataPack = NewDefaultPack()
 	default:
 		dataPack = NewDefaultPack()
