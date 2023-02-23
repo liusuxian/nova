@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 22:01:24
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 19:03:12
+ * @LastEditTime: 2023-02-23 11:42:55
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/nconf_test.go
  * @Description:
  *
@@ -56,4 +56,13 @@ func TestConfig(t *testing.T) {
 		return
 	}
 	t.Logf("confSlice: %+v\n", confSlice)
+
+	var cfg *nconf.Config
+	if cfg, err = nconf.NewRemoteConfig("consul", "127.0.0.1:8500", "config/test", "json"); err != nil {
+		t.Log("NewRemoteConfig Error:", err)
+		return
+	}
+	t.Logf("a: %+v\n", cfg.GetInt("a"))
+	t.Logf("b: %+v\n", cfg.GetInt("b"))
+	t.Logf("c: %+v\n", cfg.GetIntSlice("c"))
 }

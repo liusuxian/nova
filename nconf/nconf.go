@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 16:30:45
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 19:53:55
+ * @LastEditTime: 2023-02-23 11:42:44
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/nconf.go
  * @Description:
  *
@@ -16,6 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
+	_ "github.com/spf13/viper/remote"
 	"log"
 	"time"
 )
