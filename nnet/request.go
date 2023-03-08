@@ -48,7 +48,7 @@ func (r *Request) GetConnection() niface.IConnection {
 	return r.conn
 }
 
-// GetMsgID 获取请求的消息ID
+// GetMsgID 获取请求的消息 ID
 func (r *Request) GetMsgID() uint32 {
 	return r.msg.GetMsgID()
 }
@@ -88,7 +88,7 @@ func (r *Request) Abort() {
 	r.stepLock.Unlock()
 }
 
-// Goto 指定接下来的Handle去执行哪个Handler函数（慎用！！！，会导致循环调用）
+// Goto 指定接下来的 Handle 去执行哪个 Handler 函数（慎用！！！，会导致循环调用）
 func (r *Request) Goto(step niface.HandleStep) {
 	r.stepLock.Lock()
 	r.step = step

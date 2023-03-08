@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 00:49:32
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 17:31:32
+ * @LastEditTime: 2023-03-08 18:13:30
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/connmanager.go
  * @Description:
  *
@@ -67,7 +67,7 @@ func (cm *ConnManager) ClearAllConn() {
 	nlog.Debug(context.Background(), "Clear All Connection From ConnManager Success", zap.Int("connected", cm.connMap.Count()))
 }
 
-// GetAllConnID 获取当前所有连接ID
+// GetAllConnID 获取当前所有 ConnID
 func (cm *ConnManager) GetAllConnID() []uint64 {
 	ids := make([]uint64, 0, cm.connMap.Count())
 	for item := range cm.connMap.IterBuffered() {
