@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 21:08:37
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 18:59:33
+ * @LastEditTime: 2023-03-08 15:10:23
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/message.go
  * @Description:
  *
@@ -26,10 +26,18 @@ func NewMsgPackage(ID uint32, data []byte) *Message {
 	}
 }
 
-// Init 初始化Message消息包
-func (msg *Message) InitMsgPackage(ID uint32, data []byte) {
-	msg.ID = ID
-	msg.DataLen = uint32(len(data))
+// SetMsgID 设置消息ID
+func (msg *Message) SetMsgID(msgID uint32) {
+	msg.ID = msgID
+}
+
+// SetDataLen 设置消息体长度
+func (msg *Message) SetDataLen(len uint32) {
+	msg.DataLen = len
+}
+
+// SetData 设置消息内容
+func (msg *Message) SetData(data []byte) {
 	msg.Data = data
 }
 
@@ -46,19 +54,4 @@ func (msg *Message) GetDataLen() uint32 {
 // GetData 获取消息内容
 func (msg *Message) GetData() []byte {
 	return msg.Data
-}
-
-// SetMsgID 设置消息ID
-func (msg *Message) SetMsgID(msgID uint32) {
-	msg.ID = msgID
-}
-
-// SetDataLen 设置消息体长度
-func (msg *Message) SetDataLen(len uint32) {
-	msg.DataLen = len
-}
-
-// SetData 设置消息内容
-func (msg *Message) SetData(data []byte) {
-	msg.Data = data
 }

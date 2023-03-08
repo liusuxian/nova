@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 21:24:06
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 20:05:36
+ * @LastEditTime: 2023-03-08 15:18:14
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack_test.go
  * @Description:
  *
@@ -24,7 +24,7 @@ func TestDataPack(t *testing.T) {
 	// 创建socket TCP Server
 	var listener net.Listener
 	var err error
-	if listener, err = net.Listen("tcp", "127.0.0.1:8989"); err != nil {
+	if listener, err = net.Listen("tcp", "127.0.0.1:8888"); err != nil {
 		t.Log("Server Listen Error:", err)
 		return
 	}
@@ -72,29 +72,21 @@ func TestDataPack(t *testing.T) {
 	// 客户端goroutine，负责模拟粘包的数据，然后进行发送
 	go func() {
 		var conn net.Conn
-		if conn, err = net.Dial("tcp", "127.0.0.1:8989"); err != nil {
+		if conn, err = net.Dial("tcp", "127.0.0.1:8888"); err != nil {
 			t.Log("Client Dial Error: ", err)
 			return
 		}
 		// 创建一个封包对象
 		dp := npack.Factory().NewPack()
 		// 封装一个msg1包
-		msg1 := &npack.Message{
-			ID:      0,
-			DataLen: uint32(len("hello")),
-			Data:    []byte("hello"),
-		}
+		msg1 := npack.NewMsgPackage(1, []byte("hello"))
 		var sendData1 []byte
 		if sendData1, err = dp.Pack(msg1); err != nil {
 			t.Log("Client Pack Msg1 Error: ", err)
 			return
 		}
 		// 封装一个msg2包
-		msg2 := &npack.Message{
-			ID:      1,
-			DataLen: uint32(len("world!!")),
-			Data:    []byte("world!!"),
-		}
+		msg2 := npack.NewMsgPackage(2, []byte("world!!"))
 		var sendData2 []byte
 		if sendData2, err = dp.Pack(msg2); err != nil {
 			t.Log("Client Pack Msg2 Error: ", err)
