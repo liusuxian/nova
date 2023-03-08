@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 00:49:32
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 18:13:30
+ * @LastEditTime: 2023-03-08 22:15:49
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/connmanager.go
  * @Description:
  *
@@ -11,7 +11,6 @@
 package nnet
 
 import (
-	"context"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/orcaman/concurrent-map/v2"
@@ -34,14 +33,14 @@ func NewConnManager() *ConnManager {
 func (cm *ConnManager) AddConn(conn niface.IConnection) {
 	key := strconv.FormatUint(conn.GetConnID(), 10)
 	cm.connMap.Set(key, conn)
-	nlog.Debug(conn.Context(), "Connection Add To ConnManager Success", zap.Int("connected", cm.connMap.Count()))
+	nlog.Debug(nil, "Connection Add To ConnManager Success", zap.Int("connected", cm.connMap.Count()))
 }
 
 // RemoveConn 删除连接
 func (cm *ConnManager) RemoveConn(conn niface.IConnection) {
 	key := strconv.FormatUint(conn.GetConnID(), 10)
 	cm.connMap.Remove(key)
-	nlog.Debug(conn.Context(), "Connection Remove From ConnManager Success", zap.Uint64("connID", conn.GetConnID()), zap.Int("connected", cm.connMap.Count()))
+	nlog.Debug(nil, "Connection Remove From ConnManager Success", zap.Uint64("connID", conn.GetConnID()), zap.Int("connected", cm.connMap.Count()))
 }
 
 // GetConn 通过 ConnID 获取连接
@@ -64,7 +63,7 @@ func (cm *ConnManager) ClearAllConn() {
 		item.Val.Stop()             // 停止当前连接
 		cm.connMap.Remove(item.Key) // 清除当前连接
 	}
-	nlog.Debug(context.Background(), "Clear All Connection From ConnManager Success", zap.Int("connected", cm.connMap.Count()))
+	nlog.Debug(nil, "Clear All Connection From ConnManager Success", zap.Int("connected", cm.connMap.Count()))
 }
 
 // GetAllConnID 获取当前所有 ConnID

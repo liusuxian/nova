@@ -2,13 +2,13 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:23:33
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 21:09:43
+ * @LastEditTime: 2023-03-08 21:51:32
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/request.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
-package nnet
+package request
 
 import (
 	"context"
@@ -20,6 +20,7 @@ import (
 // Request 请求结构
 type Request struct {
 	context  context.Context    // 请求的上下文信息
+	ctxKeys  []string           // context keys
 	conn     niface.IConnection // 已经和客户端建立好的连接
 	msg      niface.IMessage    // 客户端请求的数据
 	router   niface.IRouter     // 请求处理的函数
@@ -36,8 +37,8 @@ const (
 )
 
 const (
-	ctxKeyForRequest = "NovaRequestObject"
-	requestTraceID   = "RequestTraceID"
+	ctxKeyForRequest = "NovaRequestObject" // 请求的 Request 对象
+	requestTraceID   = "RequestTraceID"    // 请求的 Trace ID
 )
 
 // NewRequest 创建请求
@@ -83,17 +84,28 @@ func (r *Request) GetCtx() context.Context {
 }
 
 // SetCtxVal 将键值对作为自定义参数设置到请求的上下文信息中
-func (r *Request) SetCtxVal(key, value any) {
+func (r *Request) SetCtxVal(key string, value any) {
 	r.context = context.WithValue(r.Context(), key, value)
+	for _, k := range r.ctxKeys {
+		if k == key {
+			return
+		}
+	}
+	r.ctxKeys = append(r.ctxKeys, key)
 }
 
 // GetCtxVal 检索并返回给定键名的值，可选参数 def 指定如果请求的上下文信息中不存在给定的 key 时的默认值
-func (r *Request) GetCtxVal(key any, def ...any) any {
+func (r *Request) GetCtxVal(key string, def ...any) any {
 	val := r.Context().Value(key)
 	if val == nil && len(def) > 0 {
 		val = def[0]
 	}
 	return val
+}
+
+// GetCtxKeys 获取所有的 context key
+func (r *Request) GetCtxKeys() []string {
+	return r.ctxKeys
 }
 
 // GetConnection 获取请求连接信息

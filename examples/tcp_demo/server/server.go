@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 12:05:05
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 19:29:32
+ * @LastEditTime: 2023-03-08 22:18:11
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/tcp_demo/server/server.go
  * @Description:
  *
@@ -11,11 +11,10 @@
 package main
 
 import (
-	"context"
 	"github.com/fsnotify/fsnotify"
 	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/nlog"
-	"github.com/liusuxian/nova/nutils/nctx"
+	"github.com/liusuxian/nova/nnet/request"
 	"go.uber.org/zap"
 )
 
@@ -53,45 +52,46 @@ type ContextUser struct {
 }
 
 func main() {
-	ctx := nctx.SetCtxGlobalVal(context.Background(), Context{
+	req := request.NewRequest(nil, nil)
+	req.SetCtxVal("data", Context{
 		User: ContextUser{
 			Id:     1,
 			Appid:  "111",
 			Openid: "222",
 		},
-		Data: map[string]any{"traceId": "333", "reqId": "444"},
+		Data: map[string]any{"reqId": "333"},
 	})
-	nlog.Debug(ctx, "Log Level", zap.String("level", nlog.Level().String()))
+	nlog.Debug(req.GetCtx(), "Log Level", zap.String("level", nlog.Level().String()))
 	var err error
 	serverConf := ServerConfig{}
 	err = nconf.StructKey("server", &serverConf)
-	nlog.Debug(ctx, "serverConf value: ", zap.Reflect("serverConf", serverConf))
+	nlog.Debug(req.GetCtx(), "serverConf value: ", zap.Reflect("serverConf", serverConf))
 	// 监视配置文件的变化
 	nconf.WatchConfig()
 	// 设置当配置文件更改时调用的事件处理程序
 	nconf.OnConfigChange(func(in fsnotify.Event) {
 		// 配置发生变化了，执行响应的操作
-		nlog.Debug(ctx, "Default Config File Changed", zap.String("name", in.Name))
+		nlog.Debug(req.GetCtx(), "Default Config File Changed", zap.String("name", in.Name))
 		err = nconf.StructKey("server.base", &serverConf)
-		nlog.Debug(ctx, "serverConf value: ", zap.Reflect("serverConf", serverConf))
+		nlog.Debug(req.GetCtx(), "serverConf value: ", zap.Reflect("serverConf", serverConf))
 	})
 
 	var cfg *nconf.Config
 	if cfg, err = nconf.NewConfig("config/test.yaml"); err != nil {
-		nlog.Fatal(ctx, "New Config Error: ", zap.Error(err))
+		nlog.Fatal(req.GetCtx(), "New Config Error: ", zap.Error(err))
 	}
 	testConf := []TestConfig{}
 	err = cfg.StructKey("test", &testConf)
-	nlog.Debug(ctx, "testConf value: ", zap.Reflect("testConf", testConf))
+	nlog.Debug(req.GetCtx(), "testConf value: ", zap.Reflect("testConf", testConf))
 	// 监视配置文件的变化
 	cfg.WatchConfig()
 	// 设置当配置文件更改时调用的事件处理程序
 	cfg.OnConfigChange(func(in fsnotify.Event) {
 		// 配置发生变化了，执行响应的操作
-		nlog.Debug(ctx, "Config File Changed", zap.String("name", in.Name))
+		nlog.Debug(req.GetCtx(), "Config File Changed", zap.String("name", in.Name))
 		err = cfg.StructKey("test", &testConf)
-		nlog.Debug(ctx, "testConf value: ", zap.Reflect("testConf", testConf))
+		nlog.Debug(req.GetCtx(), "testConf value: ", zap.Reflect("testConf", testConf))
 	})
-	nlog.Error(ctx, "错误")
+	nlog.Error(req.GetCtx(), "错误")
 	select {}
 }
