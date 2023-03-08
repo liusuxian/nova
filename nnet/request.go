@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:23:33
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 15:36:39
+ * @LastEditTime: 2023-03-08 21:09:43
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/request.go
  * @Description:
  *
@@ -11,12 +11,15 @@
 package nnet
 
 import (
+	"context"
 	"github.com/liusuxian/nova/niface"
+	uuid "github.com/satori/go.uuid"
 	"sync"
 )
 
 // Request 请求结构
 type Request struct {
+	context  context.Context    // 请求的上下文信息
 	conn     niface.IConnection // 已经和客户端建立好的连接
 	msg      niface.IMessage    // 客户端请求的数据
 	router   niface.IRouter     // 请求处理的函数
@@ -32,6 +35,11 @@ const (
 	HANDLE_OVER                          // HandleOver 处理完成
 )
 
+const (
+	ctxKeyForRequest = "NovaRequestObject"
+	requestTraceID   = "RequestTraceID"
+)
+
 // NewRequest 创建请求
 func NewRequest(conn niface.IConnection, msg niface.IMessage) (req *Request) {
 	req = new(Request)
@@ -40,7 +48,52 @@ func NewRequest(conn niface.IConnection, msg niface.IMessage) (req *Request) {
 	req.step = PRE_HANDLE
 	req.stepLock = new(sync.RWMutex)
 	req.needNext = true
+	req.SetCtxVal(requestTraceID, uuid.NewV4().String())
 	return
+}
+
+// RequestFromCtx 从上下文中检索并返回 Request 对象
+func RequestFromCtx(ctx context.Context) *Request {
+	if v := ctx.Value(ctxKeyForRequest); v != nil {
+		return v.(*Request)
+	}
+	return nil
+}
+
+// Context 是函数 GetCtx 的别名
+func (r *Request) Context() context.Context {
+	if r.context == nil {
+		r.context = context.Background()
+	}
+	// 将 Request 对象注入到上下文中
+	if RequestFromCtx(r.context) == nil {
+		r.context = context.WithValue(r.context, ctxKeyForRequest, r)
+	}
+	return r.context
+}
+
+// SetCtx 设置请求的上下文信息
+func (r *Request) SetCtx(ctx context.Context) {
+	r.context = ctx
+}
+
+// GetCtx 获取请求的上下文信息
+func (r *Request) GetCtx() context.Context {
+	return r.Context()
+}
+
+// SetCtxVal 将键值对作为自定义参数设置到请求的上下文信息中
+func (r *Request) SetCtxVal(key, value any) {
+	r.context = context.WithValue(r.Context(), key, value)
+}
+
+// GetCtxVal 检索并返回给定键名的值，可选参数 def 指定如果请求的上下文信息中不存在给定的 key 时的默认值
+func (r *Request) GetCtxVal(key any, def ...any) any {
+	val := r.Context().Value(key)
+	if val == nil && len(def) > 0 {
+		val = def[0]
+	}
+	return val
 }
 
 // GetConnection 获取请求连接信息

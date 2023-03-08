@@ -50,7 +50,7 @@ func (cm *ConnManager) GetConn(connID uint64) (niface.IConnection, error) {
 	if conn, ok := cm.connMap.Get(key); ok {
 		return conn, nil
 	}
-	return nil, errors.New("connection not found")
+	return nil, errors.New("Connection Not Found")
 }
 
 // GetConnected 获取当前连接的数量
