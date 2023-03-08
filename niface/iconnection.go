@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 00:58:49
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 14:27:14
+ * @LastEditTime: 2023-03-08 16:22:43
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/iconnection.go
  * @Description:
  *
@@ -21,7 +21,7 @@ type IConnection interface {
 	Stop()                                       // 停止连接
 	Context() context.Context                    // 返回 ctx，用于用户自定义的 go 程获取连接退出状态
 	GetConnection() net.Conn                     // 从当前连接获取原始的 socket Conn
-	GetConnID() uint32                           // 获取当前连接 ID
+	GetConnID() uint64                           // 获取当前连接 ID
 	RemoteAddr() net.Addr                        // 获取当前连接远程地址信息
 	LocalAddr() net.Addr                         // 获取当前连接本地地址信息
 	SendMsg(msgID uint32, data []byte) error     // 直接将 Message 数据发送给远程的客户端(无缓冲)
