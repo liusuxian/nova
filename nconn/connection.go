@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:00:23
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 22:18:22
+ * @LastEditTime: 2023-03-14 00:32:55
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -12,6 +12,7 @@ package nconn
 
 import (
 	"context"
+	"encoding/hex"
 	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
@@ -19,7 +20,6 @@ import (
 	"github.com/liusuxian/nova/nrequest"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
-	"io"
 	"net"
 	"sync"
 	"time"
@@ -27,32 +27,34 @@ import (
 
 // Connection 连接结构
 type Connection struct {
-	conn             net.Conn                      // 当前连接的 Socket 套接字
-	connID           uint64                        // 当前连接的 ID，也可以称作为 SessionID，ID 全局唯一
-	msgHandler       niface.IMsgHandle             // 消息管理和对应处理方法的消息管理模块
-	ctx              context.Context               // 当前连接的 Context
-	cancel           context.CancelFunc            // 当前连接的 Cancel Context
-	msgBuffChan      chan []byte                   // 有缓冲的 Channel，用于读、写两个 Goroutine 之间的消息通信
-	msgLock          sync.RWMutex                  // 收发消息的并发读写锁
-	property         map[string]any                // 连接属性
-	propertyLock     sync.Mutex                    // 连接属性的并发锁
-	isClosed         bool                          // 当前连接的关闭状态
-	connManager      niface.IConnManager           // 当前连接属于哪个 Connection Manager
-	onConnStart      func(conn niface.IConnection) // 当前连接创建时的 Hook 函数
-	onConnStop       func(conn niface.IConnection) // 当前连接断开时的 Hook 函数
-	packet           niface.IDataPack              // 数据报文封包方式
-	lastActivityTime time.Time                     // 最后一次活动时间
+	conn               net.Conn                      // 当前连接的 Socket 套接字
+	connID             uint64                        // 当前连接的 ID，也可以称作为 SessionID，ID 全局唯一
+	msgHandler         niface.IMsgHandle             // 消息管理和对应处理方法的消息管理模块
+	ctx                context.Context               // 当前连接的 Context
+	cancel             context.CancelFunc            // 当前连接的 Cancel Context
+	msgBuffChan        chan []byte                   // 有缓冲的 Channel，用于读、写两个 Goroutine 之间的消息通信
+	msgLock            sync.RWMutex                  // 收发消息的并发读写锁
+	property           map[string]any                // 连接属性
+	propertyLock       sync.Mutex                    // 连接属性的并发锁
+	isClosed           bool                          // 当前连接的关闭状态
+	connManager        niface.IConnManager           // 当前连接属于哪个 Connection Manager
+	onConnStart        func(conn niface.IConnection) // 当前连接创建时的 Hook 函数
+	onConnStop         func(conn niface.IConnection) // 当前连接断开时的 Hook 函数
+	packet             niface.IDataPack              // 数据报文封包方式
+	lastActivityTime   time.Time                     // 最后一次活动时间
+	lengthFieldDecoder niface.IDecoder               // 长度字段解码器，用于解码二进制数据流中表示长度字段的工具
 }
 
 // newServerConn 创建一个 Server 服务端特性的连接
 func newServerConn(server niface.IServer, conn net.Conn, connID uint64) *Connection {
 	// 初始化 Connection 属性
 	c := &Connection{
-		conn:        conn,
-		connID:      connID,
-		msgBuffChan: nil,
-		property:    nil,
-		isClosed:    false,
+		conn:               conn,
+		connID:             connID,
+		msgBuffChan:        nil,
+		property:           nil,
+		isClosed:           false,
+		lengthFieldDecoder: ncode.NewLengthFieldFrameDecoderByLengthField(server.GetLengthField()),
 	}
 	c.packet = server.GetPacket()
 	c.onConnStart = server.GetOnConnStart()
@@ -69,10 +71,11 @@ func newServerConn(server niface.IServer, conn net.Conn, connID uint64) *Connect
 func newClientConn(client niface.IClient, conn net.Conn) *Connection {
 	// 初始化 Connection 属性
 	c := &Connection{
-		conn:        conn,
-		msgBuffChan: nil,
-		property:    nil,
-		isClosed:    false,
+		conn:               conn,
+		msgBuffChan:        nil,
+		property:           nil,
+		isClosed:           false,
+		lengthFieldDecoder: ncode.NewLengthFieldFrameDecoderByLengthField(client.GetLengthField()),
 	}
 	c.packet = client.GetPacket()
 	c.onConnStart = client.GetOnConnStart()
@@ -118,41 +121,60 @@ func (c *Connection) StartReader() {
 		case <-c.ctx.Done():
 			return
 		default:
-			// 读取客户端的消息头
-			msgHead := make([]byte, c.packet.GetHeadLen())
-			if _, err := io.ReadFull(c.conn, msgHead); err != nil {
-				nlog.Error(c.ctx, "Connection Reader Read Msg Head Error", zap.Error(err))
-				return
-			}
-			nlog.Debug(c.ctx, "Connection Reader Read Msg Head", zap.ByteString("MsgHead", msgHead))
-			// 更新连接活动时间
-			c.updateActivity()
-			// 拆包
-			msg, err := c.packet.Unpack(msgHead)
+			// // 读取客户端的消息头
+			// msgHead := make([]byte, c.packet.GetHeadLen())
+			// if _, err := io.ReadFull(c.conn, msgHead); err != nil {
+			// 	nlog.Error(c.ctx, "Connection Reader Read Msg Head Error", zap.Error(err))
+			// 	return
+			// }
+			// nlog.Debug(c.ctx, "Connection Reader Read Msg Head", zap.ByteString("MsgHead", msgHead))
+			// // 更新连接活动时间
+			// c.updateActivity()
+			// // 拆包
+			// msg, err := c.packet.Unpack(msgHead)
+			// if err != nil {
+			// 	nlog.Error(c.ctx, "Connection Reader Unpack Error", zap.Error(err))
+			// 	return
+			// }
+			// // 读取客户端的消息体
+			// var msgData []byte
+			// if msg.GetDataLen() > 0 {
+			// 	msgData = make([]byte, msg.GetDataLen())
+			// 	if _, err := io.ReadFull(c.conn, msgData); err != nil {
+			// 		nlog.Error(c.ctx, "Connection Reader Read Msg Data Error", zap.Error(err))
+			// 		return
+			// 	}
+			// }
+			// msg.SetData(msgData)
+			// nlog.Debug(c.ctx, "Connection Reader Read Msg Data", zap.ByteString("MsgData", msgData))
+			// // 创建当前客户端请求的 Request 数据
+			// req := nrequest.NewRequest(c, msg)
+			// // 处理消息
+			// if nconf.WorkerPoolSize() > 0 {
+			// 	// 将消息交给 WorkerPool，由 Worker 进行处理
+			// 	c.msgHandler.SendMsgToWorkerPool(req)
+			// } else {
+			// 	// 马上以非阻塞方式处理消息
+			// 	go c.msgHandler.DoMsgHandler(req)
+			// }
+			buffer := make([]byte, 1024)
+			n, err := c.conn.Read(buffer[:])
 			if err != nil {
-				nlog.Error(c.ctx, "Connection Reader Unpack Error", zap.Error(err))
+				nlog.Error(c.ctx, "Connection Reader Read Buffer Error", zap.Int("Length", n), zap.Error(err))
 				return
 			}
-			// 读取客户端的消息体
-			var msgData []byte
-			if msg.GetDataLen() > 0 {
-				msgData = make([]byte, msg.GetDataLen())
-				if _, err := io.ReadFull(c.conn, msgData); err != nil {
-					nlog.Error(c.ctx, "Connection Reader Read Msg Data Error", zap.Error(err))
-					return
+			nlog.Debug(c.ctx, "Connection Reader Read Buffer", zap.String("Buffer", hex.EncodeToString(buffer[0:n])))
+			if c.lengthFieldDecoder != nil {
+				bufArrays := c.lengthFieldDecoder.Decode(buffer[0:n])
+				if bufArrays != nil {
+					for _, bytes := range bufArrays {
+						nlog.Debug(c.ctx, "Connection Reader Read Buffer", zap.String("Buffer", hex.EncodeToString(bytes)))
+						msg := &npack.Message{DataLen: uint32(len(bytes)), Data: bytes}
+						// 创建当前客户端请求的 Request 数据
+						req := nrequest.NewRequest(c, msg)
+						c.msgHandler.Decode(req)
+					}
 				}
-			}
-			msg.SetData(msgData)
-			nlog.Debug(c.ctx, "Connection Reader Read Msg Data", zap.ByteString("MsgData", msgData))
-			// 创建当前客户端请求的 Request 数据
-			req := nrequest.NewRequest(c, msg)
-			// 处理消息
-			if nconf.WorkerPoolSize() > 0 {
-				// 将消息交给 WorkerPool，由 Worker 进行处理
-				c.msgHandler.SendMsgToWorkerPool(req)
-			} else {
-				// 马上以非阻塞方式处理消息
-				go c.msgHandler.DoMsgHandler(req)
 			}
 		}
 	}
@@ -203,12 +225,64 @@ func (c *Connection) LocalAddr() net.Addr {
 	return c.conn.LocalAddr()
 }
 
+// Send 发送数据给远程的客户端(无缓冲)
+func (c *Connection) Send(data []byte) (err error) {
+	c.msgLock.RLock()
+	defer c.msgLock.RUnlock()
+	// 判断当前连接的关闭状态
+	if c.isClosed {
+		err = errors.New("Connection Closed When Send Data")
+		return
+	}
+	// 发送给客户端
+	if _, err = c.conn.Write(data); err != nil {
+		nlog.Error(c.ctx, "Connection Send Data Error", zap.ByteString("Data", data), zap.Error(err))
+		return
+	}
+	// 发送给客户端成功, 更新连接活动时间
+	c.updateActivity()
+	return
+}
+
+// SendBuff 发送数据给远程的客户端(有缓冲)
+func (c *Connection) SendBuff(data []byte) (err error) {
+	c.msgLock.RLock()
+	defer c.msgLock.RUnlock()
+	// 启动写消息 Goroutine，将数据发送给客户端
+	if c.msgBuffChan == nil {
+		c.msgBuffChan = make(chan []byte, nconf.MaxMsgChanLen())
+		go c.StartWriter()
+	}
+	// 创建定时器
+	idleTimeout := time.NewTimer(5 * time.Millisecond)
+	defer idleTimeout.Stop()
+	// 判断当前连接的关闭状态
+	if c.isClosed {
+		err = errors.New("Connection Closed When Send Buff Data")
+		return
+	}
+	// 判断发送数据是否为空
+	if data == nil {
+		nlog.Error(c.ctx, "Connection Pack Data Is Nil")
+		err = errors.New("Connection Pack Data Is Nil")
+		return
+	}
+	// 发送超时
+	select {
+	case <-idleTimeout.C:
+		err = errors.New("Connection Send Buff Data Timeout")
+		return
+	case c.msgBuffChan <- data:
+		return
+	}
+}
+
 // SendMsg 直接将 Message 数据发送给远程的客户端(无缓冲)
 func (c *Connection) SendMsg(msgID uint32, data []byte) (err error) {
 	c.msgLock.RLock()
 	defer c.msgLock.RUnlock()
 	// 判断当前连接的关闭状态
-	if c.isClosed == true {
+	if c.isClosed {
 		err = errors.New("Connection Closed When Send Msg")
 		return
 	}
@@ -242,7 +316,7 @@ func (c *Connection) SendBuffMsg(msgID uint32, data []byte) (err error) {
 	idleTimeout := time.NewTimer(5 * time.Millisecond)
 	defer idleTimeout.Stop()
 	// 判断当前连接的关闭状态
-	if c.isClosed == true {
+	if c.isClosed {
 		err = errors.New("Connection Closed When Send Buff Msg")
 		return
 	}

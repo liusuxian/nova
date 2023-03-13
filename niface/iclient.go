@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 13:38:19
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 13:56:36
+ * @LastEditTime: 2023-03-13 23:26:53
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/iclient.go
  * @Description:
  *
@@ -27,4 +27,6 @@ type IClient interface {
 	GetMsgHandler() IMsgHandle                                // 获取当前 Client 绑定的消息处理模块
 	StartHeartBeat(time.Duration)                             // 启动心跳检测
 	StartHeartBeatWithOption(time.Duration, *HeartBeatOption) // 启动心跳检测(自定义回调)
+	AddInterceptor(interceptor Interceptor)                   // 添加协议解析拦截器
+	GetLengthField() LengthField                              // 获取长度字段解码器，用于解码二进制数据流中表示长度字段的工具
 }

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:23:33
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 21:40:48
+ * @LastEditTime: 2023-03-14 01:18:17
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrequest/request.go
  * @Description:
  *
@@ -27,6 +27,7 @@ type Request struct {
 	step     niface.HandleStep  // 用来控制路由函数的执行
 	stepLock *sync.RWMutex      // 用来控制路由函数执行的并发读写锁
 	needNext bool               // 是否需要转进到下一个处理器开始执行
+	response niface.Response    // 回复接口
 }
 
 const (
@@ -121,6 +122,21 @@ func (r *Request) GetMsgID() uint32 {
 // GetData 获取请求消息的数据
 func (r *Request) GetData() []byte {
 	return r.msg.GetData()
+}
+
+// GetMessage 获取请求消息的原始数据
+func (r *Request) GetMessage() niface.IMessage {
+	return r.msg
+}
+
+// GetResponse 获取解析完后的序列化数据
+func (r *Request) GetResponse() niface.Response {
+	return r.response
+}
+
+// SetResponse 设置解析完后的序列化数据
+func (r *Request) SetResponse(response niface.Response) {
+	r.response = response
 }
 
 // BindRouter 绑定这次请求由哪个路由处理
