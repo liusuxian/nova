@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 21:30:00
+ * @LastEditTime: 2023-03-13 22:20:55
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -36,7 +36,7 @@ func (mh *MsgHandle) DoMsgHandler(req niface.IRequest) {
 	var handler niface.IRouter
 	var ok bool
 	if handler, ok = mh.apis[req.GetMsgID()]; !ok {
-		nlog.Error(req.GetCtx(), "DoMsgHandler Api Not Found", zap.Uint32("msgID", req.GetMsgID()))
+		nlog.Error(req.GetCtx(), "DoMsgHandler Api Not Found", zap.Uint32("MsgID", req.GetMsgID()))
 		return
 	}
 	// Request 请求绑定 Router
@@ -49,11 +49,11 @@ func (mh *MsgHandle) DoMsgHandler(req niface.IRequest) {
 func (mh *MsgHandle) AddRouter(msgID uint32, router niface.IRouter) {
 	// 判断当前 msgID 绑定的 API 处理方法是否已经存在
 	if _, ok := mh.apis[msgID]; ok {
-		nlog.Fatal(nil, "AddRouter Repeated Api", zap.Uint32("msgID", msgID))
+		nlog.Fatal(nil, "AddRouter Repeated Api", zap.Uint32("MsgID", msgID))
 	}
 	// 添加 msgID 与 API 的绑定关系
 	mh.apis[msgID] = router
-	nlog.Info(nil, "AddRouter Add Api", zap.Uint32("msgID", msgID))
+	nlog.Info(nil, "AddRouter Add Api", zap.Uint32("MsgID", msgID))
 }
 
 // StartWorkerPool 启动 Worker 工作池
@@ -90,6 +90,6 @@ func (mh *MsgHandle) SendMsgToWorkerPool(req niface.IRequest) {
 		})
 	} else {
 		mh.DoMsgHandler(req)
-		nlog.Error(req.GetCtx(), "SendMsgToWorkerPool WorkerPool Not Found", zap.Uint32("msgID", req.GetMsgID()))
+		nlog.Error(req.GetCtx(), "SendMsgToWorkerPool WorkerPool Not Found", zap.Uint32("MsgID", req.GetMsgID()))
 	}
 }

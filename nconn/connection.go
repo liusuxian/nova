@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:00:23
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 21:53:14
+ * @LastEditTime: 2023-03-13 22:18:22
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -84,7 +84,7 @@ func newClientConn(client niface.IClient, conn net.Conn) *Connection {
 // StartWriter 写消息 Goroutine，将数据发送给客户端
 func (c *Connection) StartWriter() {
 	nlog.Info(c.ctx, "Connection Writer Is Running")
-	defer nlog.Info(c.ctx, "Connection Writer Exit !!!", zap.String("remoteAddr", c.RemoteAddr().String()))
+	defer nlog.Info(c.ctx, "Connection Writer Exit !!!", zap.String("RemoteAddr", c.RemoteAddr().String()))
 
 	for {
 		select {
@@ -110,7 +110,7 @@ func (c *Connection) StartWriter() {
 // StartReader 读消息 Goroutine，从客户端读取数据
 func (c *Connection) StartReader() {
 	nlog.Info(c.ctx, "Connection Reader Is Running")
-	defer nlog.Info(c.ctx, "Connection Reader Exit !!!", zap.String("remoteAddr", c.RemoteAddr().String()))
+	defer nlog.Info(c.ctx, "Connection Reader Exit !!!", zap.String("RemoteAddr", c.RemoteAddr().String()))
 	defer c.Stop()
 
 	for {
@@ -124,7 +124,7 @@ func (c *Connection) StartReader() {
 				nlog.Error(c.ctx, "Connection Reader Read Msg Head Error", zap.Error(err))
 				return
 			}
-			nlog.Debug(c.ctx, "Connection Reader Read Msg Head", zap.ByteString("msgHead", msgHead))
+			nlog.Debug(c.ctx, "Connection Reader Read Msg Head", zap.ByteString("MsgHead", msgHead))
 			// 更新连接活动时间
 			c.updateActivity()
 			// 拆包
@@ -143,7 +143,7 @@ func (c *Connection) StartReader() {
 				}
 			}
 			msg.SetData(msgData)
-			nlog.Debug(c.ctx, "Connection Reader Read Msg Data", zap.ByteString("msgData", msgData))
+			nlog.Debug(c.ctx, "Connection Reader Read Msg Data", zap.ByteString("MsgData", msgData))
 			// 创建当前客户端请求的 Request 数据
 			req := nrequest.NewRequest(c, msg)
 			// 处理消息
@@ -215,13 +215,13 @@ func (c *Connection) SendMsg(msgID uint32, data []byte) (err error) {
 	// 封包
 	var msg []byte
 	if msg, err = c.packet.Pack(npack.NewMsgPackage(msgID, data)); err != nil {
-		nlog.Error(c.ctx, "Connection Pack Msg Error", zap.Uint32("msgID", msgID), zap.Error(err))
+		nlog.Error(c.ctx, "Connection Pack Msg Error", zap.Uint32("MsgID", msgID), zap.Error(err))
 		err = errors.Wrap(err, "Connection Pack Msg Error")
 		return
 	}
 	// 发送给客户端
 	if _, err = c.conn.Write(msg); err != nil {
-		nlog.Error(c.ctx, "Connection Send Msg Error", zap.Uint32("msgID", msgID), zap.Error(err))
+		nlog.Error(c.ctx, "Connection Send Msg Error", zap.Uint32("MsgID", msgID), zap.Error(err))
 		return
 	}
 	// 发送给客户端成功, 更新连接活动时间
@@ -249,7 +249,7 @@ func (c *Connection) SendBuffMsg(msgID uint32, data []byte) (err error) {
 	// 封包
 	var msg []byte
 	if msg, err = c.packet.Pack(npack.NewMsgPackage(msgID, data)); err != nil {
-		nlog.Error(c.ctx, "Connection Pack Msg Error", zap.Uint32("msgID", msgID), zap.Error(err))
+		nlog.Error(c.ctx, "Connection Pack Msg Error", zap.Uint32("MsgID", msgID), zap.Error(err))
 		err = errors.Wrap(err, "Connection Pack Msg Error")
 		return
 	}
@@ -330,7 +330,7 @@ func (c *Connection) finalizer() {
 	}
 	// 设置当前连接的关闭状态
 	c.isClosed = true
-	nlog.Info(c.ctx, "Connection Stop", zap.Uint64("connID", c.connID))
+	nlog.Info(c.ctx, "Connection Stop", zap.Uint64("ConnID", c.connID))
 }
 
 // callOnConnStart 调用连接创建时的 Hook 函数
