@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 18:49:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 19:52:37
+ * @LastEditTime: 2023-03-13 18:01:42
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack.go
  * @Description:
  *
@@ -41,7 +41,7 @@ func (p *DefaultPack) Pack(msg niface.IMessage) (data []byte, err error) {
 	dataBuf := bytes.NewBuffer([]byte{})
 	// 获取字节存储次序
 	var endianOrder binary.ByteOrder
-	endian := nconf.GetUint8("server.endian")
+	endian := nconf.Endian()
 	switch endian {
 	case 1:
 		// 小端
@@ -77,7 +77,7 @@ func (p *DefaultPack) Unpack(binaryData []byte) (data niface.IMessage, err error
 	msg := &Message{}
 	// 获取字节存储次序
 	var endianOrder binary.ByteOrder
-	endian := nconf.GetUint8("server.endian")
+	endian := nconf.Endian()
 	switch endian {
 	case 1:
 		// 小端
@@ -98,7 +98,7 @@ func (p *DefaultPack) Unpack(binaryData []byte) (data niface.IMessage, err error
 		return
 	}
 	// 判断消息体长度是否超出我们允许的最大包长度
-	maxPacketSize := nconf.GetUint32("server.maxPacketSize")
+	maxPacketSize := nconf.MaxPacketSize()
 	if maxPacketSize > 0 && msg.DataLen > maxPacketSize {
 		err = errors.New("Too Large Msg Data Received")
 		return

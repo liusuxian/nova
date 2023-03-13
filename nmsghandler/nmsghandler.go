@@ -61,7 +61,7 @@ func (mh *MsgHandle) StartWorkerPool() {
 	if mh.workerPool == nil {
 		var workerPool *ants.Pool
 		var err error
-		if workerPool, err = ants.NewPool(nconf.GetInt("server.workerPoolSize")); err != nil {
+		if workerPool, err = ants.NewPool(int(nconf.WorkerPoolSize())); err != nil {
 			nlog.Fatal(nil, "StartWorkerPool Fatal", zap.Error(err))
 		}
 		mh.workerPool = workerPool

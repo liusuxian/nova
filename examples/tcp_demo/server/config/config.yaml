@@ -2,7 +2,7 @@
 server:
   name: "Nova" # 服务器应用名称，默认"Nova"
   port: 8888 # 服务器监听端口（uint16）
-  heartbeatMax: 5000 # 最长心跳检测间隔时间（单位: 毫秒 uint32），默认 5000
+  heartbeatMax: 5000 # 最长心跳检测间隔时间（单位: 毫秒 time.Duration），默认 5000
   maxConn: 10000 # 允许的客户端连接最大数量，默认 3（uint32）
   workerPoolSize: 100000 # 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
   maxPacketSize: 4096 # 数据包的最大值，默认 4096（单位:字节 uint32）
