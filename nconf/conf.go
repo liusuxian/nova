@@ -1,9 +1,9 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-02-20 16:30:45
+ * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 18:06:22
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/nconf.go
+ * @LastEditTime: 2023-03-13 21:57:16
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.

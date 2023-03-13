@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 22:15:16
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 14:10:59
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/nlog_test.go
+ * @LastEditTime: 2023-03-13 21:31:42
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log_test.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.

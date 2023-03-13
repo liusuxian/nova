@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 00:49:32
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 14:16:38
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/nconnmanager.go
+ * @LastEditTime: 2023-03-13 21:43:10
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connmanager.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -13,7 +13,7 @@ package nconn
 import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
-	"github.com/orcaman/concurrent-map/v2"
+	cmap "github.com/orcaman/concurrent-map/v2"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"strconv"

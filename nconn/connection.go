@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:00:23
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 18:37:16
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/tcp_connection.go
+ * @LastEditTime: 2023-03-13 21:53:14
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -25,9 +25,9 @@ import (
 	"time"
 )
 
-// TCPConnection TCP连接结构
-type TCPConnection struct {
-	conn             net.Conn                      // 当前连接的 Socket TCP 套接字
+// Connection 连接结构
+type Connection struct {
+	conn             net.Conn                      // 当前连接的 Socket 套接字
 	connID           uint64                        // 当前连接的 ID，也可以称作为 SessionID，ID 全局唯一
 	msgHandler       niface.IMsgHandle             // 消息管理和对应处理方法的消息管理模块
 	ctx              context.Context               // 当前连接的 Context
@@ -44,10 +44,10 @@ type TCPConnection struct {
 	lastActivityTime time.Time                     // 最后一次活动时间
 }
 
-// newTCPServerConn 创建一个 TCPServer 服务端特性的连接
-func newTCPServerConn(server niface.IServer, conn net.Conn, connID uint64) *TCPConnection {
-	// 初始化 TCPConnection 属性
-	c := &TCPConnection{
+// newServerConn 创建一个 Server 服务端特性的连接
+func newServerConn(server niface.IServer, conn net.Conn, connID uint64) *Connection {
+	// 初始化 Connection 属性
+	c := &Connection{
 		conn:        conn,
 		connID:      connID,
 		msgBuffChan: nil,
@@ -58,17 +58,17 @@ func newTCPServerConn(server niface.IServer, conn net.Conn, connID uint64) *TCPC
 	c.onConnStart = server.GetOnConnStart()
 	c.onConnStop = server.GetOnConnStop()
 	c.msgHandler = server.GetMsgHandler()
-	// 将当前的 TCPConnection 与 Server 的 ConnManager 绑定
+	// 将当前的 Connection 与 Server 的 ConnManager 绑定
 	c.connManager = server.GetConnManager()
-	// 将新创建的 Conn 添加到连接管理中
+	// 将新创建的 Connection 添加到连接管理中
 	server.GetConnManager().AddConn(c)
 	return c
 }
 
-// newTCPClientConn 创建一个 TCPClient 客户端特性的连接
-func newTCPClientConn(client niface.IClient, conn net.Conn) *TCPConnection {
-	// 初始化 TCPConnection 属性
-	c := &TCPConnection{
+// newClientConn 创建一个 Client 客户端特性的连接
+func newClientConn(client niface.IClient, conn net.Conn) *Connection {
+	// 初始化 Connection 属性
+	c := &Connection{
 		conn:        conn,
 		msgBuffChan: nil,
 		property:    nil,
@@ -82,9 +82,9 @@ func newTCPClientConn(client niface.IClient, conn net.Conn) *TCPConnection {
 }
 
 // StartWriter 写消息 Goroutine，将数据发送给客户端
-func (c *TCPConnection) StartWriter() {
-	nlog.Info(c.ctx, "TCPConnection Writer Is Running")
-	defer nlog.Info(c.ctx, "TCPConnection Writer Exit !!!", zap.String("remoteAddr", c.RemoteAddr().String()))
+func (c *Connection) StartWriter() {
+	nlog.Info(c.ctx, "Connection Writer Is Running")
+	defer nlog.Info(c.ctx, "Connection Writer Exit !!!", zap.String("remoteAddr", c.RemoteAddr().String()))
 
 	for {
 		select {
@@ -92,13 +92,13 @@ func (c *TCPConnection) StartWriter() {
 			if ok {
 				// 有数据，发送给客户端
 				if _, err := c.conn.Write(data); err != nil {
-					nlog.Error(c.ctx, "TCPConnection Writer Send Buff Data Error", zap.Error(err))
+					nlog.Error(c.ctx, "Connection Writer Send Buff Data Error", zap.Error(err))
 					return
 				}
 				// 发送给客户端成功, 更新连接活动时间
 				c.updateActivity()
 			} else {
-				nlog.Error(c.ctx, "TCPConnection Writer MsgBuffChan Is Closed")
+				nlog.Error(c.ctx, "Connection Writer MsgBuffChan Is Closed")
 				break
 			}
 		case <-c.ctx.Done():
@@ -108,9 +108,9 @@ func (c *TCPConnection) StartWriter() {
 }
 
 // StartReader 读消息 Goroutine，从客户端读取数据
-func (c *TCPConnection) StartReader() {
-	nlog.Info(c.ctx, "TCPConnection Reader Is Running")
-	defer nlog.Info(c.ctx, "TCPConnection Reader Exit !!!", zap.String("remoteAddr", c.RemoteAddr().String()))
+func (c *Connection) StartReader() {
+	nlog.Info(c.ctx, "Connection Reader Is Running")
+	defer nlog.Info(c.ctx, "Connection Reader Exit !!!", zap.String("remoteAddr", c.RemoteAddr().String()))
 	defer c.Stop()
 
 	for {
@@ -121,16 +121,16 @@ func (c *TCPConnection) StartReader() {
 			// 读取客户端的消息头
 			msgHead := make([]byte, c.packet.GetHeadLen())
 			if _, err := io.ReadFull(c.conn, msgHead); err != nil {
-				nlog.Error(c.ctx, "TCPConnection Reader Read Msg Head Error", zap.Error(err))
+				nlog.Error(c.ctx, "Connection Reader Read Msg Head Error", zap.Error(err))
 				return
 			}
-			nlog.Debug(c.ctx, "TCPConnection Reader Read Msg Head", zap.ByteString("msgHead", msgHead))
+			nlog.Debug(c.ctx, "Connection Reader Read Msg Head", zap.ByteString("msgHead", msgHead))
 			// 更新连接活动时间
 			c.updateActivity()
 			// 拆包
 			msg, err := c.packet.Unpack(msgHead)
 			if err != nil {
-				nlog.Error(c.ctx, "TCPConnection Reader Unpack Error", zap.Error(err))
+				nlog.Error(c.ctx, "Connection Reader Unpack Error", zap.Error(err))
 				return
 			}
 			// 读取客户端的消息体
@@ -138,12 +138,12 @@ func (c *TCPConnection) StartReader() {
 			if msg.GetDataLen() > 0 {
 				msgData = make([]byte, msg.GetDataLen())
 				if _, err := io.ReadFull(c.conn, msgData); err != nil {
-					nlog.Error(c.ctx, "TCPConnection Reader Read Msg Data Error", zap.Error(err))
+					nlog.Error(c.ctx, "Connection Reader Read Msg Data Error", zap.Error(err))
 					return
 				}
 			}
 			msg.SetData(msgData)
-			nlog.Debug(c.ctx, "TCPConnection Reader Read Msg Data", zap.ByteString("msgData", msgData))
+			nlog.Debug(c.ctx, "Connection Reader Read Msg Data", zap.ByteString("msgData", msgData))
 			// 创建当前客户端请求的 Request 数据
 			req := nrequest.NewRequest(c, msg)
 			// 处理消息
@@ -159,7 +159,7 @@ func (c *TCPConnection) StartReader() {
 }
 
 // Start 启动连接
-func (c *TCPConnection) Start() {
+func (c *Connection) Start() {
 	c.ctx, c.cancel = context.WithCancel(context.Background())
 	// 执行创建连接时需要处理的业务
 	c.callOnConnStart()
@@ -174,54 +174,54 @@ func (c *TCPConnection) Start() {
 }
 
 // Stop 停止连接
-func (c *TCPConnection) Stop() {
+func (c *Connection) Stop() {
 	c.cancel()
 }
 
 // Context 返回 Context，用于用户自定义的 Goroutine 获取连接退出状态
-func (c *TCPConnection) Context() context.Context {
+func (c *Connection) Context() context.Context {
 	return c.ctx
 }
 
 // GetConnection 从当前连接获取原始的 Socket Conn
-func (c *TCPConnection) GetConnection() net.Conn {
+func (c *Connection) GetConnection() net.Conn {
 	return c.conn
 }
 
 // GetConnID 获取当前 ConnID
-func (c *TCPConnection) GetConnID() uint64 {
+func (c *Connection) GetConnID() uint64 {
 	return c.connID
 }
 
 // RemoteAddr 获取当前连接远程地址信息
-func (c *TCPConnection) RemoteAddr() net.Addr {
+func (c *Connection) RemoteAddr() net.Addr {
 	return c.conn.RemoteAddr()
 }
 
 // LocalAddr 获取当前连接本地地址信息
-func (c *TCPConnection) LocalAddr() net.Addr {
+func (c *Connection) LocalAddr() net.Addr {
 	return c.conn.LocalAddr()
 }
 
 // SendMsg 直接将 Message 数据发送给远程的客户端(无缓冲)
-func (c *TCPConnection) SendMsg(msgID uint32, data []byte) (err error) {
+func (c *Connection) SendMsg(msgID uint32, data []byte) (err error) {
 	c.msgLock.RLock()
 	defer c.msgLock.RUnlock()
 	// 判断当前连接的关闭状态
 	if c.isClosed == true {
-		err = errors.New("TCPConnection Closed When Send Msg")
+		err = errors.New("Connection Closed When Send Msg")
 		return
 	}
 	// 封包
 	var msg []byte
 	if msg, err = c.packet.Pack(npack.NewMsgPackage(msgID, data)); err != nil {
-		nlog.Error(c.ctx, "TCPConnection Pack Msg Error", zap.Uint32("msgID", msgID), zap.Error(err))
-		err = errors.Wrap(err, "TCPConnection Pack Msg Error")
+		nlog.Error(c.ctx, "Connection Pack Msg Error", zap.Uint32("msgID", msgID), zap.Error(err))
+		err = errors.Wrap(err, "Connection Pack Msg Error")
 		return
 	}
 	// 发送给客户端
 	if _, err = c.conn.Write(msg); err != nil {
-		nlog.Error(c.ctx, "TCPConnection Send Msg Error", zap.Uint32("msgID", msgID), zap.Error(err))
+		nlog.Error(c.ctx, "Connection Send Msg Error", zap.Uint32("msgID", msgID), zap.Error(err))
 		return
 	}
 	// 发送给客户端成功, 更新连接活动时间
@@ -230,7 +230,7 @@ func (c *TCPConnection) SendMsg(msgID uint32, data []byte) (err error) {
 }
 
 // SendBuffMsg 直接将 Message 数据发送给远程的客户端(有缓冲)
-func (c *TCPConnection) SendBuffMsg(msgID uint32, data []byte) (err error) {
+func (c *Connection) SendBuffMsg(msgID uint32, data []byte) (err error) {
 	c.msgLock.RLock()
 	defer c.msgLock.RUnlock()
 	// 启动写消息 Goroutine，将数据发送给客户端
@@ -243,20 +243,20 @@ func (c *TCPConnection) SendBuffMsg(msgID uint32, data []byte) (err error) {
 	defer idleTimeout.Stop()
 	// 判断当前连接的关闭状态
 	if c.isClosed == true {
-		err = errors.New("TCPConnection Closed When Send Buff Msg")
+		err = errors.New("Connection Closed When Send Buff Msg")
 		return
 	}
 	// 封包
 	var msg []byte
 	if msg, err = c.packet.Pack(npack.NewMsgPackage(msgID, data)); err != nil {
-		nlog.Error(c.ctx, "TCPConnection Pack Msg Error", zap.Uint32("msgID", msgID), zap.Error(err))
-		err = errors.Wrap(err, "TCPConnection Pack Msg Error")
+		nlog.Error(c.ctx, "Connection Pack Msg Error", zap.Uint32("msgID", msgID), zap.Error(err))
+		err = errors.Wrap(err, "Connection Pack Msg Error")
 		return
 	}
 	// 发送超时
 	select {
 	case <-idleTimeout.C:
-		err = errors.New("TCPConnection Send Buff Msg Timeout")
+		err = errors.New("Connection Send Buff Msg Timeout")
 		return
 	case c.msgBuffChan <- msg:
 		return
@@ -264,7 +264,7 @@ func (c *TCPConnection) SendBuffMsg(msgID uint32, data []byte) (err error) {
 }
 
 // SetProperty 设置当前连接属性
-func (c *TCPConnection) SetProperty(key string, value any) {
+func (c *Connection) SetProperty(key string, value any) {
 	c.propertyLock.Lock()
 	defer c.propertyLock.Unlock()
 
@@ -276,7 +276,7 @@ func (c *TCPConnection) SetProperty(key string, value any) {
 }
 
 // GetProperty 获取当前连接属性
-func (c *TCPConnection) GetProperty(key string) (value any, err error) {
+func (c *Connection) GetProperty(key string) (value any, err error) {
 	c.propertyLock.Lock()
 	defer c.propertyLock.Unlock()
 
@@ -285,12 +285,12 @@ func (c *TCPConnection) GetProperty(key string) (value any, err error) {
 		return
 	}
 
-	err = errors.New("TCPConnection No Property Found")
+	err = errors.New("Connection No Property Found")
 	return
 }
 
 // RemoveProperty 移除当前连接属性
-func (c *TCPConnection) RemoveProperty(key string) {
+func (c *Connection) RemoveProperty(key string) {
 	c.propertyLock.Lock()
 	defer c.propertyLock.Unlock()
 
@@ -298,7 +298,7 @@ func (c *TCPConnection) RemoveProperty(key string) {
 }
 
 // IsAlive 判断当前连接是否存活
-func (c *TCPConnection) IsAlive() bool {
+func (c *Connection) IsAlive() bool {
 	if c.isClosed {
 		return false
 	}
@@ -307,7 +307,7 @@ func (c *TCPConnection) IsAlive() bool {
 }
 
 // finalizer 清理器
-func (c *TCPConnection) finalizer() {
+func (c *Connection) finalizer() {
 	// 执行连接断开时需要处理的业务
 	c.callOnConnStop()
 
@@ -330,26 +330,26 @@ func (c *TCPConnection) finalizer() {
 	}
 	// 设置当前连接的关闭状态
 	c.isClosed = true
-	nlog.Info(c.ctx, "TCPConnection Stop", zap.Uint64("connID", c.connID))
+	nlog.Info(c.ctx, "Connection Stop", zap.Uint64("connID", c.connID))
 }
 
 // callOnConnStart 调用连接创建时的 Hook 函数
-func (c *TCPConnection) callOnConnStart() {
+func (c *Connection) callOnConnStart() {
 	if c.onConnStart != nil {
-		nlog.Info(c.ctx, "TCPConnection CallOnConnStart...")
+		nlog.Info(c.ctx, "Connection CallOnConnStart...")
 		c.onConnStart(c)
 	}
 }
 
 // callOnConnStop 调用连接断开时的 Hook 函数
-func (c *TCPConnection) callOnConnStop() {
+func (c *Connection) callOnConnStop() {
 	if c.onConnStop != nil {
-		nlog.Info(c.ctx, "TCPConnection CallOnConnStop...")
+		nlog.Info(c.ctx, "Connection CallOnConnStop...")
 		c.onConnStop(c)
 	}
 }
 
 // updateActivity 更新连接活动时间
-func (c *TCPConnection) updateActivity() {
+func (c *Connection) updateActivity() {
 	c.lastActivityTime = time.Now()
 }
