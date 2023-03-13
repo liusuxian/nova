@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:23:33
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 13:39:10
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/request/request.go
+ * @LastEditTime: 2023-03-13 14:48:47
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrequest/nrequest.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -19,8 +19,8 @@ import (
 
 // Request 请求结构
 type Request struct {
-	context  context.Context    // 请求的上下文信息
-	ctxKeys  []string           // context keys
+	context  context.Context    // 请求的 Context
+	ctxKeys  []string           // 请求的 Context Keys
 	conn     niface.IConnection // 已经和客户端建立好的连接
 	msg      niface.IMessage    // 客户端请求的数据
 	router   niface.IRouter     // 请求处理的函数
@@ -73,17 +73,17 @@ func (r *Request) Context() context.Context {
 	return r.context
 }
 
-// SetCtx 设置请求的上下文信息
+// SetCtx 设置请求的 Context
 func (r *Request) SetCtx(ctx context.Context) {
 	r.context = ctx
 }
 
-// GetCtx 获取请求的上下文信息
+// GetCtx 获取请求的 Context
 func (r *Request) GetCtx() context.Context {
 	return r.Context()
 }
 
-// SetCtxVal 将键值对作为自定义参数设置到请求的上下文信息中
+// SetCtxVal 将键值对作为自定义参数设置到请求的 Context 中
 func (r *Request) SetCtxVal(key string, value any) {
 	r.context = context.WithValue(r.Context(), key, value)
 	for _, k := range r.ctxKeys {
@@ -94,7 +94,7 @@ func (r *Request) SetCtxVal(key string, value any) {
 	r.ctxKeys = append(r.ctxKeys, key)
 }
 
-// GetCtxVal 检索并返回给定键名的值，可选参数 def 指定如果请求的上下文信息中不存在给定的 key 时的默认值
+// GetCtxVal 检索并返回给定键名的值，可选参数 def 指定如果请求的 Context 中不存在给定的 key 时的默认值
 func (r *Request) GetCtxVal(key string, def ...any) any {
 	val := r.Context().Value(key)
 	if val == nil && len(def) > 0 {
@@ -103,7 +103,7 @@ func (r *Request) GetCtxVal(key string, def ...any) any {
 	return val
 }
 
-// GetCtxKeys 获取所有的 context key
+// GetCtxKeys 获取所有的 Context Key
 func (r *Request) GetCtxKeys() []string {
 	return r.ctxKeys
 }

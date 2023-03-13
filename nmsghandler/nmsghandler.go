@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 22:59:55
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/msghandler.go
+ * @LastEditTime: 2023-03-13 14:51:44
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/nmsghandler.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -21,7 +21,7 @@ import (
 // MsgHandle 消息处理回调结构
 type MsgHandle struct {
 	apis       map[uint32]niface.IRouter // 存放每个 MsgID 所对应的处理方法
-	workerPool *ants.Pool                // worker 工作池
+	workerPool *ants.Pool                // Worker 工作池
 }
 
 // NewMsgHandle 创建消息处理
@@ -56,7 +56,7 @@ func (mh *MsgHandle) AddRouter(msgID uint32, router niface.IRouter) {
 	nlog.Info(nil, "AddRouter Add Api", zap.Uint32("msgID", msgID))
 }
 
-// StartWorkerPool 启动 worker 工作池
+// StartWorkerPool 启动 Worker 工作池
 func (mh *MsgHandle) StartWorkerPool() {
 	if mh.workerPool == nil {
 		var workerPool *ants.Pool
@@ -68,21 +68,21 @@ func (mh *MsgHandle) StartWorkerPool() {
 	}
 }
 
-// StopWorkerPool 停止 worker 工作池
+// StopWorkerPool 停止 Worker 工作池
 func (mh *MsgHandle) StopWorkerPool() {
 	if mh.workerPool != nil {
 		mh.workerPool.Release()
 	}
 }
 
-// RebootWorkerPool 重启 worker 工作池
+// RebootWorkerPool 重启 Worker 工作池
 func (mh *MsgHandle) RebootWorkerPool() {
 	if mh.workerPool != nil {
 		mh.workerPool.Reboot()
 	}
 }
 
-// SendMsgToWorkerPool 将消息交给 WorkerPool，由 worker 进行处理
+// SendMsgToWorkerPool 将消息交给 WorkerPool，由 Worker 进行处理
 func (mh *MsgHandle) SendMsgToWorkerPool(req niface.IRequest) {
 	if mh.workerPool != nil {
 		mh.workerPool.Submit(func() {

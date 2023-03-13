@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 14:59:29
+ * @LastEditTime: 2023-03-13 15:08:48
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/iserver.go
  * @Description:
  *
@@ -18,7 +18,7 @@ type IServer interface {
 	Stop()                                                    // 停止服务器
 	Server()                                                  // 开启业务服务
 	AddRouter(msgID uint32, router IRouter)                   // 路由功能：给当前服务注册一个路由业务方法，供客户端连接处理使用
-	GetConnMgr() IConnManager                                 // 得到连接管理
+	GetConnManager() IConnManager                             // 得到连接管理
 	SetOnConnStart(func(IConnection))                         // 设置当前 Server 的连接创建时Hook函数
 	SetOnConnStop(func(IConnection))                          // 设置当前 Server 的连接断开时的Hook函数
 	GetOnConnStart() func(IConnection)                        // 获取当前 Server 的连接创建时Hook函数
