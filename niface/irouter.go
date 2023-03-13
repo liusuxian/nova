@@ -12,7 +12,7 @@ package niface
 
 // IRouter 路由接口
 type IRouter interface {
-	PreHandle(request IRequest)  // 在处理 conn 业务之前的钩子
-	Handle(request IRequest)     // 处理 conn 业务
-	PostHandle(request IRequest) // 处理 conn 业务之后的钩子
+	PreHandle(request IRequest)  // 在处理 Connection 业务之前的钩子
+	Handle(request IRequest)     // 处理 Connection 业务
+	PostHandle(request IRequest) // 处理 Connection 业务之后的钩子
 }

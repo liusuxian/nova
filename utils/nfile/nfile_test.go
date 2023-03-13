@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 17:09:08
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 12:29:21
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nutils/nfile/nfile_test.go
+ * @LastEditTime: 2023-03-13 13:53:26
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nfile/nfile_test.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -11,7 +11,7 @@
 package nfile_test
 
 import (
-	"github.com/liusuxian/nova/nutils/nfile"
+	"github.com/liusuxian/nova/utils/nfile"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 19:32:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 22:15:05
+ * @LastEditTime: 2023-03-13 14:10:32
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/nlog.go
  * @Description:
  *
@@ -14,9 +14,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/liusuxian/nova/nconf"
-	"github.com/liusuxian/nova/nnet/request"
-	"github.com/liusuxian/nova/nutils/nfile"
-	"github.com/liusuxian/nova/nutils/nstr"
+	"github.com/liusuxian/nova/nrequest"
+	"github.com/liusuxian/nova/utils/nfile"
+	"github.com/liusuxian/nova/utils/nstr"
 	"github.com/natefinch/lumberjack"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -220,7 +220,7 @@ func withCtxLogger(ctx context.Context, fields ...zap.Field) *zap.Logger {
 	if ctx == nil {
 		return logger.With(fields...)
 	}
-	req := request.RequestFromCtx(ctx)
+	req := nrequest.RequestFromCtx(ctx)
 	if req == nil {
 		return logger.With(fields...)
 	}

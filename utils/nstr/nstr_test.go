@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 12:35:19
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-22 12:39:40
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nutils/nstr/nstr_test.go
+ * @LastEditTime: 2023-03-13 13:53:47
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nstr/nstr_test.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -11,7 +11,7 @@
 package nstr_test
 
 import (
-	"github.com/liusuxian/nova/nutils/nstr"
+	"github.com/liusuxian/nova/utils/nstr"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

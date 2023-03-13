@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 16:30:45
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-02-23 11:42:44
+ * @LastEditTime: 2023-03-13 13:54:29
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/nconf.go
  * @Description:
  *
@@ -12,7 +12,7 @@ package nconf
 
 import (
 	"github.com/fsnotify/fsnotify"
-	"github.com/liusuxian/nova/nutils/nfile"
+	"github.com/liusuxian/nova/utils/nfile"
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"

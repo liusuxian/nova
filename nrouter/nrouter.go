@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
-package nnet
+package nrouter
 
 import "github.com/liusuxian/nova/niface"
 
@@ -20,17 +20,17 @@ type BaseRouter struct {
 // 之所以 BaseRouter 的方法都为空，是因为有的 Router 不希望有 PreHandle 或 PostHandle
 // 所以 Router 全部复合 BaseRouter 的好处是，不需要实现 PreHandle 和 PostHandle 也可以实例化
 
-// PreHandle 在处理 conn 业务之前的钩子
+// PreHandle 在处理 Connection 业务之前的钩子
 func (br *BaseRouter) PreHandle(req niface.IRequest) {
 
 }
 
-// Handle 处理 conn 业务
+// Handle 处理 Connection 业务
 func (br *BaseRouter) Handle(req niface.IRequest) {
 
 }
 
-// PostHandle 处理 conn 业务之后的钩子
+// PostHandle 处理 Connection 业务之后的钩子
 func (br *BaseRouter) PostHandle(req niface.IRequest) {
 
 }

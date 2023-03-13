@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
-package nnet
+package nmsghandler
 
 import (
 	"github.com/liusuxian/nova/nconf"

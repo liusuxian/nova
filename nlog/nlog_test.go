@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 22:15:16
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 22:10:17
+ * @LastEditTime: 2023-03-13 14:10:59
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/nlog_test.go
  * @Description:
  *
@@ -12,10 +12,9 @@ package nlog_test
 
 import (
 	"context"
-	"testing"
-
 	"github.com/liusuxian/nova/nlog"
-	"github.com/liusuxian/nova/nnet/request"
+	"github.com/liusuxian/nova/nrequest"
+	"testing"
 )
 
 // Context 上下文结构
@@ -32,7 +31,7 @@ type ContextUser struct {
 }
 
 func TestLog(t *testing.T) {
-	req := request.NewRequest(nil, nil)
+	req := nrequest.NewRequest(nil, nil)
 	req.SetCtxVal("aaa", 1)
 	req.SetCtxVal("bbb", 2)
 	req.SetCtxVal("ccc", 3)

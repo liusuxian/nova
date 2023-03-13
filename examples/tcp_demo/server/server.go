@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 12:05:05
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 22:18:11
+ * @LastEditTime: 2023-03-13 14:12:54
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/tcp_demo/server/server.go
  * @Description:
  *
@@ -14,7 +14,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/nlog"
-	"github.com/liusuxian/nova/nnet/request"
+	"github.com/liusuxian/nova/nrequest"
 	"go.uber.org/zap"
 )
 
@@ -52,7 +52,7 @@ type ContextUser struct {
 }
 
 func main() {
-	req := request.NewRequest(nil, nil)
+	req := nrequest.NewRequest(nil, nil)
 	req.SetCtxVal("data", Context{
 		User: ContextUser{
 			Id:     1,
