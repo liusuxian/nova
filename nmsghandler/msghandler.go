@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 01:16:34
+ * @LastEditTime: 2023-03-14 01:29:37
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -95,7 +95,7 @@ func (mh *MsgHandle) SendMsgToWorkerPool(req niface.IRequest) {
 			mh.DoMsgHandler(req)
 		})
 	} else {
-		mh.DoMsgHandler(req)
+		go mh.DoMsgHandler(req)
 		nlog.Error(req.GetCtx(), "SendMsgToWorkerPool WorkerPool Not Found", zap.Uint32("MsgID", req.GetMsgID()))
 	}
 }
