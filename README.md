@@ -1,2 +1,2 @@
 # nova
-lightweight concurrent server framework(轻量级并发服务器框架)
+highly concurrent game server framework(高并发游戏服务器框架)
