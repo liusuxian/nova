@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:23:33
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 21:51:32
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/request.go
+ * @LastEditTime: 2023-03-13 13:39:10
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/request/request.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -25,7 +25,7 @@ type Request struct {
 	msg      niface.IMessage    // 客户端请求的数据
 	router   niface.IRouter     // 请求处理的函数
 	step     niface.HandleStep  // 用来控制路由函数的执行
-	stepLock *sync.RWMutex      // 并发互斥
+	stepLock *sync.RWMutex      // 用来控制路由函数执行的并发读写锁
 	needNext bool               // 是否需要转进到下一个处理器开始执行
 }
 
@@ -37,8 +37,8 @@ const (
 )
 
 const (
-	ctxKeyForRequest = "NovaRequestObject" // 请求的 Request 对象
-	requestTraceID   = "RequestTraceID"    // 请求的 Trace ID
+	ctxKeyForRequest = "NovaRequestObject"  // 请求的 Request 对象
+	requestTraceID   = "NovaRequestTraceID" // 请求的 Trace ID
 )
 
 // NewRequest 创建请求

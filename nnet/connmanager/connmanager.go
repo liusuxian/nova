@@ -2,13 +2,13 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 00:49:32
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 22:15:49
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/connmanager.go
+ * @LastEditTime: 2023-03-13 13:38:25
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nnet/connmanager/connmanager.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
-package nnet
+package connmanager
 
 import (
 	"github.com/liusuxian/nova/niface"
@@ -21,7 +21,7 @@ import (
 
 // ConnManager 连接管理结构
 type ConnManager struct {
-	connMap cmap.ConcurrentMap[string, niface.IConnection] // 存放连接的并发安全 map
+	connMap cmap.ConcurrentMap[string, niface.IConnection] // 存放 connection 的并发安全 map
 }
 
 // NewConnManager 创建一个连接管理
