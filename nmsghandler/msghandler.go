@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 10:52:57
+ * @LastEditTime: 2023-03-14 14:58:19
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -15,30 +15,32 @@ import (
 	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
-	"github.com/panjf2000/ants/v2"
 	"go.uber.org/zap"
 )
 
 // MsgHandle 消息处理回调结构
 type MsgHandle struct {
-	apis       map[uint32]niface.IRouter // 存放每个 MsgID 所对应的处理方法
-	workerPool *ants.Pool                // Worker 工作池
-	builder    niface.InterceptorBuilder // 拦截器构建器
+	apis           map[uint32]niface.IRouter // 存放每个 MsgID 所对应的处理方法
+	workerPoolSize uint32                    // 业务工作 Worker 池的数量
+	taskQueue      []chan niface.IRequest    // Worker 负责取任务的消息队列
+	builder        niface.InterceptorBuilder // 责任链构造器
 }
 
 // NewMsgHandle 创建消息处理
 func NewMsgHandle() *MsgHandle {
+	workerPoolSize := nconf.WorkerPoolSize()
 	return &MsgHandle{
-		apis:    make(map[uint32]niface.IRouter),
-		builder: ncode.NewInterceptorBuilder(),
+		apis:           make(map[uint32]niface.IRouter),
+		workerPoolSize: workerPoolSize,
+		taskQueue:      make([]chan niface.IRequest, workerPoolSize), // 一个 Worker 对应一个 Queue
+		builder:        ncode.NewInterceptorBuilder(),
 	}
 }
 
 // DoMsgHandler 马上以非阻塞方式处理消息
 func (mh *MsgHandle) DoMsgHandler(req niface.IRequest) {
-	var handler niface.IRouter
-	var ok bool
-	if handler, ok = mh.apis[req.GetMsgID()]; !ok {
+	handler, ok := mh.apis[req.GetMsgID()]
+	if !ok {
 		nlog.Error(req.GetCtx(), "DoMsgHandler Api Not Found", zap.Uint32("MsgID", req.GetMsgID()))
 		return
 	}
@@ -61,43 +63,37 @@ func (mh *MsgHandle) AddRouter(msgID uint32, router niface.IRouter) {
 
 // StartWorkerPool 启动 Worker 工作池
 func (mh *MsgHandle) StartWorkerPool() {
-	if mh.workerPool == nil {
-		// 此处必须把 msghandler 添加到责任链中，并且是责任链最后一环，在 msghandler 中进行解码后由 router 做数据分发
-		mh.AddInterceptor(mh)
-		var workerPool *ants.Pool
-		var err error
-		if workerPool, err = ants.NewPool(int(nconf.WorkerPoolSize())); err != nil {
-			nlog.Fatal(nil, "StartWorkerPool Fatal", zap.Error(err))
-		}
-		mh.workerPool = workerPool
+	// 此处必须把 Msghandler 添加到责任链中，并且是责任链最后一环，在 Msghandler 中进行解码后由 Router 做数据分发
+	mh.AddInterceptor(mh)
+	// 遍历需要启动 Worker 的数量，依此启动
+	for i := 0; i < int(mh.workerPoolSize); i++ {
+		// 给当前 Worker 对应的任务队列开辟空间
+		mh.taskQueue[i] = make(chan niface.IRequest, nconf.MaxWorkerTaskLen())
+		// 启动当前 Worker，阻塞的等待对应的任务队列是否有消息传递进来
+		go mh.StartOneWorker(i, mh.taskQueue[i])
 	}
 }
 
-// StopWorkerPool 停止 Worker 工作池
-func (mh *MsgHandle) StopWorkerPool() {
-	if mh.workerPool != nil {
-		mh.workerPool.Release()
-	}
-}
-
-// RebootWorkerPool 重启 Worker 工作池
-func (mh *MsgHandle) RebootWorkerPool() {
-	if mh.workerPool != nil {
-		mh.workerPool.Reboot()
-	}
-}
-
-// SendMsgToWorkerPool 将消息交给 WorkerPool，由 Worker 进行处理
-func (mh *MsgHandle) SendMsgToWorkerPool(req niface.IRequest) {
-	nlog.Debug(req.GetCtx(), "SendMsgToWorkerPool", zap.String("Data", hex.EncodeToString(req.GetData())))
-	if mh.workerPool != nil {
-		mh.workerPool.Submit(func() {
+// StartOneWorker 启动一个 Worker
+func (mh *MsgHandle) StartOneWorker(workerID int, taskQueue chan niface.IRequest) {
+	nlog.Info(nil, "Worker Is Started", zap.Int("WorkerID", workerID))
+	for {
+		select {
+		// 有消息则取出队列的 Request，并执行绑定的业务方法
+		case req := <-taskQueue:
 			mh.DoMsgHandler(req)
-		})
-	} else {
-		go mh.DoMsgHandler(req)
-		nlog.Error(req.GetCtx(), "SendMsgToWorkerPool WorkerPool Not Found", zap.Uint32("MsgID", req.GetMsgID()))
+		}
 	}
+}
+
+// SendMsgToTaskQueue 将消息交给 TaskQueue，由 Worker 进行处理
+func (mh *MsgHandle) SendMsgToTaskQueue(req niface.IRequest) {
+	// 根据 ConnID 来分配当前的连接应该由哪个 Worker 负责处理
+	// 轮询的平均分配法则，得到需要处理当前连接的 WorkerID
+	workerID := req.GetConnection().GetConnID() % uint64(mh.workerPoolSize)
+	// 将请求消息发送给任务队列
+	mh.taskQueue[workerID] <- req
+	nlog.Debug(req.GetCtx(), "SendMsgToTaskQueue", zap.Uint64("WorkerID", workerID), zap.String("Data", hex.EncodeToString(req.GetData())))
 }
 
 // Intercept 拦截并处理
@@ -107,11 +103,11 @@ func (mh *MsgHandle) Intercept(chain niface.Chain) niface.Response {
 		switch request.(type) {
 		case niface.IRequest:
 			iRequest := request.(niface.IRequest)
-			if mh.workerPool != nil {
-				mh.workerPool.Submit(func() {
-					mh.DoMsgHandler(iRequest)
-				})
+			if mh.workerPoolSize > 0 {
+				// 已经启动工作池机制，将消息交给 Worker 处理
+				mh.SendMsgToTaskQueue(iRequest)
 			} else {
+				// 从绑定好的消息和对应的处理方法中执行对应的 Handle 方法
 				go mh.DoMsgHandler(iRequest)
 			}
 		}
@@ -120,8 +116,8 @@ func (mh *MsgHandle) Intercept(chain niface.Chain) niface.Response {
 }
 
 // Decode 解码
-func (mh *MsgHandle) Decode(request niface.IRequest) {
-	mh.builder.Execute(request) // 将消息丢到责任链，通过责任链里拦截器层层处理层层传递
+func (mh *MsgHandle) Decode(req niface.IRequest) {
+	mh.builder.Execute(req) // 将消息丢到责任链，通过责任链里拦截器层层处理层层传递
 }
 
 // AddInterceptor 添加拦截器，每个拦截器处理完后，数据都会传递至下一个拦截器，使得消息可以层层处理层层传递，顺序取决于注册顺序

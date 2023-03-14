@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 21:57:16
+ * @LastEditTime: 2023-03-14 14:57:33
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -305,6 +305,7 @@ func init() {
 	SetDefault("server.heartbeatMax", time.Duration(5000)*time.Millisecond) // 最长心跳检测间隔时间（单位: 毫秒 time.Duration），默认 5000
 	SetDefault("server.maxConn", 3)                                         // 允许的客户端连接最大数量，默认 3（uint32）
 	SetDefault("server.workerPoolSize", 10)                                 // 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
+	SetDefault("server.maxWorkerTaskLen", 1024)                             // 工作任务池 Worker 对应负责的任务队列最大任务存储数量，默认 1024（uint32）
 	SetDefault("server.maxPacketSize", 4096)                                // 数据包的最大值，默认 4096（单位:字节 uint32）
 	SetDefault("server.packetMethod", 1)                                    // 封包和拆包方式，默认 1，1: 消息ID(4字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
 	SetDefault("server.endian", 1)                                          // 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
@@ -530,6 +531,11 @@ func MaxConn() uint32 {
 // WorkerPoolSize 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
 func WorkerPoolSize() uint32 {
 	return GetUint32("server.workerPoolSize")
+}
+
+// MaxWorkerTaskLen 工作任务池 Worker 对应负责的任务队列最大任务存储数量，默认 1024（uint32）
+func MaxWorkerTaskLen() uint32 {
+	return GetUint32("server.maxWorkerTaskLen")
 }
 
 // MaxPacketSize 数据包的最大值，默认 4096（单位:字节 uint32）

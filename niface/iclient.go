@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 13:38:19
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 10:47:01
+ * @LastEditTime: 2023-03-14 13:33:07
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/iclient.go
  * @Description:
  *
@@ -29,4 +29,5 @@ type IClient interface {
 	StartHeartBeatWithOption(time.Duration, *HeartBeatOption) // 启动心跳检测(自定义回调)
 	AddInterceptor(interceptor Interceptor)                   // 添加拦截器，每个拦截器处理完后，数据都会传递至下一个拦截器，使得消息可以层层处理层层传递，顺序取决于注册顺序
 	GetLengthField() LengthField                              // 获取长度字段解码器，用于解码二进制数据流中表示长度字段的工具
+	SetLengthField(LengthField)                               // 设置长度字段解码器
 }

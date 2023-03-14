@@ -6,7 +6,6 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/orcaman/concurrent-map/v2 v2.0.1
-	github.com/panjf2000/ants/v2 v2.7.1
 	github.com/pkg/errors v0.9.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/cast v1.5.0
