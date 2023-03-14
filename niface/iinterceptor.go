@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 23:28:17
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 15:02:03
+ * @LastEditTime: 2023-03-14 15:16:26
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/iinterceptor.go
  * @Description:
  *
@@ -22,19 +22,19 @@ type Request interface {
 type Response interface {
 }
 
-// Interceptor 拦截器接口
+// Interceptor
 type Interceptor interface {
-	Intercept(Chain) Response // 拦截并处理
+	Intercept(Chain) Response
 }
 
-// Chain 责任链模式接口
+// Chain
 type Chain interface {
-	Request() Request         // 请求
-	Proceed(Request) Response // 继续处理
+	Request() Request
+	Proceed(Request) Response
 }
 
-// InterceptorBuilder 责任链构造器接口
+// InterceptorBuilder
 type InterceptorBuilder interface {
-	AddInterceptor(interceptor Interceptor) // 添加拦截器，每个拦截器处理完后，数据都会传递至下一个拦截器，使得消息可以层层处理层层传递，顺序取决于注册顺序
-	Execute(request Request) Response       // 将消息丢到责任链，通过责任链里拦截器层层处理层层传递
+	AddInterceptor(interceptor Interceptor)
+	Execute(request Request) Response
 }
