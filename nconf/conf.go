@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 19:30:17
+ * @LastEditTime: 2023-03-14 23:26:19
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -301,15 +301,14 @@ func init() {
 	}
 	// 设置默认值
 	// 服务器配置
-	SetDefault("server.name", "Nova")           // 服务器应用名称，默认"Nova"
-	SetDefault("server.maxHeartbeat", 5000)     // 最长心跳检测间隔时间（单位: 毫秒 uint32），默认 5000
-	SetDefault("server.maxConn", 3)             // 允许的客户端连接最大数量，默认 3（uint32）
-	SetDefault("server.workerPoolSize", 10)     // 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
-	SetDefault("server.maxWorkerTaskLen", 1024) // 工作任务池 Worker 对应负责的任务队列最大任务存储数量，默认 1024（uint32）
-	SetDefault("server.maxPacketSize", 4096)    // 数据包的最大值，默认 4096（单位:字节 uint32）
-	SetDefault("server.packetMethod", 1)        // 封包和拆包方式，默认 1，1: 消息ID(4字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
-	SetDefault("server.endian", 1)              // 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
-	SetDefault("server.maxMsgChanLen", 1024)    // SendBuffMsg发送消息的缓冲最大长度，默认 1024（单位:字节 uint32）
+	SetDefault("server.name", "Nova")        // 服务器应用名称，默认"Nova"
+	SetDefault("server.maxHeartbeat", 5000)  // 最长心跳检测间隔时间（单位: 毫秒 uint32），默认 5000
+	SetDefault("server.maxConn", 3)          // 允许的客户端连接最大数量，默认 3（uint32）
+	SetDefault("server.workerPoolSize", 10)  // 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
+	SetDefault("server.maxPacketSize", 4096) // 数据包的最大值，默认 4096（单位:字节 uint32）
+	SetDefault("server.packetMethod", 1)     // 封包和拆包方式，默认 1，1: 消息ID(4字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
+	SetDefault("server.endian", 1)           // 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
+	SetDefault("server.maxMsgChanLen", 1024) // SendBuffMsg发送消息的缓冲最大长度，默认 1024（单位:字节 uint32）
 	// 日志配置
 	SetDefault("logger.level", "info")    // 日志打印级别 debug、info、warn、error、dpanic、panic、fatal
 	SetDefault("logger.format", "json")   // 输出日志格式 logfmt、json
@@ -511,49 +510,4 @@ func StructKey(key string, rawVal any, opts ...viper.DecoderConfigOption) error 
 // WatchConfig 监视配置文件的变化
 func WatchConfig() {
 	defaultConfig.v.WatchConfig()
-}
-
-// ServerName 服务器应用名称，默认"Nova"
-func ServerName() string {
-	return GetString("server.name")
-}
-
-// MaxHeartbeat 最长心跳检测间隔时间（单位: 毫秒 uint32），默认 5000
-func MaxHeartbeat() time.Duration {
-	return time.Duration(GetUint32("server.maxHeartbeat")) * time.Millisecond
-}
-
-// MaxConn 允许的客户端连接最大数量，默认 3（uint32）
-func MaxConn() uint32 {
-	return GetUint32("server.maxConn")
-}
-
-// WorkerPoolSize 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
-func WorkerPoolSize() uint32 {
-	return GetUint32("server.workerPoolSize")
-}
-
-// MaxWorkerTaskLen 工作任务池 Worker 对应负责的任务队列最大任务存储数量，默认 1024（uint32）
-func MaxWorkerTaskLen() uint32 {
-	return GetUint32("server.maxWorkerTaskLen")
-}
-
-// MaxPacketSize 数据包的最大值，默认 4096（单位:字节 uint32）
-func MaxPacketSize() uint32 {
-	return GetUint32("server.maxPacketSize")
-}
-
-// PacketMethod 封包和拆包方式，默认 1，1: 消息ID(4字节)-消息体长度(4字节)-消息内容
-func PacketMethod() uint8 {
-	return GetUint8("server.packetMethod")
-}
-
-// Endian 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
-func Endian() uint8 {
-	return GetUint8("server.endian")
-}
-
-// MaxMsgChanLen SendBuffMsg发送消息的缓冲最大长度，默认 1024（单位:字节 uint32）
-func MaxMsgChanLen() uint32 {
-	return GetUint32("server.maxMsgChanLen")
 }

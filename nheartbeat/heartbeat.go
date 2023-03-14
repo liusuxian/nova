@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 19:28:44
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 23:09:07
+ * @LastEditTime: 2023-03-15 00:48:13
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nheartbeat/heartbeat.go
  * @Description:
  *
@@ -16,13 +16,10 @@ import (
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nrouter"
 	"go.uber.org/zap"
-	"time"
 )
 
 // HeartbeatChecker 心跳检测器结构
 type HeartbeatChecker struct {
-	interval         time.Duration           // 心跳检测时间间隔
-	quitChan         chan bool               // 退出信号
 	hearbeatMsg      []byte                  // 心跳消息，也可以通过 makeMsgFunc 来动态生成
 	makeMsg          niface.HeartBeatMsgFunc // 用户自定义的心跳检测消息处理方法
 	onRemoteNotAlive niface.OnRemoteNotAlive // 用户自定义的远程连接不存活时的处理方法
@@ -43,10 +40,8 @@ func (hbr *HeartbeatDefaultRouter) Handle(req niface.IRequest) {
 }
 
 // NewHeartbeatCheckerServer Server 创建心跳检测器
-func NewHeartbeatCheckerServer(interval time.Duration, server niface.IServer) *HeartbeatChecker {
+func NewHeartbeatCheckerServer(server niface.IServer) *HeartbeatChecker {
 	heartbeat := &HeartbeatChecker{
-		interval:         interval,
-		quitChan:         make(chan bool),
 		makeMsg:          makeMsgDefaultFunc,
 		onRemoteNotAlive: onRemoteNotAliveDefaultFunc,
 		msgID:            niface.HeartBeatDefaultMsgID,
@@ -58,10 +53,8 @@ func NewHeartbeatCheckerServer(interval time.Duration, server niface.IServer) *H
 }
 
 // NewHeartbeatCheckerClient Client 创建心跳检测器
-func NewHeartbeatCheckerClient(interval time.Duration, client niface.IClient) *HeartbeatChecker {
+func NewHeartbeatCheckerClient(client niface.IClient) *HeartbeatChecker {
 	heartbeat := &HeartbeatChecker{
-		interval:         interval,
-		quitChan:         make(chan bool),
 		makeMsg:          makeMsgDefaultFunc,
 		onRemoteNotAlive: onRemoteNotAliveDefaultFunc,
 		msgID:            niface.HeartBeatDefaultMsgID,
@@ -94,27 +87,8 @@ func (hbc *HeartbeatChecker) BindRouter(msgID uint32, router niface.IRouter) {
 	}
 }
 
-// Start 启动心跳检测
-func (hbc *HeartbeatChecker) Start() {
-	ticker := time.NewTicker(hbc.interval)
-	for {
-		select {
-		case <-ticker.C:
-			hbc.check()
-		case <-hbc.quitChan:
-			ticker.Stop()
-			return
-		}
-	}
-}
-
-// Stop 停止心跳检测
-func (hbc *HeartbeatChecker) Stop() {
-	hbc.quitChan <- true
-}
-
-// check 执行心跳检测
-func (hbc *HeartbeatChecker) check() {
+// Check 执行心跳检测
+func (hbc *HeartbeatChecker) Check() {
 	if hbc.server != nil {
 		hbc.checkServer()
 	} else if hbc.client != nil {
@@ -122,7 +96,7 @@ func (hbc *HeartbeatChecker) check() {
 	}
 }
 
-// checkServer 检测服务端连接
+// TODO checkServer 检测服务端连接
 func (hbc *HeartbeatChecker) checkServer() {
 	if hbc.server.GetConnManager() != nil {
 		connIDList := hbc.server.GetConnManager().GetAllConnID()
@@ -143,18 +117,18 @@ func (hbc *HeartbeatChecker) checkServer() {
 	}
 }
 
-// checkClient 检测客户端连接
+// TODO checkClient 检测客户端连接
 func (hbc *HeartbeatChecker) checkClient() {
-	if hbc.client.Conn() != nil {
-		if !hbc.client.Conn().IsAlive() {
-			hbc.onRemoteNotAlive(hbc.client.Conn())
-		} else {
-			msg := hbc.makeMsg(hbc.client.Conn())
-			if err := hbc.client.Conn().SendMsg(hbc.msgID, msg); err != nil {
-				nlog.Error(nil, "Send Heartbeat Msg Error", zap.Uint32("MsgID", hbc.msgID), zap.ByteString("Msg", msg), zap.Error(err))
-			}
-		}
-	}
+	// if hbc.client.Conn() != nil {
+	// 	if !hbc.client.Conn().IsAlive() {
+	// 		hbc.onRemoteNotAlive(hbc.client.Conn())
+	// 	} else {
+	// 		msg := hbc.makeMsg(hbc.client.Conn())
+	// 		if err := hbc.client.Conn().SendMsg(hbc.msgID, msg); err != nil {
+	// 			nlog.Error(nil, "Send Heartbeat Msg Error", zap.Uint32("MsgID", hbc.msgID), zap.ByteString("Msg", msg), zap.Error(err))
+	// 		}
+	// 	}
+	// }
 }
 
 // TODO makeMsgDefaultFunc 默认的心跳检测消息处理方法

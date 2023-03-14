@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 21:13:41
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 18:01:06
+ * @LastEditTime: 2023-03-15 00:32:39
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/packfactory.go
  * @Description:
  *
@@ -11,7 +11,6 @@
 package npack
 
 import (
-	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/niface"
 	"sync"
 )
@@ -35,15 +34,14 @@ func Factory() *packFactory {
 }
 
 // NewPack 创建一个具体的封包拆包对象
-func (pf *packFactory) NewPack() (dataPack niface.IDataPack) {
-	packetMethod := nconf.PacketMethod()
+func (pf *packFactory) NewPack(packetMethod, endian uint8, maxPacketSize uint32) (dataPack niface.IDataPack) {
 	switch packetMethod {
 	case 1:
 		// 默认封包拆包方式
 		// 消息ID(4字节)-消息体长度(4字节)-消息内容
-		dataPack = NewDefaultPack()
+		dataPack = NewDefaultPack(endian, maxPacketSize)
 	default:
-		dataPack = NewDefaultPack()
+		dataPack = NewDefaultPack(endian, maxPacketSize)
 	}
 	return
 }

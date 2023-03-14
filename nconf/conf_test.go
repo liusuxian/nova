@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 19:29:51
+ * @LastEditTime: 2023-03-14 23:21:49
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf_test.go
  * @Description:
  *
@@ -17,16 +17,16 @@ import (
 
 // ServerConfig 服务器配置
 type ServerConfig struct {
-	Name             string // 服务器应用名称，默认"Nova"
-	Port             uint16 // 服务器监听端口（uint16）
-	MaxHeartbeat     uint32 // 最长心跳检测间隔时间（单位: 毫秒 uint32），默认 5000
-	MaxConn          uint32 // 允许的客户端连接最大数量，默认 3（uint32）
-	WorkerPoolSize   uint32 // 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
-	MaxWorkerTaskLen uint32 // 工作任务池 Worker 对应负责的任务队列最大任务存储数量，默认 1024（uint32）
-	MaxPacketSize    uint32 // 数据包的最大值，默认 4096（单位:字节 uint32）
-	PacketMethod     uint8  // 封包和拆包方式，默认 1，1: 消息ID(4字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
-	Endian           uint8  // 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
-	MaxMsgChanLen    uint32 // SendBuffMsg发送消息的缓冲最大长度，默认 1024（单位:字节 uint32）
+	Name           string // 服务器应用名称，默认"Nova"
+	Network        string // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
+	Port           uint16 // 服务器监听端口（uint16）
+	MaxHeartbeat   uint32 // 最长心跳检测间隔时间（单位: 毫秒 uint32），默认 5000
+	MaxConn        uint32 // 允许的客户端连接最大数量，默认 3（uint32）
+	WorkerPoolSize uint32 // 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
+	MaxPacketSize  uint32 // 数据包的最大值，默认 4096（单位:字节 uint32）
+	PacketMethod   uint8  // 封包和拆包方式，默认 1，1: 消息ID(4字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
+	Endian         uint8  // 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
+	MaxMsgChanLen  uint32 // SendBuffMsg发送消息的缓冲最大长度，默认 1024（单位:字节 uint32）
 }
 
 // LogConfig 日志配置

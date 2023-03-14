@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 18:49:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 18:01:42
+ * @LastEditTime: 2023-03-15 00:31:18
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack.go
  * @Description:
  *
@@ -13,21 +13,25 @@ package npack
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/niface"
 	"github.com/pkg/errors"
 )
 
 // DefaultPack 默认封包拆包结构，消息ID(4字节)-消息体长度(4字节)-消息内容
 type DefaultPack struct {
+	endian        uint8  // 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
+	maxPacketSize uint32 // 数据包的最大值，默认 4096（单位:字节 uint32）
 }
 
 // 默认包头长度，消息ID uint32(4字节) + 消息体 uint32(4字节)
 var defaultHeadLen uint8 = 8
 
 // NewDefaultPack 创建默认封包拆包实例
-func NewDefaultPack() niface.IDataPack {
-	return &DefaultPack{}
+func NewDefaultPack(endian uint8, maxPacketSize uint32) niface.IDataPack {
+	return &DefaultPack{
+		endian:        endian,
+		maxPacketSize: maxPacketSize,
+	}
 }
 
 // GetHeadLen 获取包头长度
@@ -41,8 +45,7 @@ func (p *DefaultPack) Pack(msg niface.IMessage) (data []byte, err error) {
 	dataBuf := bytes.NewBuffer([]byte{})
 	// 获取字节存储次序
 	var endianOrder binary.ByteOrder
-	endian := nconf.Endian()
-	switch endian {
+	switch p.endian {
 	case 1:
 		// 小端
 		endianOrder = binary.LittleEndian
@@ -77,8 +80,7 @@ func (p *DefaultPack) Unpack(binaryData []byte) (data niface.IMessage, err error
 	msg := &Message{}
 	// 获取字节存储次序
 	var endianOrder binary.ByteOrder
-	endian := nconf.Endian()
-	switch endian {
+	switch p.endian {
 	case 1:
 		// 小端
 		endianOrder = binary.LittleEndian
@@ -98,8 +100,7 @@ func (p *DefaultPack) Unpack(binaryData []byte) (data niface.IMessage, err error
 		return
 	}
 	// 判断消息体长度是否超出我们允许的最大包长度
-	maxPacketSize := nconf.MaxPacketSize()
-	if maxPacketSize > 0 && msg.DataLen > maxPacketSize {
+	if p.maxPacketSize > 0 && msg.DataLen > p.maxPacketSize {
 		err = errors.New("Too Large Msg Data Received")
 		return
 	}

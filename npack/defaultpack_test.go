@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 21:24:06
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 15:18:14
+ * @LastEditTime: 2023-03-15 00:33:21
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack_test.go
  * @Description:
  *
@@ -38,7 +38,7 @@ func TestDataPack(t *testing.T) {
 			// 处理客户端请求
 			go func(conn net.Conn) {
 				// 创建封包拆包对象
-				dp := npack.Factory().NewPack()
+				dp := npack.Factory().NewPack(1, 1, 4096)
 				for {
 					// 先读出流中的head部分
 					headData := make([]byte, dp.GetHeadLen())
@@ -77,7 +77,7 @@ func TestDataPack(t *testing.T) {
 			return
 		}
 		// 创建一个封包对象
-		dp := npack.Factory().NewPack()
+		dp := npack.Factory().NewPack(1, 1, 4096)
 		// 封装一个msg1包
 		msg1 := npack.NewMsgPackage(1, []byte("hello"))
 		var sendData1 []byte
