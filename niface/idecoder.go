@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 23:21:33
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 23:55:39
+ * @LastEditTime: 2023-03-14 10:39:06
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/idecoder.go
  * @Description:
  *
@@ -17,7 +17,7 @@ type IDecoder interface {
 	Decode(buff []byte) [][]byte
 }
 
-// LengthField 长度字段结构
+// TODO LengthField 长度字段结构
 //
 //	Order: 大小端排序
 //	大端模式: 是指数据的高字节保存在内存的低地址中，而数据的低字节保存在内存的高地址中，地址由小向大增加，而数据从高位往低位放

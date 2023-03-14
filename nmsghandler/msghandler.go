@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 01:29:37
+ * @LastEditTime: 2023-03-14 10:52:57
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -23,7 +23,7 @@ import (
 type MsgHandle struct {
 	apis       map[uint32]niface.IRouter // 存放每个 MsgID 所对应的处理方法
 	workerPool *ants.Pool                // Worker 工作池
-	builder    niface.InterceptorBuilder // 责任链构造器
+	builder    niface.InterceptorBuilder // 拦截器构建器
 }
 
 // NewMsgHandle 创建消息处理
@@ -100,7 +100,7 @@ func (mh *MsgHandle) SendMsgToWorkerPool(req niface.IRequest) {
 	}
 }
 
-// Intercept 拦截器
+// Intercept 拦截并处理
 func (mh *MsgHandle) Intercept(chain niface.Chain) niface.Response {
 	request := chain.Request()
 	if request != nil {
