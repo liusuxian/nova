@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 19:39:58
+ * @LastEditTime: 2023-03-14 20:28:34
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/tcp_server.go
  * @Description:
  *
@@ -27,7 +27,7 @@ type TCPServer struct {
 	eng     gnet.Engine
 	options gnet.Options    // TCP 服务器启动选项
 	ctx     context.Context // TCP 服务器 Context
-	port    uint16          // TCP 服务器 端口
+	port    uint16          // TCP 服务器端口
 }
 
 // NewTCPServer 创建 TCPServer
@@ -50,7 +50,7 @@ func (s *TCPServer) Start() {
 
 // Stop 停止服务器
 func (s *TCPServer) Stop() {
-	_ = s.eng.Stop(s.ctx)
+	s.eng.Stop(s.ctx)
 }
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
@@ -62,13 +62,13 @@ func (s *TCPServer) OnBoot(eng gnet.Engine) (action gnet.Action) {
 
 // OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
 func (s *TCPServer) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
-	nlog.Info(s.ctx, "TCPServer OnClose", zap.String("RemoteAddr", conn.RemoteAddr().String()))
+	nlog.Info(s.ctx, "TCPServer OnClose", zap.String("RemoteAddr", conn.RemoteAddr().String()), zap.Int("Connections", s.eng.CountConnections()))
 	return
 }
 
 // OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
 func (s *TCPServer) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
-	nlog.Info(s.ctx, "TCPServer OnOpen")
+	nlog.Info(s.ctx, "TCPServer OnOpen", zap.Int("Connections", s.eng.CountConnections()))
 	return
 }
 
@@ -80,14 +80,14 @@ func (s *TCPServer) OnShutdown(eng gnet.Engine) {
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
 func (s *TCPServer) OnTick() (delay time.Duration, action gnet.Action) {
-	nlog.Debug(s.ctx, "TCPServer OnTick")
+	nlog.Debug(s.ctx, "TCPServer OnTick", zap.Int("Connections", s.eng.CountConnections()))
 	delay = nconf.MaxHeartbeat()
 	return
 }
 
 // OnTraffic 在本地套接字从对等方接收数据时触发。
 func (s *TCPServer) OnTraffic(conn gnet.Conn) (action gnet.Action) {
-	var buf []byte
+	var buf = []byte{}
 	conn.Read(buf)
 	nlog.Info(s.ctx, "TCPServer OnTraffic", zap.ByteString("data", buf))
 	return
