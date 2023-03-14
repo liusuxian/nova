@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 14:58:19
+ * @LastEditTime: 2023-03-14 15:03:03
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -38,16 +38,16 @@ func NewMsgHandle() *MsgHandle {
 }
 
 // DoMsgHandler 马上以非阻塞方式处理消息
-func (mh *MsgHandle) DoMsgHandler(req niface.IRequest) {
-	handler, ok := mh.apis[req.GetMsgID()]
+func (mh *MsgHandle) DoMsgHandler(request niface.IRequest) {
+	handler, ok := mh.apis[request.GetMsgID()]
 	if !ok {
-		nlog.Error(req.GetCtx(), "DoMsgHandler Api Not Found", zap.Uint32("MsgID", req.GetMsgID()))
+		nlog.Error(request.GetCtx(), "DoMsgHandler Api Not Found", zap.Uint32("MsgID", request.GetMsgID()))
 		return
 	}
 	// Request 请求绑定 Router
-	req.BindRouter(handler)
+	request.BindRouter(handler)
 	// 执行对应处理方法
-	req.Call()
+	request.Call()
 }
 
 // AddRouter 为消息添加具体的处理逻辑
@@ -87,13 +87,13 @@ func (mh *MsgHandle) StartOneWorker(workerID int, taskQueue chan niface.IRequest
 }
 
 // SendMsgToTaskQueue 将消息交给 TaskQueue，由 Worker 进行处理
-func (mh *MsgHandle) SendMsgToTaskQueue(req niface.IRequest) {
+func (mh *MsgHandle) SendMsgToTaskQueue(request niface.IRequest) {
 	// 根据 ConnID 来分配当前的连接应该由哪个 Worker 负责处理
 	// 轮询的平均分配法则，得到需要处理当前连接的 WorkerID
-	workerID := req.GetConnection().GetConnID() % uint64(mh.workerPoolSize)
+	workerID := request.GetConnection().GetConnID() % uint64(mh.workerPoolSize)
 	// 将请求消息发送给任务队列
-	mh.taskQueue[workerID] <- req
-	nlog.Debug(req.GetCtx(), "SendMsgToTaskQueue", zap.Uint64("WorkerID", workerID), zap.String("Data", hex.EncodeToString(req.GetData())))
+	mh.taskQueue[workerID] <- request
+	nlog.Debug(request.GetCtx(), "SendMsgToTaskQueue", zap.Uint64("WorkerID", workerID), zap.String("Data", hex.EncodeToString(request.GetData())))
 }
 
 // Intercept 拦截并处理
@@ -116,8 +116,8 @@ func (mh *MsgHandle) Intercept(chain niface.Chain) niface.Response {
 }
 
 // Decode 解码
-func (mh *MsgHandle) Decode(req niface.IRequest) {
-	mh.builder.Execute(req) // 将消息丢到责任链，通过责任链里拦截器层层处理层层传递
+func (mh *MsgHandle) Decode(request niface.IRequest) {
+	mh.builder.Execute(request) // 将消息丢到责任链，通过责任链里拦截器层层处理层层传递
 }
 
 // AddInterceptor 添加拦截器，每个拦截器处理完后，数据都会传递至下一个拦截器，使得消息可以层层处理层层传递，顺序取决于注册顺序
