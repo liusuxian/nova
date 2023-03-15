@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 00:58:49
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 00:08:59
+ * @LastEditTime: 2023-03-15 01:19:45
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/iconnection.go
  * @Description:
  *
@@ -24,8 +24,6 @@ type IConnection interface {
 	GetConnID() uint64                           // 获取当前 ConnID
 	RemoteAddr() net.Addr                        // 获取当前连接远程地址信息
 	LocalAddr() net.Addr                         // 获取当前连接本地地址信息
-	Send(data []byte) error                      // 发送数据给远程的客户端(无缓冲)
-	SendBuff(data []byte) error                  // 发送数据给远程的客户端(有缓冲)
 	SendMsg(msgID uint32, data []byte) error     // 直接将 Message 数据发送给远程的客户端(无缓冲)
 	SendBuffMsg(msgID uint32, data []byte) error // 直接将 Message 数据发送给远程的客户端(有缓冲)
 	SetProperty(key string, value any)           // 设置当前连接属性

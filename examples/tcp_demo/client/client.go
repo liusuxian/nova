@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 23:09:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 20:25:55
+ * @LastEditTime: 2023-03-15 13:02:32
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/tcp_demo/client/client.go
  * @Description:
  *
@@ -16,6 +16,6 @@ import (
 )
 
 func main() {
-	c := nclient.NewTCPClient("127.0.0.1", 8888, gnet.Options{})
+	c := nclient.NewClient("tcp", "127.0.0.1:8888", gnet.Options{})
 	c.Start()
 }

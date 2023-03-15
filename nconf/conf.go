@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-14 23:26:19
+ * @LastEditTime: 2023-03-15 12:52:53
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -17,7 +17,6 @@ import (
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
 	_ "github.com/spf13/viper/remote"
-	"log"
 	"time"
 )
 
@@ -291,7 +290,6 @@ func init() {
 	v.AddConfigPath("config") // 设置配置文件的搜索目录
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			log.Println("No Such Default Config File")
 		} else {
 			panic(errors.Wrapf(err, "Read Default Config Error"))
 		}
@@ -319,7 +317,6 @@ func init() {
 	SetDefault("logger.maxAge", 7)        // 日志保留时间（单位:天 int）
 	SetDefault("logger.compress", false)  // 是否压缩日志
 	SetDefault("logger.stdout", true)     // 是否输出到控制台
-	log.Println("Default Config Create Or Load Succeed !!!")
 }
 
 // Get 获取 value
