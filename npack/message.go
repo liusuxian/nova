@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 21:08:37
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-08 18:20:16
+ * @LastEditTime: 2023-03-15 17:32:49
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/message.go
  * @Description:
  *
@@ -12,13 +12,13 @@ package npack
 
 // Message 消息结构
 type Message struct {
-	ID      uint32 // 消息的 ID
+	ID      uint16 // 消息的 ID
 	DataLen uint32 // 消息的长度
 	Data    []byte // 消息的内容
 }
 
 // NewMsgPackage 创建 Message 消息包
-func NewMsgPackage(ID uint32, data []byte) *Message {
+func NewMsgPackage(ID uint16, data []byte) *Message {
 	return &Message{
 		ID:      ID,
 		DataLen: uint32(len(data)),
@@ -27,7 +27,7 @@ func NewMsgPackage(ID uint32, data []byte) *Message {
 }
 
 // SetMsgID 设置消息 ID
-func (msg *Message) SetMsgID(msgID uint32) {
+func (msg *Message) SetMsgID(msgID uint16) {
 	msg.ID = msgID
 }
 
@@ -42,7 +42,7 @@ func (msg *Message) SetData(data []byte) {
 }
 
 // GetMsgID 获取消息 ID
-func (msg *Message) GetMsgID() uint32 {
+func (msg *Message) GetMsgID() uint16 {
 	return msg.ID
 }
 

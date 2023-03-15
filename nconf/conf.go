@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 12:52:53
+ * @LastEditTime: 2023-03-15 16:27:12
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -304,19 +304,20 @@ func init() {
 	SetDefault("server.maxConn", 3)          // 允许的客户端连接最大数量，默认 3（uint32）
 	SetDefault("server.workerPoolSize", 10)  // 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
 	SetDefault("server.maxPacketSize", 4096) // 数据包的最大值，默认 4096（单位:字节 uint32）
-	SetDefault("server.packetMethod", 1)     // 封包和拆包方式，默认 1，1: 消息ID(4字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
+	SetDefault("server.packetMethod", 1)     // 封包和拆包方式，默认 1，1: 消息ID(2字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
 	SetDefault("server.endian", 1)           // 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
 	SetDefault("server.maxMsgChanLen", 1024) // SendBuffMsg发送消息的缓冲最大长度，默认 1024（单位:字节 uint32）
 	// 日志配置
-	SetDefault("logger.level", "info")    // 日志打印级别 debug、info、warn、error、dpanic、panic、fatal
-	SetDefault("logger.format", "json")   // 输出日志格式 logfmt、json
-	SetDefault("logger.path", "logs")     // 输出日志文件路径
-	SetDefault("logger.filename", "nova") // 输出日志文件名称
-	SetDefault("logger.maxSize", 10)      // 单个日志文件最多存储量（单位:MB int）
-	SetDefault("logger.maxBackups", 10)   // 日志备份文件最多数量（int）
-	SetDefault("logger.maxAge", 7)        // 日志保留时间（单位:天 int）
-	SetDefault("logger.compress", false)  // 是否压缩日志
-	SetDefault("logger.stdout", true)     // 是否输出到控制台
+	SetDefault("logger.ctxKeys", []string{})      // 自定义 Context 上下文变量名称，自动打印 Context 的变量到日志中。默认为空
+	SetDefault("logger.details.level", "info")    // 日志打印级别 debug、info、warn、error、dpanic、panic、fatal
+	SetDefault("logger.details.format", "json")   // 输出日志格式 logfmt、json
+	SetDefault("logger.details.path", "logs")     // 输出日志文件路径
+	SetDefault("logger.details.filename", "nova") // 输出日志文件名称
+	SetDefault("logger.details.maxSize", 10)      // 单个日志文件最多存储量（单位:MB int）
+	SetDefault("logger.details.maxBackups", 10)   // 日志备份文件最多数量（int）
+	SetDefault("logger.details.maxAge", 7)        // 日志保留时间（单位:天 int）
+	SetDefault("logger.details.compress", false)  // 是否压缩日志
+	SetDefault("logger.details.stdout", true)     // 是否输出到控制台
 }
 
 // Get 获取 value

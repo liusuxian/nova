@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 00:56:24
+ * @LastEditTime: 2023-03-15 18:01:43
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -19,6 +19,7 @@ import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nmsghandler"
+	"github.com/liusuxian/nova/npack"
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
 	"time"
@@ -50,35 +51,34 @@ type ServerConfig struct {
 	MaxConn        uint32 // 允许的客户端连接最大数量，默认 3（uint32）
 	WorkerPoolSize uint32 // 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
 	MaxPacketSize  uint32 // 数据包的最大值，默认 4096（单位:字节 uint32）
-	PacketMethod   uint8  // 封包和拆包方式，默认 1，1: 消息ID(4字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
+	PacketMethod   uint8  // 封包和拆包方式，默认 1，1: 消息ID(2字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
 	Endian         uint8  // 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
 	MaxMsgChanLen  uint32 // SendBuffMsg发送消息的缓冲最大长度，默认 1024（单位:字节 uint32）
 }
 
 // NewServer 创建 Server
-func NewServer(options gnet.Options) niface.IServer {
+func NewServer(opts ...Option) niface.IServer {
 	// 获取服务器配置
-	serverConf := &ServerConfig{}
+	serCfg := &ServerConfig{}
 	ctx := context.Background()
-	if err := nconf.StructKey("server", serverConf); err != nil {
+	if err := nconf.StructKey("server", serCfg); err != nil {
 		nlog.Fatal(ctx, "New Server Error", zap.Error(err))
 	}
 	// 初始化 Server 属性
-	heartbeatInterval := time.Duration(serverConf.MaxHeartbeat) * time.Millisecond
-	if options.TCPKeepAlive == 0 {
-		options.TCPKeepAlive = heartbeatInterval
-	}
+	heartbeatInterval := time.Duration(serCfg.MaxHeartbeat) * time.Millisecond
 	s := &Server{
-		options:           options,
-		serverConf:        serverConf,
-		addr:              fmt.Sprintf("%s://:%d", serverConf.Network, serverConf.Port),
+		serverConf:        serCfg,
+		addr:              fmt.Sprintf("%s://:%d", serCfg.Network, serCfg.Port),
 		ctx:               ctx,
 		msgHandler:        nmsghandler.NewMsgHandle(),
 		connMgr:           nconn.NewConnManager(),
-		packet:            nil, // TODO
+		packet:            npack.Factory().NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
 		heartbeatInterval: heartbeatInterval,
 	}
 	s.heartbeatChecker = nheartbeat.NewHeartbeatCheckerServer(s)
+	for _, opt := range opts {
+		opt(s)
+	}
 	return s
 }
 
@@ -98,7 +98,7 @@ func (s *Server) Stop() {
 }
 
 // AddRouter 路由功能：给当前服务注册一个路由业务方法，供客户端连接处理使用
-func (s *Server) AddRouter(msgID uint32, router niface.IRouter) {
+func (s *Server) AddRouter(msgID uint16, router niface.IRouter) {
 	s.msgHandler.AddRouter(msgID, router)
 }
 
@@ -184,10 +184,19 @@ func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
 	return
 }
 
-// TODO OnTraffic 在本地套接字从对等方接收数据时触发。
+// OnTraffic 在本地套接字从对等方接收数据时触发。
 func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
-	var buf = []byte{}
-	conn.Read(buf)
-	nlog.Info(s.ctx, "Server OnTraffic", zap.ByteString("data", buf))
+	for {
+		msg, err := s.packet.Unpack(conn)
+		if err == npack.ErrIncompletePacket {
+			break
+		}
+		if err != nil {
+			nlog.Error(s.ctx, "Server OnTraffic Error", zap.Error(err))
+			action = gnet.Close
+			return
+		}
+		nlog.Debug(s.ctx, "Server OnTraffic", zap.Uint16("MsgID", msg.GetMsgID()), zap.Uint32("DataLen", msg.GetDataLen()), zap.ByteString("Data", msg.GetData()))
+	}
 	return
 }

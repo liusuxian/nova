@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 19:28:44
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 00:48:13
+ * @LastEditTime: 2023-03-15 17:38:27
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nheartbeat/heartbeat.go
  * @Description:
  *
@@ -23,7 +23,7 @@ type HeartbeatChecker struct {
 	hearbeatMsg      []byte                  // 心跳消息，也可以通过 makeMsgFunc 来动态生成
 	makeMsg          niface.HeartBeatMsgFunc // 用户自定义的心跳检测消息处理方法
 	onRemoteNotAlive niface.OnRemoteNotAlive // 用户自定义的远程连接不存活时的处理方法
-	msgID            uint32                  // 用户自定义的心跳检测消息ID
+	msgID            uint16                  // 用户自定义的心跳检测消息ID
 	router           niface.IRouter          // 用户自定义的心跳检测消息业务处理路由
 	server           niface.IServer          // 所属服务端
 	client           niface.IClient          // 所属客户端
@@ -36,7 +36,7 @@ type HeartbeatDefaultRouter struct {
 
 // Handle 处理心跳消息
 func (hbr *HeartbeatDefaultRouter) Handle(req niface.IRequest) {
-	nlog.Debug(req.GetCtx(), "Receive Heartbeat", zap.String("From", req.GetConnection().RemoteAddr().String()), zap.Uint32("MsgID", req.GetMsgID()), zap.ByteString("Data", req.GetData()))
+	nlog.Debug(req.GetCtx(), "Receive Heartbeat", zap.String("From", req.GetConnection().RemoteAddr().String()), zap.Uint16("MsgID", req.GetMsgID()), zap.ByteString("Data", req.GetData()))
 }
 
 // NewHeartbeatCheckerServer Server 创建心跳检测器
@@ -80,7 +80,7 @@ func (hbc *HeartbeatChecker) SetOnRemoteNotAlive(f niface.OnRemoteNotAlive) {
 }
 
 // BindRouter 绑定心跳检测消息业务处理路由
-func (hbc *HeartbeatChecker) BindRouter(msgID uint32, router niface.IRouter) {
+func (hbc *HeartbeatChecker) BindRouter(msgID uint16, router niface.IRouter) {
 	if router != nil && msgID != niface.HeartBeatDefaultMsgID {
 		hbc.msgID = msgID
 		hbc.router = router
@@ -110,7 +110,7 @@ func (hbc *HeartbeatChecker) checkServer() {
 			} else {
 				msg := hbc.makeMsg(conn)
 				if err := conn.SendMsg(hbc.msgID, msg); err != nil {
-					nlog.Error(nil, "Send Heartbeat Msg Error", zap.Uint32("MsgID", hbc.msgID), zap.ByteString("Msg", msg), zap.Error(err))
+					nlog.Error(nil, "Send Heartbeat Msg Error", zap.Uint16("MsgID", hbc.msgID), zap.ByteString("Msg", msg), zap.Error(err))
 				}
 			}
 		}
@@ -125,7 +125,7 @@ func (hbc *HeartbeatChecker) checkClient() {
 	// 	} else {
 	// 		msg := hbc.makeMsg(hbc.client.Conn())
 	// 		if err := hbc.client.Conn().SendMsg(hbc.msgID, msg); err != nil {
-	// 			nlog.Error(nil, "Send Heartbeat Msg Error", zap.Uint32("MsgID", hbc.msgID), zap.ByteString("Msg", msg), zap.Error(err))
+	// 			nlog.Error(nil, "Send Heartbeat Msg Error", zap.Uint16("MsgID", hbc.msgID), zap.ByteString("Msg", msg), zap.Error(err))
 	// 		}
 	// 	}
 	// }

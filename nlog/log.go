@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-13 21:31:17
+ * @LastEditTime: 2023-03-15 16:06:32
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -14,14 +14,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/liusuxian/nova/nconf"
-	"github.com/liusuxian/nova/nrequest"
 	"github.com/liusuxian/nova/utils/nfile"
 	"github.com/liusuxian/nova/utils/nstr"
 	"github.com/natefinch/lumberjack"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,6 +28,12 @@ import (
 
 // LogConfig 日志配置
 type LogConfig struct {
+	CtxKeys []string          // 自定义 Context 上下文变量名称，自动打印 Context 的变量到日志中。默认为空
+	Details []LogDetailConfig // 日志详细配置
+}
+
+// LogDetailConfig 日志详细配置
+type LogDetailConfig struct {
 	Level      string // 日志打印级别 debug、info、warn、error、dpanic、panic、fatal
 	Format     string // 输出日志格式 logfmt、json
 	Path       string // 输出日志文件路径
@@ -58,29 +62,30 @@ var logLevel = map[string]zapcore.Level{
 // 只能输出结构化日志，但是性能要高于SugaredLogger
 var logger *zap.Logger
 
+// 日志配置
+var logConfig LogConfig
+
 func init() {
 	// 读取配置
 	var err error
-	confSlice := []LogConfig{}
-	if err = nconf.StructKey("logger", &confSlice); err != nil {
-		log.Fatalf("Get Logger Config Error: %+v\n", err)
+	if err = nconf.StructKey("logger", &logConfig); err != nil {
+		panic(errors.Wrapf(err, "Get Logger Config Error"))
 	}
 	// 初始化日志
-	if err = initLogger(confSlice); err != nil {
-		log.Fatalf("Init Logger Error: %+v\n", err)
+	if err = initLogger(logConfig.Details); err != nil {
+		panic(errors.Wrapf(err, "Init Logger Error"))
 	}
-	log.Println("Init Logger Succeed !!!")
 }
 
 // 初始化日志
-func initLogger(confSlice []LogConfig) (err error) {
-	confSliceLen := len(confSlice)
-	if confSliceLen == 0 {
-		err = errors.Errorf("Logger Config Empty: %+v", confSlice)
+func initLogger(details []LogDetailConfig) (err error) {
+	detailsLen := len(details)
+	if detailsLen == 0 {
+		err = errors.Errorf("Logger Details Config Empty: %+v", details)
 		return
 	}
-	coreSlice := make([]zapcore.Core, 0, confSliceLen)
-	for _, conf := range confSlice {
+	coreSlice := make([]zapcore.Core, 0, detailsLen)
+	for _, conf := range details {
 		// 获取日志输出方式
 		var writeSyncer zapcore.WriteSyncer
 		if writeSyncer, err = getWriter(conf); err != nil {
@@ -105,7 +110,7 @@ func initLogger(confSlice []LogConfig) (err error) {
 }
 
 // 获取编码器(如何写入日志)
-func getEncoder(conf LogConfig) zapcore.Encoder {
+func getEncoder(conf LogDetailConfig) zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig() // NewJSONEncoder()输出json格式，NewConsoleEncoder()输出普通文本格式
 	encoderConfig.LevelKey = "level"
 	encoderConfig.TimeKey = "time"
@@ -128,7 +133,7 @@ func getEncoder(conf LogConfig) zapcore.Encoder {
 }
 
 // 获取日志输出方式
-func getWriter(conf LogConfig) (writeSyncer zapcore.WriteSyncer, err error) {
+func getWriter(conf LogDetailConfig) (writeSyncer zapcore.WriteSyncer, err error) {
 	// 判断日志路径是否存在，如果不存在就创建
 	conf.Path = strings.TrimSpace(conf.Path)
 	if !nfile.PathExists(conf.Path) {
@@ -220,14 +225,14 @@ func withCtxLogger(ctx context.Context, fields ...zap.Field) *zap.Logger {
 	if ctx == nil {
 		return logger.With(fields...)
 	}
-	req := nrequest.RequestFromCtx(ctx)
-	if req == nil {
+	ctxKeys := logConfig.CtxKeys
+	ctxKeysLen := len(ctxKeys)
+	if ctxKeysLen == 0 {
 		return logger.With(fields...)
 	}
-	ctxKeys := req.GetCtxKeys()
-	fieldList := make([]zapcore.Field, 0, len(ctxKeys))
-	for _, key := range req.GetCtxKeys() {
-		fieldList = append(fieldList, zap.Any(key, req.GetCtxVal(key)))
+	fieldList := make([]zapcore.Field, 0, ctxKeysLen)
+	for _, key := range ctxKeys {
+		fieldList = append(fieldList, zap.Any(key, ctx.Value(key)))
 	}
 	return logger.With(fieldList...).With(fields...)
 }
