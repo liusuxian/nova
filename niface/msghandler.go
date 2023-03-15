@@ -12,10 +12,10 @@ package niface
 
 // IMsgHandle 消息处理接口
 type IMsgHandle interface {
-	DoMsgHandler(req IRequest)              // 马上以非阻塞方式处理消息
+	DoMsgHandler(request IRequest)          // 马上以非阻塞方式处理消息
 	AddRouter(msgID uint16, router IRouter) // 为消息添加具体的处理逻辑
 	StartWorkerPool()                       // 启动 Worker 工作池
 	StopWorkerPool()                        // 停止 Worker 工作池
 	RebootWorkerPool()                      // 重启 Worker 工作池
-	SendMsgToWorkerPool(req IRequest)       // 将消息交给 WorkerPool，由 Worker 进行处理
+	SendMsgToWorkerPool(request IRequest)   // 将消息交给 WorkerPool，由 Worker 进行处理
 }

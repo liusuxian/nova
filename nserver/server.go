@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 20:35:24
+ * @LastEditTime: 2023-03-15 21:27:34
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -32,7 +32,7 @@ type Server struct {
 	options           gnet.Options                  // 服务器 Net 启动选项
 	serverConf        *ServerConfig                 // 服务器配置
 	addr              string                        // 服务器绑定的地址
-	ctx               context.Context               // 当前 Server 的 Context
+	ctx               context.Context               // 当前 Server 的根 Context
 	msgHandler        niface.IMsgHandle             // 当前 Server 绑定的消息处理模块
 	connMgr           niface.IConnManager           // 当前 Server 的连接管理模块
 	onConnStart       func(conn niface.IConnection) // 当前 Server 的连接创建时的 Hook 函数
@@ -70,12 +70,12 @@ func NewServer(opts ...Option) niface.IServer {
 		serverConf:        serCfg,
 		addr:              fmt.Sprintf("%s://:%d", serCfg.Network, serCfg.Port),
 		ctx:               ctx,
-		msgHandler:        nmsghandler.NewMsgHandle(),
-		connMgr:           nconn.NewConnManager(),
+		msgHandler:        nmsghandler.NewMsgHandle(ctx, serCfg.WorkerPoolSize),
+		connMgr:           nconn.NewConnManager(ctx),
 		packet:            npack.Factory().NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
 		heartbeatInterval: heartbeatInterval,
 	}
-	s.heartbeatChecker = nheartbeat.NewHeartbeatCheckerServer(s)
+	s.heartbeatChecker = nheartbeat.NewHeartbeatCheckerServer(ctx, s)
 	for _, opt := range opts {
 		opt(s)
 	}
