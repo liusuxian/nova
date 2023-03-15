@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 18:01:43
+ * @LastEditTime: 2023-03-15 20:35:24
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -107,6 +107,11 @@ func (s *Server) GetConnManager() niface.IConnManager {
 	return s.connMgr
 }
 
+// 获取当前活跃的连接数
+func (s *Server) GetConnections() uint32 {
+	return uint32(s.eng.CountConnections())
+}
+
 // SetOnConnStart 设置当前 Server 的连接创建时的 Hook 函数
 func (s *Server) SetOnConnStart(hookFunc func(niface.IConnection)) {
 	s.onConnStart = hookFunc
@@ -160,13 +165,13 @@ func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
 
 // TODO OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
 func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnClose", zap.String("RemoteAddr", conn.RemoteAddr().String()), zap.Int("Connections", s.eng.CountConnections()))
+	nlog.Info(s.ctx, "Server OnClose", zap.String("RemoteAddr", conn.RemoteAddr().String()), zap.Uint32("Connections", s.GetConnections()))
 	return
 }
 
 // TODO OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
 func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", conn.Fd()), zap.Int("Connections", s.eng.CountConnections()))
+	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", conn.Fd()), zap.Uint32("Connections", s.GetConnections()))
 	return
 }
 
@@ -178,7 +183,7 @@ func (s *Server) OnShutdown(eng gnet.Engine) {
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
 func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
-	nlog.Debug(s.ctx, "Server OnTick", zap.Int("Connections", s.eng.CountConnections()))
+	nlog.Debug(s.ctx, "Server OnTick", zap.Uint32("Connections", s.GetConnections()))
 	go s.heartbeatChecker.Check()
 	delay = s.heartbeatInterval
 	return
