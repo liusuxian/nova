@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-20 23:09:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 19:00:58
+ * @LastEditTime: 2023-03-16 20:11:38
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/tcp_demo/client/client.go
  * @Description:
  *
@@ -13,6 +13,7 @@ package main
 import (
 	"github.com/liusuxian/nova/nclient"
 	"github.com/panjf2000/gnet/v2"
+	"log"
 	"os"
 	"os/signal"
 	"sync"
@@ -36,5 +37,6 @@ func main() {
 	// 注册信号接收器
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 	// 等待信号
-	<-c
+	sig := <-c
+	log.Printf("收到退出信号 %s 客户端将退出\n", sig.String())
 }
