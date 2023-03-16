@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 00:49:32
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 19:23:18
+ * @LastEditTime: 2023-03-16 19:44:59
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connmanager.go
  * @Description:
  *
@@ -38,14 +38,14 @@ func NewConnManager(ctx context.Context) *ConnManager {
 func (cm *ConnManager) AddConn(conn niface.IConnection) {
 	key := strconv.FormatInt(int64(conn.GetConnID()), 10)
 	cm.connMap.Set(key, conn)
-	nlog.Debug(cm.ctx, "Connection Add To ConnManager Success", zap.Int("ConnCount", cm.connMap.Count()))
+	nlog.Debug(cm.ctx, "Connection Add To ConnManager Success", zap.Int("ConnID", conn.GetConnID()), zap.Int("ConnCount", cm.connMap.Count()))
 }
 
 // RemoveConn 删除连接
-func (cm *ConnManager) RemoveConn(conn niface.IConnection) {
-	key := strconv.FormatInt(int64(conn.GetConnID()), 10)
+func (cm *ConnManager) RemoveConn(connID int) {
+	key := strconv.FormatInt(int64(connID), 10)
 	cm.connMap.Remove(key)
-	nlog.Debug(cm.ctx, "Connection Remove From ConnManager Success", zap.Int("ConnID", conn.GetConnID()), zap.Int("ConnCount", cm.connMap.Count()))
+	nlog.Debug(cm.ctx, "Connection Remove From ConnManager Success", zap.Int("ConnID", connID), zap.Int("ConnCount", cm.connMap.Count()))
 }
 
 // GetConn 通过 ConnID 获取连接

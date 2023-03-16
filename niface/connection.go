@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 20:17:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 11:30:52
+ * @LastEditTime: 2023-03-16 19:53:33
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/connection.go
  * @Description:
  *
@@ -31,6 +31,7 @@ type IConnection interface {
 	GetProperty(key string) (any, error)         // 获取当前连接属性
 	RemoveProperty(key string)                   // 移除当前连接属性
 	IsAlive() bool                               // 判断当前连接是否存活
+	UpdateActivity()                             // 更新连接活动时间
 }
 
 // 用户自定义的心跳检测消息处理方法

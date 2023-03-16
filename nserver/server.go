@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 18:09:52
+ * @LastEditTime: 2023-03-16 19:58:47
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -180,15 +180,19 @@ func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	return
 }
 
-// TODO OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
-func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnClose", zap.String("RemoteAddr", conn.RemoteAddr().String()), zap.Int("Connections", s.GetConnections()))
+// OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
+func (s *Server) OnClose(c gnet.Conn, err error) (action gnet.Action) {
+	nlog.Info(s.ctx, "Server OnClose", zap.String("RemoteAddr", c.RemoteAddr().String()), zap.Int("Connections", s.GetConnections()))
+	// 删除连接
+	s.connMgr.RemoveConn(c.Fd())
 	return
 }
 
-// TODO OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
-func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", conn.Fd()), zap.Int("Connections", s.GetConnections()))
+// OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
+func (s *Server) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
+	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", c.Fd()), zap.Int("Connections", s.GetConnections()))
+	// 添加连接
+	s.connMgr.AddConn(nconn.NewServerConn(s.ctx, s, c, s.heartbeatInterval))
 	return
 }
 
@@ -201,14 +205,14 @@ func (s *Server) OnShutdown(eng gnet.Engine) {
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
 func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
 	nlog.Debug(s.ctx, "Server OnTick", zap.Int("Connections", s.GetConnections()))
-	go s.heartbeatChecker.Check()
+	// go s.heartbeatChecker.Check()
 	return s.heartbeatInterval, s.action
 }
 
 // OnTraffic 在本地套接字从对等方接收数据时触发。
-func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
+func (s *Server) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	for {
-		msg, err := s.packet.Unpack(conn)
+		msg, err := s.packet.Unpack(c)
 		if err == npack.ErrIncompletePacket {
 			break
 		}
@@ -217,6 +221,14 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 			return gnet.Close
 		}
 		nlog.Debug(s.ctx, "Server OnTraffic", zap.Uint16("MsgID", msg.GetMsgID()), zap.Int("DataLen", msg.GetDataLen()), zap.ByteString("Data", msg.GetData()))
+		conn, err := s.connMgr.GetConn(c.Fd())
+		if err != nil {
+			nlog.Error(s.ctx, "Server OnTraffic GetConn Error", zap.Error(err))
+		}
+		if conn != nil {
+			// 更新连接活动时间
+			conn.UpdateActivity()
+		}
 	}
 	return
 }
