@@ -191,8 +191,8 @@ func (s *Server) OnClose(c gnet.Conn, err error) (action gnet.Action) {
 // OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
 func (s *Server) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
 	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", c.Fd()), zap.Int("Connections", s.GetConnections()))
-	// 添加连接
-	s.connMgr.AddConn(nconn.NewServerConn(s.ctx, s, c, s.heartbeatInterval))
+	// 创建一个 Server 服务端特性的连接
+	nconn.NewServerConn(s.ctx, s, c, s.heartbeatInterval)
 	return
 }
 
