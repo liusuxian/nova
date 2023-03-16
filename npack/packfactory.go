@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 21:13:41
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 00:32:39
+ * @LastEditTime: 2023-03-16 12:57:36
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/packfactory.go
  * @Description:
  *
@@ -34,7 +34,7 @@ func Factory() *packFactory {
 }
 
 // NewPack 创建一个具体的封包拆包对象
-func (pf *packFactory) NewPack(packetMethod, endian uint8, maxPacketSize uint32) (dataPack niface.IDataPack) {
+func (pf *packFactory) NewPack(packetMethod, endian, maxPacketSize int) (dataPack niface.IDataPack) {
 	switch packetMethod {
 	case 1:
 		// 默认封包拆包方式

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 16:06:32
+ * @LastEditTime: 2023-03-16 12:39:30
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -38,9 +38,9 @@ type LogDetailConfig struct {
 	Format     string // 输出日志格式 logfmt、json
 	Path       string // 输出日志文件路径
 	Filename   string // 输出日志文件名称
-	MaxSize    int    // 单个日志文件最多存储量，单位(mb)
+	MaxSize    int    // 单个日志文件最多存储量（单位:MB）
 	MaxBackups int    // 日志备份文件最多数量
-	MaxAge     int    // 日志保留时间，单位:天(day)
+	MaxAge     int    // 日志保留时间（单位:天）
 	Compress   bool   // 是否压缩日志
 	Stdout     bool   // 是否输出到控制台
 }

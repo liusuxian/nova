@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 16:26:12
+ * @LastEditTime: 2023-03-16 12:48:25
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf_test.go
  * @Description:
  *
@@ -19,14 +19,14 @@ import (
 type ServerConfig struct {
 	Name           string // 服务器应用名称，默认"Nova"
 	Network        string // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
-	Port           uint16 // 服务器监听端口（uint16）
-	MaxHeartbeat   uint32 // 最长心跳检测间隔时间（单位: 毫秒 uint32），默认 5000
-	MaxConn        uint32 // 允许的客户端连接最大数量，默认 3（uint32）
-	WorkerPoolSize uint32 // 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
-	MaxPacketSize  uint32 // 数据包的最大值，默认 4096（单位:字节 uint32）
-	PacketMethod   uint8  // 封包和拆包方式，默认 1，1: 消息ID(2字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
-	Endian         uint8  // 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
-	MaxMsgChanLen  uint32 // SendBuffMsg发送消息的缓冲最大长度，默认 1024（单位:字节 uint32）
+	Port           int    // 服务器监听端口
+	MaxHeartbeat   int    // 最长心跳检测间隔时间（单位:毫秒），默认 5000
+	MaxConn        int    // 允许的客户端连接最大数量，默认 3
+	WorkerPoolSize int    // 工作任务池最大工作 Goroutine 数量，默认 10
+	MaxPacketSize  int    // 数据包的最大值（单位:字节），默认 4096
+	PacketMethod   int    // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
+	Endian         int    // 字节存储次序，1: 小端 2: 大端，默认 1
+	MaxMsgChanLen  int    // 发送消息的缓冲最大长度（单位:字节），默认 1024
 }
 
 // LogConfig 日志配置
@@ -41,9 +41,9 @@ type LogDetailConfig struct {
 	Format     string // 输出日志格式 logfmt、json
 	Path       string // 输出日志文件路径
 	Filename   string // 输出日志文件名称
-	MaxSize    int    // 单个日志文件最多存储量，单位(mb)
+	MaxSize    int    // 单个日志文件最多存储量（单位:MB）
 	MaxBackups int    // 日志备份文件最多数量
-	MaxAge     int    // 日志保留时间，单位:天(day)
+	MaxAge     int    // 日志保留时间（单位:天）
 	Compress   bool   // 是否压缩日志
 	Stdout     bool   // 是否输出到控制台
 }

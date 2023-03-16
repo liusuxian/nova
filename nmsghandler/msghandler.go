@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 21:17:46
+ * @LastEditTime: 2023-03-16 12:40:58
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -23,11 +23,11 @@ type MsgHandle struct {
 	ctx            context.Context           // 当前 Server 的根 Context
 	apis           map[uint16]niface.IRouter // 存放每个 MsgID 所对应的处理方法
 	workerPool     *ants.Pool                // Worker 工作池
-	workerPoolSize uint32                    // Worker 池的最大 Worker 数量
+	workerPoolSize int                       // Worker 池的最大 Worker 数量
 }
 
 // NewMsgHandle 创建消息处理
-func NewMsgHandle(ctx context.Context, workerPoolSize uint32) *MsgHandle {
+func NewMsgHandle(ctx context.Context, workerPoolSize int) *MsgHandle {
 	return &MsgHandle{
 		ctx:            ctx,
 		apis:           make(map[uint16]niface.IRouter),
@@ -62,7 +62,7 @@ func (mh *MsgHandle) AddRouter(msgID uint16, router niface.IRouter) {
 // StartWorkerPool 启动 Worker 工作池
 func (mh *MsgHandle) StartWorkerPool() {
 	if mh.workerPool == nil {
-		workerPool, err := ants.NewPool(int(mh.workerPoolSize))
+		workerPool, err := ants.NewPool(mh.workerPoolSize)
 		if err != nil {
 			nlog.Fatal(mh.ctx, "StartWorkerPool Fatal", zap.Error(err))
 		}

@@ -12,10 +12,10 @@ package niface
 
 // IMessage 消息接口
 type IMessage interface {
-	SetMsgID(uint16)    // 设置消息 ID
-	SetDataLen(uint32)  // 设置消息体长度
-	SetData([]byte)     // 设置消息内容
-	GetMsgID() uint16   // 获取消息 ID
-	GetDataLen() uint32 // 获取消息体长度
-	GetData() []byte    // 获取消息内容
+	SetMsgID(uint16)  // 设置消息 ID
+	SetDataLen(int)   // 设置消息体长度
+	SetData([]byte)   // 设置消息内容
+	GetMsgID() uint16 // 获取消息 ID
+	GetDataLen() int  // 获取消息体长度
+	GetData() []byte  // 获取消息内容
 }
