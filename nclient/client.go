@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 15:22:57
+ * @LastEditTime: 2023-03-16 19:25:47
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -11,34 +11,30 @@
 package nclient
 
 import (
-	"context"
 	"github.com/liusuxian/nova/niface"
-	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/npack"
 	"github.com/panjf2000/gnet/v2"
-	"go.uber.org/zap"
+	"github.com/pkg/errors"
 )
 
 // Client 客户端结构
 type Client struct {
 	gnet.BuiltinEventEngine
-	client  *gnet.Client    // gnet 客户端
-	conn    gnet.Conn       // gnet Conn
-	ctx     context.Context // 客户端 Context
-	network string          // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
-	addr    string          // 服务器地址
+	client  *gnet.Client // gnet 客户端
+	conn    gnet.Conn    // gnet Conn
+	network string       // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
+	addr    string       // 服务器地址
 }
 
 // NewClient 创建 Client
 func NewClient(network, addr string, options gnet.Options) niface.IClient {
 	c := &Client{
-		ctx:     context.Background(),
 		network: network,
 		addr:    addr,
 	}
 	client, err := gnet.NewClient(c, gnet.WithOptions(options))
 	if err != nil {
-		nlog.Fatal(c.ctx, "New Client Error", zap.Error(err))
+		panic(errors.Wrapf(err, "New Client Error"))
 	}
 	c.client = client
 
@@ -49,7 +45,7 @@ func NewClient(network, addr string, options gnet.Options) niface.IClient {
 func (c *Client) Start() {
 	conn, err := c.client.Dial(c.network, c.addr)
 	if err != nil {
-		nlog.Fatal(c.ctx, "Start Client Error", zap.Error(err))
+		panic(errors.Wrapf(err, "Start Client Error"))
 	}
 	c.conn = conn
 	// 创建一个封包对象
@@ -69,4 +65,49 @@ func (c *Client) Start() {
 // Stop 停止客户端
 func (c *Client) Stop() {
 	c.client.Stop()
+}
+
+// 给当前 Client 添加路由
+func (c *Client) AddRouter(msgID uint16, router niface.IRouter) {
+}
+
+// 当前 Client 的连接信息
+func (c *Client) Conn() niface.IConnection {
+	return nil
+}
+
+// 设置当前 Client 的连接创建时Hook函数
+func (c *Client) SetOnConnStart(f func(niface.IConnection)) {
+}
+
+// 设置当前 Client 的连接断开时的Hook函数
+func (c *Client) SetOnConnStop(f func(niface.IConnection)) {
+}
+
+// 获取当前 Client 的连接创建时Hook函数
+func (c *Client) GetOnConnStart() func(niface.IConnection) {
+	return nil
+}
+
+// 获取当前 Client 的连接断开时的Hook函数
+func (c *Client) GetOnConnStop() func(niface.IConnection) {
+	return nil
+}
+
+// 设置当前 Client 绑定的数据协议封包方式
+func (c *Client) SetPacket(pack niface.IDataPack) {
+}
+
+// 获取当前 Client 绑定的数据协议封包方式
+func (c *Client) GetPacket() niface.IDataPack {
+	return nil
+}
+
+// 获取当前 Client 绑定的消息处理模块
+func (c *Client) GetMsgHandler() niface.IMsgHandle {
+	return nil
+}
+
+// 设置心跳检测
+func (c *Client) SetHeartBeat(option *niface.HeartBeatOption) {
 }

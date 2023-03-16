@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 00:49:32
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 21:27:19
+ * @LastEditTime: 2023-03-16 19:23:18
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connmanager.go
  * @Description:
  *
@@ -17,6 +17,7 @@ import (
 	cmap "github.com/orcaman/concurrent-map/v2"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"strconv"
 )
 
 // ConnManager 连接管理结构
@@ -35,38 +36,28 @@ func NewConnManager(ctx context.Context) *ConnManager {
 
 // AddConn 添加连接
 func (cm *ConnManager) AddConn(conn niface.IConnection) {
-	cm.connMap.Set(conn.GetConnID(), conn)
-	nlog.Debug(cm.ctx, "Connection Add To ConnManager Success", zap.Int("Count", cm.connMap.Count()))
+	key := strconv.FormatInt(int64(conn.GetConnID()), 10)
+	cm.connMap.Set(key, conn)
+	nlog.Debug(cm.ctx, "Connection Add To ConnManager Success", zap.Int("ConnCount", cm.connMap.Count()))
 }
 
 // RemoveConn 删除连接
 func (cm *ConnManager) RemoveConn(conn niface.IConnection) {
-	cm.connMap.Remove(conn.GetConnID())
-	nlog.Debug(cm.ctx, "Connection Remove From ConnManager Success", zap.String("ConnID", conn.GetConnID()), zap.Int("Count", cm.connMap.Count()))
+	key := strconv.FormatInt(int64(conn.GetConnID()), 10)
+	cm.connMap.Remove(key)
+	nlog.Debug(cm.ctx, "Connection Remove From ConnManager Success", zap.Int("ConnID", conn.GetConnID()), zap.Int("ConnCount", cm.connMap.Count()))
 }
 
 // GetConn 通过 ConnID 获取连接
-func (cm *ConnManager) GetConn(connID string) (niface.IConnection, error) {
-	if conn, ok := cm.connMap.Get(connID); ok {
+func (cm *ConnManager) GetConn(connID int) (niface.IConnection, error) {
+	key := strconv.FormatInt(int64(connID), 10)
+	if conn, ok := cm.connMap.Get(key); ok {
 		return conn, nil
 	}
 	return nil, errors.New("Connection Not Found")
 }
 
-// ClearAllConn 清除并停止当前所有连接
-func (cm *ConnManager) ClearAllConn() {
-	for item := range cm.connMap.IterBuffered() {
-		item.Val.Stop()             // 停止当前连接
-		cm.connMap.Remove(item.Key) // 清除当前连接
-	}
-	nlog.Debug(cm.ctx, "Clear All Connection From ConnManager Success", zap.Int("Count", cm.connMap.Count()))
-}
-
-// GetAllConnID 获取当前所有 ConnID
-func (cm *ConnManager) GetAllConnID() []string {
-	ids := make([]string, 0, cm.connMap.Count())
-	for item := range cm.connMap.IterBuffered() {
-		ids = append(ids, item.Val.GetConnID())
-	}
-	return ids
+// GetAllConn 获取当前所有连接
+func (cm *ConnManager) GetAllConn() map[string]niface.IConnection {
+	return cm.connMap.Items()
 }

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 21:57:53
+ * @LastEditTime: 2023-03-16 18:09:52
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -22,6 +22,9 @@ import (
 	"github.com/liusuxian/nova/npack"
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -29,7 +32,8 @@ import (
 type Server struct {
 	gnet.BuiltinEventEngine
 	eng               gnet.Engine
-	options           gnet.Options                  // 服务器 Net 启动选项
+	options           gnet.Options                  // 服务器 gnet 启动选项
+	action            gnet.Action                   // gnet 事件完成后发生的动作，None 无任何操作，Close 关闭连接，Shutdown 停止整个gnet引擎
 	serverConf        *ServerConfig                 // 服务器配置
 	addr              string                        // 服务器绑定的地址
 	ctx               context.Context               // 当前 Server 的根 Context
@@ -46,14 +50,14 @@ type Server struct {
 type ServerConfig struct {
 	Name           string // 服务器应用名称，默认"Nova"
 	Network        string // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
-	Port           uint16 // 服务器监听端口（uint16）
-	MaxHeartbeat   uint32 // 最长心跳检测间隔时间（单位: 毫秒 uint32），默认 5000
-	MaxConn        uint32 // 允许的客户端连接最大数量，默认 3（uint32）
-	WorkerPoolSize uint32 // 工作任务池最大工作 Goroutine 数量，默认 10（uint32）
-	MaxPacketSize  uint32 // 数据包的最大值，默认 4096（单位:字节 uint32）
-	PacketMethod   uint8  // 封包和拆包方式，默认 1，1: 消息ID(2字节)-消息体长度(4字节)-消息内容（单位:字节 uint8）
-	Endian         uint8  // 字节存储次序，默认小端，1: 小端 2: 大端（单位:字节 uint8）
-	MaxMsgChanLen  uint32 // SendBuffMsg发送消息的缓冲最大长度，默认 1024（单位:字节 uint32）
+	Port           int    // 服务器监听端口
+	MaxHeartbeat   int    // 最长心跳检测间隔时间（单位:毫秒），默认 5000
+	MaxConn        int    // 允许的客户端连接最大数量，默认 3
+	WorkerPoolSize int    // 工作任务池最大工作 Goroutine 数量，默认 10
+	MaxPacketSize  int    // 数据包的最大值（单位:字节），默认 4096
+	PacketMethod   int    // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
+	Endian         int    // 字节存储次序，1: 小端 2: 大端，默认 1
+	MaxMsgChanLen  int    // 发送消息的缓冲最大长度（单位:字节），默认 1024
 }
 
 // NewServer 创建 Server
@@ -67,6 +71,7 @@ func NewServer(opts ...Option) niface.IServer {
 	// 初始化 Server 属性
 	heartbeatInterval := time.Duration(serCfg.MaxHeartbeat) * time.Millisecond
 	s := &Server{
+		action:            gnet.None,
 		serverConf:        serCfg,
 		addr:              fmt.Sprintf("%s://:%d", serCfg.Network, serCfg.Port),
 		ctx:               ctx,
@@ -84,6 +89,20 @@ func NewServer(opts ...Option) niface.IServer {
 
 // TODO Start 启动服务器
 func (s *Server) Start() {
+	nlog.Info(s.ctx, "Start Server......", zap.String("ServerName", s.serverConf.Name), zap.Int("Pid", os.Getpid()))
+
+	go func(s *Server) {
+		// 创建一个通道，用于接收信号
+		c := make(chan os.Signal, 1)
+		// 注册信号接收器
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		// 等待信号
+		sig := <-c
+		nlog.Info(s.ctx, "Server Interrupt Signal", zap.String("ServerName", s.serverConf.Name), zap.String("Signal", sig.String()))
+		// 停止服务器
+		s.Stop()
+	}(s)
+
 	if err := gnet.Run(s, s.addr, gnet.WithOptions(s.options)); err != nil {
 		nlog.Fatal(s.ctx, "Start Server Error", zap.Error(err))
 	}
@@ -91,10 +110,8 @@ func (s *Server) Start() {
 
 // TODO Stop 停止服务器
 func (s *Server) Stop() {
-	nlog.Info(s.ctx, "Stop Server......", zap.String("ServerName", s.serverConf.Name))
-	// 清除并停止当前所有连接
-	s.connMgr.ClearAllConn()
-	s.eng.Stop(s.ctx)
+	nlog.Info(s.ctx, "Stop Server......", zap.String("ServerName", s.serverConf.Name), zap.Int("Pid", os.Getpid()))
+	s.action = gnet.Shutdown
 }
 
 // AddRouter 路由功能：给当前服务注册一个路由业务方法，供客户端连接处理使用
@@ -108,8 +125,8 @@ func (s *Server) GetConnManager() niface.IConnManager {
 }
 
 // 获取当前活跃的连接数
-func (s *Server) GetConnections() uint32 {
-	return uint32(s.eng.CountConnections())
+func (s *Server) GetConnections() int {
+	return s.eng.CountConnections()
 }
 
 // SetOnConnStart 设置当前 Server 的连接创建时的 Hook 函数
@@ -158,20 +175,20 @@ func (s *Server) SetHeartBeat(option *niface.HeartBeatOption) {
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnBoot", zap.String("listening", s.addr), zap.String("ServerName", s.serverConf.Name), zap.Any("options", s.options))
 	s.eng = eng
+	nlog.Info(s.ctx, "Server OnBoot", zap.String("listening", s.addr), zap.String("ServerName", s.serverConf.Name), zap.Any("options", s.options))
 	return
 }
 
 // TODO OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
 func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnClose", zap.String("RemoteAddr", conn.RemoteAddr().String()), zap.Uint32("Connections", s.GetConnections()))
+	nlog.Info(s.ctx, "Server OnClose", zap.String("RemoteAddr", conn.RemoteAddr().String()), zap.Int("Connections", s.GetConnections()))
 	return
 }
 
 // TODO OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
 func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", conn.Fd()), zap.Uint32("Connections", s.GetConnections()))
+	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", conn.Fd()), zap.Int("Connections", s.GetConnections()))
 	return
 }
 
@@ -183,10 +200,9 @@ func (s *Server) OnShutdown(eng gnet.Engine) {
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
 func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
-	nlog.Debug(s.ctx, "Server OnTick", zap.Uint32("Connections", s.GetConnections()))
+	nlog.Debug(s.ctx, "Server OnTick", zap.Int("Connections", s.GetConnections()))
 	go s.heartbeatChecker.Check()
-	delay = s.heartbeatInterval
-	return
+	return s.heartbeatInterval, s.action
 }
 
 // OnTraffic 在本地套接字从对等方接收数据时触发。
@@ -198,10 +214,9 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		}
 		if err != nil {
 			nlog.Error(s.ctx, "Server OnTraffic Error", zap.Error(err))
-			action = gnet.Close
-			return
+			return gnet.Close
 		}
-		nlog.Debug(s.ctx, "Server OnTraffic", zap.Uint16("MsgID", msg.GetMsgID()), zap.Uint32("DataLen", msg.GetDataLen()), zap.ByteString("Data", msg.GetData()))
+		nlog.Debug(s.ctx, "Server OnTraffic", zap.Uint16("MsgID", msg.GetMsgID()), zap.Int("DataLen", msg.GetDataLen()), zap.ByteString("Data", msg.GetData()))
 	}
 	return
 }

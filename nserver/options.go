@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-15 13:26:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 14:39:09
+ * @LastEditTime: 2023-03-16 14:58:39
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/options.go
  * @Description:
  *
@@ -46,98 +46,113 @@ func WithPacket(pack niface.IDataPack) Option {
 	}
 }
 
-// 设置是否启用多核支持
+// WithMulticore 表示引擎是否将有效地创建为多核，如果是这样的话，
+// 那么您必须注意在所有事件回调之间同步内存，否则，
+// 它将使用单线程运行引擎。引擎中的线程数将自动
+// 被分配为当前进程可用的逻辑 CPU 数
 func WithMulticore(multicore bool) Option {
 	return func(s *Server) {
 		s.options.Multicore = multicore
 	}
 }
 
-// 设置事件循环数量。每个事件循环都是一个 goroutine，默认情况下，会创建与 CPU 核心数相同的事件循环
+// WithNumEventLoop 设置要启动的事件循环goroutine的数量
+//
+//	注意：设置 NumEventLoop 将覆盖 Multicore
 func WithNumEventLoop(numEventLoop int) Option {
 	return func(s *Server) {
 		s.options.NumEventLoop = numEventLoop
 	}
 }
 
-// 设置负载均衡算法
+// WithLoadBalancing 表示分配新连接时使用的负载均衡算法
 func WithLoadBalancing(lb LoadBalancing) Option {
 	return func(s *Server) {
 		s.options.LB = gnet.LoadBalancing(lb)
 	}
 }
 
-// 设置是否启用地址复用
+// WithReuseAddr 表示是否设置 SO_REUSEADDR 套接字选项
 func WithReuseAddr(reuseAddr bool) Option {
 	return func(s *Server) {
 		s.options.ReuseAddr = reuseAddr
 	}
 }
 
-// 设置是否启用端口复用
+// WithReusePort 表示是否设置 SO_REUSEPORT 套接字选项
 func WithReusePort(reusePort bool) Option {
 	return func(s *Server) {
 		s.options.ReusePort = reusePort
 	}
 }
 
-// 设置多播（UDP multicast）套接字绑定的网络接口
+// WithMulticastInterfaceIndex 是多播 UDP 地址将绑定到的接口名称的索引
 func WithMulticastInterfaceIndex(idx int) Option {
 	return func(s *Server) {
 		s.options.MulticastInterfaceIndex = idx
 	}
 }
 
-// 设置读取数据时的缓冲区大小
+// WithReadBufferCap 是在可读事件到来时从对端读取的最大字节数。
+// 默认值为64KB，可以减小它以避免影响后续连接，也可以增加它以从套接字读取更多数据。
+//
+// 请注意，ReadBufferCap 将始终转换为大于或等于其实际值的最小的2的幂整数值
 func WithReadBufferCap(readBufferCap int) Option {
 	return func(s *Server) {
 		s.options.ReadBufferCap = readBufferCap
 	}
 }
 
-// 设置写入数据时的缓冲区大小
+// WithWriteBufferCap 是静态出站缓冲区可以容纳的最大字节数，
+// 如果数据超过此值，溢出将存储在弹性链表缓冲区中。默认值为64KB。
+//
+// 请注意，WriteBufferCap 将始终转换为大于或等于其实际值的最小的2的幂整数值
 func WithWriteBufferCap(writeBufferCap int) Option {
 	return func(s *Server) {
 		s.options.WriteBufferCap = writeBufferCap
 	}
 }
 
-// 设置 I/O 事件循环的 LockOSThread 模式。每个事件循环都是一个 goroutine，LockOSThread 模式可以锁定 goroutine 所在的线程，防止其被调度到其他线程上执行
+// WithLockOSThread 用于确定每个 I/O 事件循环是否与一个 OS 线程关联，它在需要某些机制时非常有用，
+// 如线程本地存储或调用某些需要通过 cgo 进行线程级操作的 C 库（如图形库：GLib），
+// 或希望所有 I/O 事件循环实际上并行运行以提高性能
 func WithLockOSThread(lockOSThread bool) Option {
 	return func(s *Server) {
 		s.options.LockOSThread = lockOSThread
 	}
 }
 
-// 设置一个定时器，它将以指定的时间间隔触发回调函数。定时器通常用于周期性地执行一些任务，例如定期刷新缓存、定期发送心跳包等
+// WithTicker 表示是否已设置定时器
 func WithTicker(ticker bool) Option {
 	return func(s *Server) {
 		s.options.Ticker = ticker
 	}
 }
 
-// 设置 TCP KeepAlive 选项。用于检测空闲的、无数据传输的 TCP 连接，以便及时释放资源。
+// WithTCPKeepAlive 设置（SO_KEEPALIVE）套接字选项的持续时间
 func WithTCPKeepAlive(tcpKeepAlive time.Duration) Option {
 	return func(s *Server) {
 		s.options.TCPKeepAlive = tcpKeepAlive
 	}
 }
 
-// 设置是否禁用 Nagle 算法
+// WithTCPNoDelay 控制操作系统是否应该延迟数据包传输以期望发送较少的数据包（Nagle 算法）。
+//
+// 默认值为 true（无延迟），意味着数据在写操作后尽快发送
 func WithTCPNoDelay(tcpNoDelay TCPSocketOpt) Option {
 	return func(s *Server) {
 		s.options.TCPNoDelay = gnet.TCPSocketOpt(tcpNoDelay)
 	}
 }
 
-// 设置 socket 最大接收缓冲区大小（单位为字节）
+// WithSocketRecvBuffer 设置套接字接收缓冲区的最大字节数
 func WithSocketRecvBuffer(recvBuf int) Option {
 	return func(s *Server) {
 		s.options.SocketRecvBuffer = recvBuf
 	}
 }
 
-// 设置 socket 最大发送缓冲区大小（单位为字节）
+// WithSocketSendBuffer 设置套接字发送缓冲区的最大字节数
 func WithSocketSendBuffer(sendBuf int) Option {
 	return func(s *Server) {
 		s.options.SocketSendBuffer = sendBuf
