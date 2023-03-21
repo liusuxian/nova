@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 15:53:29
+ * @LastEditTime: 2023-03-21 16:43:23
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -212,7 +212,7 @@ func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
 // OnTraffic 在本地套接字从对等方接收数据时触发。
 func (s *Server) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	for {
-		msg, err := s.packet.Unpack(c)
+		msg, err := s.packet.UnPack(c)
 		if err == npack.ErrIncompletePacket {
 			break
 		}

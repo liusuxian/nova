@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 18:49:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 16:02:33
+ * @LastEditTime: 2023-03-21 16:47:06
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack.go
  * @Description:
  *
@@ -71,8 +71,8 @@ func (p *defaultPack) Pack(msg niface.IMessage) (data []byte, err error) {
 	return
 }
 
-// Unpack 拆包
-func (p *defaultPack) Unpack(conn gnet.Conn) (data niface.IMessage, err error) {
+// UnPack 拆包
+func (p *defaultPack) UnPack(conn gnet.Conn) (data niface.IMessage, err error) {
 	// 读消息头
 	var buf []byte
 	bodyOffset := msgIdSize + msgBodySize
