@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 15:24:20
+ * @LastEditTime: 2023-03-21 15:53:29
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -77,7 +77,7 @@ func NewServer(opts ...Option) niface.IServer {
 		ctx:               ctx,
 		msgHandler:        nmsghandler.NewMsgHandle(ctx, serCfg.WorkerPoolSize),
 		connMgr:           nconn.NewConnManager(ctx),
-		packet:            npack.Factory().NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
+		packet:            npack.NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
 		heartbeatInterval: heartbeatInterval,
 	}
 	s.heartbeatChecker = nheartbeat.NewHeartbeatCheckerServer(ctx, s)

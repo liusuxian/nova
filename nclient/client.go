@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 14:41:45
+ * @LastEditTime: 2023-03-21 16:03:22
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -49,7 +49,7 @@ func (c *Client) Start() {
 	}
 	c.conn = conn
 	// 创建一个封包对象
-	dp := npack.Factory().NewPack(1, 1, 4096)
+	dp := npack.NewPack(npack.DefaultPacketMethod, npack.LittleEndian, 4096)
 	// 封装一个msg1包
 	msg1 := npack.NewMsgPackage(1, []byte("hello"))
 	sendData1, _ := dp.Pack(msg1)
