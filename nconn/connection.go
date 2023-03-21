@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:00:23
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 21:16:22
+ * @LastEditTime: 2023-03-21 21:21:45
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -137,7 +137,7 @@ func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCa
 	// 封包
 	var buf []byte
 	if buf, err = c.packet.Pack(npack.NewMsgPackage(msgID, data)); err != nil {
-		nlog.Error(c.rootCtx, "Connection Pack Msg Error", zap.Uint16("MsgID", msgID), zap.Error(err))
+		nlog.Error(c.rootCtx, "Connection Pack Msg Error", zap.Int("connID", c.connID), zap.Uint16("MsgID", msgID), zap.Error(err))
 		err = errors.Wrap(err, "Connection Pack Msg Error")
 		return
 	}
@@ -155,19 +155,22 @@ func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCa
 	// 接收错误
 	select {
 	case <-idleTimeout.C:
+		nlog.Error(c.rootCtx, "Connection Send Msg Timeout", zap.Int("connID", c.connID), zap.Uint16("MsgID", msgID))
 		err = errors.New("Connection Send Msg Timeout")
 		return
 	case err = <-c.sendMsgErrChan:
 		if err != nil {
-			nlog.Error(c.rootCtx, "Connection Send Msg Error", zap.Uint16("MsgID", msgID), zap.Error(err))
+			nlog.Error(c.rootCtx, "Connection Send Msg Error", zap.Int("connID", c.connID), zap.Uint16("MsgID", msgID), zap.Error(err))
 			return
 		}
 	case <-c.ctx.Done():
+		nlog.Info(c.rootCtx, "Connection Closed When Send Msg", zap.Int("connID", c.connID))
+		err = errors.New("Connection Closed When Send Msg")
 		return
 	}
 	// 发送给客户端成功, 更新连接活动时间
 	c.UpdateActivity()
-	nlog.Debug(c.rootCtx, "Connection Send Msg Succeed")
+	nlog.Debug(c.rootCtx, "Connection Send Msg Succeed", zap.Int("connID", c.connID))
 	return
 }
 
@@ -245,7 +248,7 @@ func (c *Connection) finalizer() {
 // callOnConnStart 调用连接创建时的 Hook 函数
 func (c *Connection) callOnConnStart() {
 	if c.onConnStart != nil {
-		nlog.Info(c.rootCtx, "Connection CallOnConnStart...")
+		nlog.Info(c.rootCtx, "Connection CallOnConnStart...", zap.Int("connID", c.connID))
 		c.onConnStart(c)
 	}
 }
@@ -253,7 +256,7 @@ func (c *Connection) callOnConnStart() {
 // callOnConnStop 调用连接断开时的 Hook 函数
 func (c *Connection) callOnConnStop() {
 	if c.onConnStop != nil {
-		nlog.Info(c.rootCtx, "Connection CallOnConnStop...")
+		nlog.Info(c.rootCtx, "Connection CallOnConnStop...", zap.Int("connID", c.connID))
 		c.onConnStop(c)
 	}
 }
