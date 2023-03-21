@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 19:28:44
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 19:31:38
+ * @LastEditTime: 2023-03-21 14:25:11
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nheartbeat/heartbeat.go
  * @Description:
  *
@@ -99,7 +99,7 @@ func (hbc *HeartbeatChecker) Check() {
 	}
 }
 
-// TODO checkServer 检测服务端连接
+// checkServer 检测服务端连接
 func (hbc *HeartbeatChecker) checkServer() {
 	if hbc.server.GetConnManager() != nil {
 		allConn := hbc.server.GetConnManager().GetAllConn()
@@ -109,14 +109,14 @@ func (hbc *HeartbeatChecker) checkServer() {
 			} else {
 				msg := hbc.makeMsg(conn)
 				if err := conn.SendMsg(hbc.msgID, msg); err != nil {
-					nlog.Error(hbc.ctx, "Send Heartbeat Msg Error", zap.Uint16("MsgID", hbc.msgID), zap.ByteString("Msg", msg), zap.Error(err))
+					nlog.Error(hbc.ctx, "Server Send Heartbeat Msg Error", zap.Uint16("MsgID", hbc.msgID), zap.ByteString("MsgData", msg), zap.Error(err))
 				}
 			}
 		}
 	}
 }
 
-// TODO checkClient 检测客户端连接
+// checkClient 检测客户端连接
 func (hbc *HeartbeatChecker) checkClient() {
 	if hbc.client.Conn() != nil {
 		if !hbc.client.Conn().IsAlive() {
@@ -124,7 +124,7 @@ func (hbc *HeartbeatChecker) checkClient() {
 		} else {
 			msg := hbc.makeMsg(hbc.client.Conn())
 			if err := hbc.client.Conn().SendMsg(hbc.msgID, msg); err != nil {
-				nlog.Error(hbc.ctx, "Send Heartbeat Msg Error", zap.Uint16("MsgID", hbc.msgID), zap.ByteString("Msg", msg), zap.Error(err))
+				nlog.Error(hbc.ctx, "Client Send Heartbeat Msg Error", zap.Uint16("MsgID", hbc.msgID), zap.ByteString("MsgData", msg), zap.Error(err))
 			}
 		}
 	}
@@ -132,7 +132,7 @@ func (hbc *HeartbeatChecker) checkClient() {
 
 // makeMsgDefaultFunc 默认的心跳检测消息处理方法
 func makeMsgDefaultFunc(conn niface.IConnection) []byte {
-	return []byte("pong")
+	return []byte("ping")
 }
 
 // onRemoteNotAliveDefaultFunc 默认的远程连接不存活时的处理方法
