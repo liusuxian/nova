@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 20:34:11
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 17:19:30
+ * @LastEditTime: 2023-03-21 21:06:00
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/client/client.go
  * @Description:
  *
@@ -22,11 +22,11 @@ import (
 
 func main() {
 	var wg sync.WaitGroup
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 4; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			c := nclient.NewClient("tcp", "127.0.0.1:8888", gnet.Options{})
+			c := nclient.NewClient("tcp", "05807165157c4471.natapp.cc:1688", gnet.Options{})
 			c.Start()
 		}()
 	}

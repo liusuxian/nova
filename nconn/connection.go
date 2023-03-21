@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:00:23
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 20:28:30
+ * @LastEditTime: 2023-03-21 21:16:22
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -162,13 +162,12 @@ func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCa
 			nlog.Error(c.rootCtx, "Connection Send Msg Error", zap.Uint16("MsgID", msgID), zap.Error(err))
 			return
 		}
-		nlog.Debug(c.rootCtx, "Connection Send Msg Succeed")
 	case <-c.ctx.Done():
 		return
 	}
 	// 发送给客户端成功, 更新连接活动时间
 	c.UpdateActivity()
-	nlog.Debug(c.rootCtx, "Connection UpdateActivity Succeed")
+	nlog.Debug(c.rootCtx, "Connection Send Msg Succeed")
 	return
 }
 

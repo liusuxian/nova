@@ -184,7 +184,7 @@ func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
 
 // OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
 func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnClose", zap.String("RemoteAddr", conn.RemoteAddr().String()), zap.Int("Connections", s.GetConnections()))
+	nlog.Info(s.ctx, "Server OnClose", zap.Int("connID", conn.Fd()), zap.String("RemoteAddr", conn.RemoteAddr().String()), zap.Int("Connections", s.GetConnections()))
 	// 通过 ConnID 获取连接
 	iConn, _ := s.connMgr.GetConn(conn.Fd())
 	// 停止连接
@@ -234,7 +234,7 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 			nlog.Error(s.ctx, "Server OnTraffic Unpack Error", zap.Error(err))
 			return gnet.Close
 		}
-		nlog.Debug(s.ctx, "Server OnTraffic", zap.Uint16("MsgID", msg.GetMsgID()), zap.Int("DataLen", msg.GetDataLen()), zap.ByteString("Data", msg.GetData()))
+		nlog.Debug(s.ctx, "Server OnTraffic", zap.Int("connID", conn.Fd()), zap.Uint16("MsgID", msg.GetMsgID()), zap.Int("DataLen", msg.GetDataLen()), zap.ByteString("Data", msg.GetData()))
 		iConn, err := s.connMgr.GetConn(conn.Fd())
 		if err != nil {
 			nlog.Error(s.ctx, "Server OnTraffic GetConn Error", zap.Error(err))
