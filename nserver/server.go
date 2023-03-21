@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 19:58:47
+ * @LastEditTime: 2023-03-21 15:24:20
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -87,7 +87,7 @@ func NewServer(opts ...Option) niface.IServer {
 	return s
 }
 
-// TODO Start 启动服务器
+// TODO Start 启动 Server
 func (s *Server) Start() {
 	nlog.Info(s.ctx, "Start Server......", zap.String("ServerName", s.serverConf.Name), zap.Int("Pid", os.Getpid()))
 
@@ -108,23 +108,23 @@ func (s *Server) Start() {
 	}
 }
 
-// TODO Stop 停止服务器
+// TODO Stop 停止 Server
 func (s *Server) Stop() {
 	nlog.Info(s.ctx, "Stop Server......", zap.String("ServerName", s.serverConf.Name), zap.Int("Pid", os.Getpid()))
 	s.action = gnet.Shutdown
 }
 
-// AddRouter 路由功能：给当前服务注册一个路由业务方法，供客户端连接处理使用
+// AddRouter 给当前 Server 添加路由
 func (s *Server) AddRouter(msgID uint16, router niface.IRouter) {
 	s.msgHandler.AddRouter(msgID, router)
 }
 
-// GetConnManager 获取连接管理
+// GetConnManager 获取当前 Server 的连接管理
 func (s *Server) GetConnManager() niface.IConnManager {
 	return s.connMgr
 }
 
-// 获取当前活跃的连接数
+// GetConnections 获取当前 Server 的活跃连接数
 func (s *Server) GetConnections() int {
 	return s.eng.CountConnections()
 }
@@ -149,22 +149,22 @@ func (s *Server) GetOnConnStop() func(niface.IConnection) {
 	return s.onConnStop
 }
 
-// SetPacket 设置当前 Server 绑定的数据协议封包方式
+// SetPacket 设置当前 Server 绑定的数据协议封包和拆包方式
 func (s *Server) SetPacket(packet niface.IDataPack) {
 	s.packet = packet
 }
 
-// GetPacket 获取当前 Server 绑定的数据协议封包方式
+// GetPacket 获取当前 Server 绑定的数据协议封包和拆包方式
 func (s *Server) GetPacket() niface.IDataPack {
 	return s.packet
 }
 
-// 获取当前 Server 绑定的消息处理模块
+// GetMsgHandler 获取当前 Server 绑定的消息处理模块
 func (s *Server) GetMsgHandler() niface.IMsgHandle {
 	return s.msgHandler
 }
 
-// SetHeartBeat 设置心跳检测
+// SetHeartBeat 设置当前 Server 的心跳检测
 func (s *Server) SetHeartBeat(option *niface.HeartBeatOption) {
 	if option != nil {
 		s.heartbeatChecker.SetHeartBeatMsgFunc(option.MakeMsg)
@@ -175,8 +175,8 @@ func (s *Server) SetHeartBeat(option *niface.HeartBeatOption) {
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
-	s.eng = eng
 	nlog.Info(s.ctx, "Server OnBoot", zap.String("listening", s.addr), zap.String("ServerName", s.serverConf.Name), zap.Any("options", s.options))
+	s.eng = eng
 	return
 }
 
@@ -204,7 +204,7 @@ func (s *Server) OnShutdown(eng gnet.Engine) {
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
 func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
-	nlog.Debug(s.ctx, "Server OnTick", zap.Int("Connections", s.GetConnections()))
+	nlog.Debug(s.ctx, "Server OnTick")
 	// go s.heartbeatChecker.Check()
 	return s.heartbeatInterval, s.action
 }
@@ -217,18 +217,17 @@ func (s *Server) OnTraffic(c gnet.Conn) (action gnet.Action) {
 			break
 		}
 		if err != nil {
-			nlog.Error(s.ctx, "Server OnTraffic Error", zap.Error(err))
+			nlog.Error(s.ctx, "Server OnTraffic Unpack Error", zap.Error(err))
 			return gnet.Close
 		}
 		nlog.Debug(s.ctx, "Server OnTraffic", zap.Uint16("MsgID", msg.GetMsgID()), zap.Int("DataLen", msg.GetDataLen()), zap.ByteString("Data", msg.GetData()))
 		conn, err := s.connMgr.GetConn(c.Fd())
 		if err != nil {
 			nlog.Error(s.ctx, "Server OnTraffic GetConn Error", zap.Error(err))
+			return gnet.Close
 		}
-		if conn != nil {
-			// 更新连接活动时间
-			conn.UpdateActivity()
-		}
+		// 更新连接活动时间
+		conn.UpdateActivity()
 	}
 	return
 }

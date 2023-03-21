@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 19:25:47
+ * @LastEditTime: 2023-03-21 14:41:45
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -41,7 +41,7 @@ func NewClient(network, addr string, options gnet.Options) niface.IClient {
 	return c
 }
 
-// Start 启动客户端
+// Start 启动 Client
 func (c *Client) Start() {
 	conn, err := c.client.Dial(c.network, c.addr)
 	if err != nil {
@@ -62,52 +62,52 @@ func (c *Client) Start() {
 	c.client.Start()
 }
 
-// Stop 停止客户端
+// Stop 停止 Client
 func (c *Client) Stop() {
 	c.client.Stop()
 }
 
-// 给当前 Client 添加路由
+// AddRouter 给当前 Client 添加路由
 func (c *Client) AddRouter(msgID uint16, router niface.IRouter) {
 }
 
-// 当前 Client 的连接信息
+// Conn 当前 Client 的连接信息
 func (c *Client) Conn() niface.IConnection {
 	return nil
 }
 
-// 设置当前 Client 的连接创建时Hook函数
+// SetOnConnStart 设置当前 Client 的连接创建时的 Hook 函数
 func (c *Client) SetOnConnStart(f func(niface.IConnection)) {
 }
 
-// 设置当前 Client 的连接断开时的Hook函数
+// SetOnConnStop 设置当前 Client 的连接断开时的 Hook 函数
 func (c *Client) SetOnConnStop(f func(niface.IConnection)) {
 }
 
-// 获取当前 Client 的连接创建时Hook函数
+// GetOnConnStart 获取当前 Client 的连接创建时的 Hook 函数
 func (c *Client) GetOnConnStart() func(niface.IConnection) {
 	return nil
 }
 
-// 获取当前 Client 的连接断开时的Hook函数
+// GetOnConnStop 获取当前 Client 的连接断开时的 Hook 函数
 func (c *Client) GetOnConnStop() func(niface.IConnection) {
 	return nil
 }
 
-// 设置当前 Client 绑定的数据协议封包方式
+// SetPacket 设置当前 Client 绑定的数据协议封包和拆包方式
 func (c *Client) SetPacket(pack niface.IDataPack) {
 }
 
-// 获取当前 Client 绑定的数据协议封包方式
+// GetPacket 获取当前 Client 绑定的数据协议封包和拆包方式
 func (c *Client) GetPacket() niface.IDataPack {
 	return nil
 }
 
-// 获取当前 Client 绑定的消息处理模块
+// GetMsgHandler 获取当前 Client 绑定的消息处理模块
 func (c *Client) GetMsgHandler() niface.IMsgHandle {
 	return nil
 }
 
-// 设置心跳检测
+// SetHeartBeat 设置当前 Client 的心跳检测
 func (c *Client) SetHeartBeat(option *niface.HeartBeatOption) {
 }
