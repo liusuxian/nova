@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 12:40:58
+ * @LastEditTime: 2023-03-21 20:47:53
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -67,6 +67,7 @@ func (mh *MsgHandle) StartWorkerPool() {
 			nlog.Fatal(mh.ctx, "StartWorkerPool Fatal", zap.Error(err))
 		}
 		mh.workerPool = workerPool
+		nlog.Info(mh.ctx, "StartWorkerPool Succeed")
 	}
 }
 

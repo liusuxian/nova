@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 16:43:23
+ * @LastEditTime: 2023-03-21 20:57:17
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -87,11 +87,11 @@ func NewServer(opts ...Option) niface.IServer {
 	return s
 }
 
-// TODO Start 启动 Server
+// Start 启动 Server
 func (s *Server) Start() {
 	nlog.Info(s.ctx, "Start Server......", zap.String("ServerName", s.serverConf.Name), zap.Int("Pid", os.Getpid()))
 
-	go func(s *Server) {
+	go func() {
 		// 创建一个通道，用于接收信号
 		c := make(chan os.Signal, 1)
 		// 注册信号接收器
@@ -101,14 +101,14 @@ func (s *Server) Start() {
 		nlog.Info(s.ctx, "Server Interrupt Signal", zap.String("ServerName", s.serverConf.Name), zap.String("Signal", sig.String()))
 		// 停止服务器
 		s.Stop()
-	}(s)
+	}()
 
 	if err := gnet.Run(s, s.addr, gnet.WithOptions(s.options)); err != nil {
 		nlog.Fatal(s.ctx, "Start Server Error", zap.Error(err))
 	}
 }
 
-// TODO Stop 停止 Server
+// Stop 停止 Server
 func (s *Server) Stop() {
 	nlog.Info(s.ctx, "Stop Server......", zap.String("ServerName", s.serverConf.Name), zap.Int("Pid", os.Getpid()))
 	s.action = gnet.Shutdown
@@ -177,22 +177,36 @@ func (s *Server) SetHeartBeat(option *niface.HeartBeatOption) {
 func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	nlog.Info(s.ctx, "Server OnBoot", zap.String("listening", s.addr), zap.String("ServerName", s.serverConf.Name), zap.Any("options", s.options))
 	s.eng = eng
+	// 启动 Worker 工作池
+	s.msgHandler.StartWorkerPool()
 	return
 }
 
 // OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
-func (s *Server) OnClose(c gnet.Conn, err error) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnClose", zap.String("RemoteAddr", c.RemoteAddr().String()), zap.Int("Connections", s.GetConnections()))
-	// 删除连接
-	s.connMgr.RemoveConn(c.Fd())
+func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
+	nlog.Info(s.ctx, "Server OnClose", zap.String("RemoteAddr", conn.RemoteAddr().String()), zap.Int("Connections", s.GetConnections()))
+	// 通过 ConnID 获取连接
+	iConn, _ := s.connMgr.GetConn(conn.Fd())
+	// 停止连接
+	if iConn != nil {
+		iConn.Stop()
+	}
 	return
 }
 
 // OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
-func (s *Server) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", c.Fd()), zap.Int("Connections", s.GetConnections()))
+func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
+	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", conn.Fd()), zap.Int("Connections", s.GetConnections()))
+	// 检测允许的客户端连接最大数量
+	if s.GetConnections() > s.serverConf.MaxConn {
+		// TODO
+		action = gnet.Close
+		return
+	}
 	// 创建一个 Server 服务端特性的连接
-	nconn.NewServerConn(s.ctx, s, c, s.heartbeatInterval)
+	serverConn := nconn.NewServerConn(s.ctx, s, conn, s.heartbeatInterval)
+	// 启动连接
+	go serverConn.Start()
 	return
 }
 
@@ -205,14 +219,14 @@ func (s *Server) OnShutdown(eng gnet.Engine) {
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
 func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
 	nlog.Debug(s.ctx, "Server OnTick")
-	// go s.heartbeatChecker.Check()
+	go s.heartbeatChecker.Check()
 	return s.heartbeatInterval, s.action
 }
 
 // OnTraffic 在本地套接字从对等方接收数据时触发。
-func (s *Server) OnTraffic(c gnet.Conn) (action gnet.Action) {
+func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 	for {
-		msg, err := s.packet.UnPack(c)
+		msg, err := s.packet.UnPack(conn)
 		if err == npack.ErrIncompletePacket {
 			break
 		}
@@ -221,13 +235,13 @@ func (s *Server) OnTraffic(c gnet.Conn) (action gnet.Action) {
 			return gnet.Close
 		}
 		nlog.Debug(s.ctx, "Server OnTraffic", zap.Uint16("MsgID", msg.GetMsgID()), zap.Int("DataLen", msg.GetDataLen()), zap.ByteString("Data", msg.GetData()))
-		conn, err := s.connMgr.GetConn(c.Fd())
+		iConn, err := s.connMgr.GetConn(conn.Fd())
 		if err != nil {
 			nlog.Error(s.ctx, "Server OnTraffic GetConn Error", zap.Error(err))
 			return gnet.Close
 		}
 		// 更新连接活动时间
-		conn.UpdateActivity()
+		iConn.UpdateActivity()
 	}
 	return
 }

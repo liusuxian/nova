@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 20:17:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 19:53:33
+ * @LastEditTime: 2023-03-21 19:56:42
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/connection.go
  * @Description:
  *
@@ -18,20 +18,19 @@ import (
 
 // IConnection 连接接口
 type IConnection interface {
-	Start()                                      // 启动连接
-	Stop()                                       // 停止连接
-	Context() context.Context                    // 返回 Context，用于用户自定义的 Goroutine 获取连接退出状态
-	GetConnection() gnet.Conn                    // 从当前连接获取原始的 gnet.Conn
-	GetConnID() int                              // 获取当前 ConnID
-	RemoteAddr() net.Addr                        // 获取当前连接远程地址信息
-	LocalAddr() net.Addr                         // 获取当前连接本地地址信息
-	SendMsg(msgID uint16, data []byte) error     // 直接将 Message 数据发送给远程的客户端(无缓冲)
-	SendBuffMsg(msgID uint16, data []byte) error // 直接将 Message 数据发送给远程的客户端(有缓冲)
-	SetProperty(key string, value any)           // 设置当前连接属性
-	GetProperty(key string) (any, error)         // 获取当前连接属性
-	RemoveProperty(key string)                   // 移除当前连接属性
-	IsAlive() bool                               // 判断当前连接是否存活
-	UpdateActivity()                             // 更新连接活动时间
+	Start()                                                                  // 启动连接
+	Stop()                                                                   // 停止连接
+	Context() context.Context                                                // 返回 Context，用于用户自定义的 Goroutine 获取连接退出状态
+	GetConnection() gnet.Conn                                                // 从当前连接获取原始的 gnet.Conn
+	GetConnID() int                                                          // 获取当前 ConnID
+	RemoteAddr() net.Addr                                                    // 获取当前连接远程地址信息
+	LocalAddr() net.Addr                                                     // 获取当前连接本地地址信息
+	SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCallback) error // 将 Message 数据发送给远程的对端
+	SetProperty(key string, value any)                                       // 设置当前连接属性
+	GetProperty(key string) (any, error)                                     // 获取当前连接属性
+	RemoveProperty(key string)                                               // 移除当前连接属性
+	IsAlive() bool                                                           // 判断当前连接是否存活
+	UpdateActivity()                                                         // 更新连接活动时间
 }
 
 // 用户自定义的心跳检测消息处理方法
