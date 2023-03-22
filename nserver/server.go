@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-22 18:58:28
+ * @LastEditTime: 2023-03-22 22:19:28
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -206,6 +206,8 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	serverConn := nconn.NewServerConn(s.ctx, s, conn, s.heartbeatInterval)
 	// 启动连接
 	go serverConn.Start()
+	// 获取心跳消息数据
+	out = s.heartbeatChecker.GetHeartbeatMsgData()
 	return
 }
 
