@@ -7,3 +7,8 @@ highly concurrent game server framework(高并发游戏服务器框架)
   ```
   $ cd protoc-x.x.x-osx-aarch_64/bin
   ```
+- 将解压后的 bin 目录中的 protoc 二进制文件复制到 $GOPATH/bin 目录里面，并配置 PATH 环境变量，确保 protoc 可以正常执行
+  ```
+  $ cp protoc $GOPATH/bin
+  ```
+  :::tip $GOPATH 为你本机的实际文件夹地址 :::
