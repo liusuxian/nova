@@ -12,3 +12,14 @@ highly concurrent game server framework(高并发游戏服务器框架)
   $ cp protoc $GOPATH/bin
   ```
   :::tip $GOPATH 为你本机的实际文件夹地址 :::
+- 验证安装结果
+  ```
+  $ protoc --version
+  libprotoc x.x.x
+  ```
+## protoc-gen-go/protoc-gen-go-grpc 安装
+- 下载安装 protoc-gen-go
+  ```
+  $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+  $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+  ```
