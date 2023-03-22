@@ -4,6 +4,6 @@ highly concurrent game server framework(高并发游戏服务器框架)
 ## protoc 安装
 - 进入 [protobuf release](https://github.com/protocolbuffers/protobuf/releases) 页面，选择适合自己操作系统的压缩包文件
 - 解压 protoc-x.x.x-osx-aarch_64.zip 并进入 protoc-x.x.x-osx-aarch_64
-```
-$ cd protoc-x.x.x-osx-aarch_64/bin
-```
+  ```
+    $ cd protoc-x.x.x-osx-aarch_64/bin
+  ```
