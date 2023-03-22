@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:00:23
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 21:21:45
+ * @LastEditTime: 2023-03-22 17:53:08
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -135,12 +135,7 @@ func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCa
 		return
 	}
 	// 封包
-	var buf []byte
-	if buf, err = c.packet.Pack(npack.NewMsgPackage(msgID, data)); err != nil {
-		nlog.Error(c.rootCtx, "Connection Pack Msg Error", zap.Int("connID", c.connID), zap.Uint16("MsgID", msgID), zap.Error(err))
-		err = errors.Wrap(err, "Connection Pack Msg Error")
-		return
-	}
+	buf := c.packet.Pack(npack.NewMsgPackage(msgID, data))
 	// 异步发送给客户端
 	go func() {
 		if len(callback) > 0 {
