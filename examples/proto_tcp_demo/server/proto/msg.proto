@@ -8,13 +8,20 @@ message Ping {
   uint64 timestamp = 1; // 服务器当前时间戳，秒级
 }
 
+// 登录方式
+enum Mode {
+  UNKNOWN_MODE = 0; // 未知登录方式
+  VISITOR = 1;      // 游客
+  WECHAT = 2;       // 微信
+}
+
 // 登录请求
 message LoginRequest {
-  uint32 type = 1;     // 登录方式，1:游客 2:微信
+  uint32 mode = 1;     // 登录方式，1:游客 2:微信
   string passport = 2; // 登录账号，仅支持游客登录方式
 }
 
 // 登录响应
 message LoginResponse {
-  uint32 code = 1; // 错误码，0:成功 >=1:错误码
+  uint32 code = 1; // 响应码，0:成功 >=1:错误码
 }

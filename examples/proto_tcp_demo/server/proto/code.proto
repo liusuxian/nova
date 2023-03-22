@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package pb;
+option go_package = "./;pb";
+
+// 响应码
+enum Code {
+  SUCCESS = 0;       // 成功
+  UNKNOWN_CODE = 1;  // 未知错误
+  USER_NOTEXIST = 2; // 用户不存在
+}

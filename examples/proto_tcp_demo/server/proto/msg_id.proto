@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package pb;
+option go_package = "./;pb";
+
+// 消息ID
+enum MsgID {
+  UNKNOWN_MSGID = 0; // 未知消息ID
+  HEARTBEAT = 1;     // 心跳
+  LOGIN = 2;         // 登录
+}
