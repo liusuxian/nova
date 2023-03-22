@@ -61,7 +61,7 @@ func (mh *MsgHandle) AddRouter(msgID uint16, router niface.IRouter) {
 
 // StartWorkerPool 启动 Worker 工作池
 func (mh *MsgHandle) StartWorkerPool() {
-	if mh.workerPool == nil {
+	if mh.workerPool == nil && mh.workerPoolSize > 0 {
 		workerPool, err := ants.NewPool(mh.workerPoolSize)
 		if err != nil {
 			nlog.Fatal(mh.ctx, "StartWorkerPool Fatal", zap.Error(err))

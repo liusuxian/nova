@@ -4,8 +4,8 @@ package pb;
 option go_package = "./;pb";
 
 // 心跳
-message Ping {
-  uint64 timestamp = 1; // 服务器当前时间戳，秒级
+message Heartbeat {
+  int64 timestamp = 1; // 服务器当前时间戳，秒级
 }
 
 // 登录方式

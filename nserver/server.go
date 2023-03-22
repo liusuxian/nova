@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-22 11:06:25
+ * @LastEditTime: 2023-03-22 16:01:57
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -92,11 +92,11 @@ func (s *Server) Start() {
 
 	go func() {
 		// 创建一个通道，用于接收信号
-		c := make(chan os.Signal, 1)
+		sc := make(chan os.Signal, 1)
 		// 注册信号接收器
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 		// 等待信号
-		sig := <-c
+		sig := <-sc
 		nlog.Info(s.ctx, "Server Interrupt Signal", zap.String("ServerName", s.serverConf.Name), zap.String("Signal", sig.String()))
 		// 停止服务器
 		s.Stop()
