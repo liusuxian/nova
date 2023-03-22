@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 20:57:17
+ * @LastEditTime: 2023-03-22 11:06:25
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -57,7 +57,6 @@ type ServerConfig struct {
 	MaxPacketSize  int    // 数据包的最大值（单位:字节），默认 4096
 	PacketMethod   int    // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
 	Endian         int    // 字节存储次序，1: 小端 2: 大端，默认 1
-	MaxMsgChanLen  int    // 发送消息的缓冲最大长度（单位:字节），默认 1024
 }
 
 // NewServer 创建 Server

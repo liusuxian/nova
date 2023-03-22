@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 12:45:56
+ * @LastEditTime: 2023-03-22 11:06:16
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -306,7 +306,6 @@ func init() {
 	SetDefault("server.maxPacketSize", 4096) // 数据包的最大值（单位:字节），默认 4096
 	SetDefault("server.packetMethod", 1)     // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
 	SetDefault("server.endian", 1)           // 字节存储次序，1: 小端 2: 大端，默认 1
-	SetDefault("server.maxMsgChanLen", 1024) // 发送消息的缓冲最大长度（单位:字节），默认 1024
 	// 日志配置
 	SetDefault("logger.ctxKeys", []string{})      // 自定义 Context 上下文变量名称，自动打印 Context 的变量到日志中。默认为空
 	SetDefault("logger.details.level", "info")    // 日志打印级别 debug、info、warn、error、dpanic、panic、fatal

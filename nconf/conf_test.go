@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 12:48:25
+ * @LastEditTime: 2023-03-22 11:05:59
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf_test.go
  * @Description:
  *
@@ -26,7 +26,6 @@ type ServerConfig struct {
 	MaxPacketSize  int    // 数据包的最大值（单位:字节），默认 4096
 	PacketMethod   int    // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
 	Endian         int    // 字节存储次序，1: 小端 2: 大端，默认 1
-	MaxMsgChanLen  int    // 发送消息的缓冲最大长度（单位:字节），默认 1024
 }
 
 // LogConfig 日志配置
