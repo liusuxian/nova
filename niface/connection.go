@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 20:17:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-22 18:48:28
+ * @LastEditTime: 2023-03-22 21:51:55
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/connection.go
  * @Description:
  *
@@ -34,7 +34,7 @@ type IConnection interface {
 }
 
 // 用户自定义的心跳检测消息处理方法
-type HeartBeatMsgFunc func(IConnection) []byte
+type HeartBeatMsgFunc func() []byte
 
 // 用户自定义的远程连接不存活时的处理方法
 type OnRemoteNotAlive func(IConnection)
