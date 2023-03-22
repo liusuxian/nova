@@ -102,8 +102,8 @@ func (c *Connection) Stop() {
 	c.cancel()
 }
 
-// Context 返回 Context，用于用户自定义的 Goroutine 获取连接退出状态
-func (c *Connection) Context() context.Context {
+// GetCtx 返回 Context，用于用户自定义的 Goroutine 获取连接退出状态
+func (c *Connection) GetCtx() context.Context {
 	return c.ctx
 }
 

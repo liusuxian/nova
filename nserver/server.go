@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-22 16:01:57
+ * @LastEditTime: 2023-03-22 18:49:41
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -116,6 +116,11 @@ func (s *Server) Stop() {
 // AddRouter 给当前 Server 添加路由
 func (s *Server) AddRouter(msgID uint16, router niface.IRouter) {
 	s.msgHandler.AddRouter(msgID, router)
+}
+
+// GetCtx 获取当前 Server 的 Context
+func (s *Server) GetCtx() context.Context {
+	return s.ctx
 }
 
 // GetConnManager 获取当前 Server 的连接管理
