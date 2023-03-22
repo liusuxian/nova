@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 18:49:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 16:47:06
+ * @LastEditTime: 2023-03-22 17:33:26
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack.go
  * @Description:
  *
@@ -42,7 +42,7 @@ func (p *defaultPack) GetHeadLen() uint8 {
 }
 
 // Pack 封包
-func (p *defaultPack) Pack(msg niface.IMessage) (data []byte, err error) {
+func (p *defaultPack) Pack(msg niface.IMessage) (data []byte) {
 	// 创建消息包的缓冲区
 	bodyOffset := msgIdSize + msgBodySize
 	msgLen := bodyOffset + msg.GetDataLen()
