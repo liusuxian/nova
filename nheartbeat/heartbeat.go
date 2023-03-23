@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 19:28:44
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 19:36:38
+ * @LastEditTime: 2023-03-23 20:57:28
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nheartbeat/heartbeat.go
  * @Description:
  *
@@ -38,6 +38,9 @@ type HeartbeatDefaultRouter struct {
 // Handle 处理心跳消息
 func (hbr *HeartbeatDefaultRouter) Handle(request niface.IRequest) {
 	nlog.Debug(request.GetCtx(), "Receive Heartbeat", zap.String("From", request.GetConnection().RemoteAddr().String()), zap.Uint16("MsgID", request.GetMsgID()), zap.ByteString("Data", request.GetData()))
+	if err := request.GetConnection().SendMsg(request.GetMsgID(), request.GetData(), nil); err != nil {
+		nlog.Error(request.GetCtx(), "Handle Send Heartbeat Msg Error", zap.Uint16("MsgID", request.GetMsgID()), zap.Error(err))
+	}
 }
 
 // NewHeartbeatCheckerServer Server 创建心跳检测器

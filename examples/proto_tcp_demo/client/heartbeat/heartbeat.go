@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 17:18:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 20:29:28
+ * @LastEditTime: 2023-03-23 20:56:26
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/heartbeat/heartbeat.go
  * @Description:
  *
@@ -40,7 +40,7 @@ func (hbr *HeartBeatRouter) Handle(request niface.IRequest) {
 		nlog.Error(request.GetCtx(), "Marshal Heartbeat Msg Error", zap.Error(err))
 		return
 	}
-	if err := request.GetConnection().SendMsg(uint16(pb.MsgID_HEARTBEAT), data, nil); err != nil {
+	if err := request.GetConnection().SendMsg(request.GetMsgID(), data, nil); err != nil {
 		nlog.Error(request.GetCtx(), "Handle Heartbeat Send Msg Error", zap.Error(err))
 		return
 	}
