@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 15:13:16
+ * @LastEditTime: 2023-03-23 16:37:04
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -35,17 +35,15 @@ func NewMsgHandle(workerPoolSize int) *MsgHandle {
 	}
 }
 
-// HandlerMsg 处理消息
-func (mh *MsgHandle) HandlerMsg(request niface.IRequest) {
-	handler, ok := mh.apis[request.GetMsgID()]
-	if !ok {
-		nlog.Error(request.GetCtx(), "HandlerMsg Api Not Found", zap.Uint16("MsgID", request.GetMsgID()))
-		return
+// HandleRequest 处理请求消息
+func (mh *MsgHandle) HandleRequest(request niface.IRequest) {
+	if mh.workerPool != nil {
+		mh.workerPool.Submit(func() {
+			mh.doRequest(request)
+		})
+	} else {
+		go mh.doRequest(request)
 	}
-	// Request 请求绑定 Router
-	request.BindRouter(handler)
-	// 执行对应处理方法
-	request.Call()
 }
 
 // AddRouter 为消息添加具体的处理逻辑
@@ -67,7 +65,7 @@ func (mh *MsgHandle) StartWorkerPool() {
 			nlog.Fatal(mh.ctx, "StartWorkerPool Fatal", zap.Error(err))
 		}
 		mh.workerPool = workerPool
-		nlog.Info(mh.ctx, "StartWorkerPool Succeed")
+		nlog.Info(mh.ctx, "StartWorkerPool Succeed", zap.Int("WorkerPoolSize", mh.workerPoolSize))
 	}
 }
 
@@ -78,18 +76,15 @@ func (mh *MsgHandle) StopWorkerPool() {
 	}
 }
 
-// RebootWorkerPool 重启 Worker 工作池
-func (mh *MsgHandle) RebootWorkerPool() {
-	if mh.workerPool != nil {
-		mh.workerPool.Reboot()
+// doRequest 处理请求
+func (mh *MsgHandle) doRequest(request niface.IRequest) {
+	handler, ok := mh.apis[request.GetMsgID()]
+	if !ok {
+		nlog.Error(request.GetCtx(), "HandlerMsg Api Not Found", zap.Uint16("MsgID", request.GetMsgID()))
+		return
 	}
-}
-
-// SendMsgToWorkerPool 将消息交给 WorkerPool，由 Worker 进行处理
-func (mh *MsgHandle) SendMsgToWorkerPool(request niface.IRequest) {
-	if mh.workerPool != nil {
-		mh.workerPool.Submit(func() {
-			mh.HandlerMsg(request)
-		})
-	}
+	// Request 请求绑定 Router
+	request.BindRouter(handler)
+	// 执行对应处理方法
+	request.Call()
 }
