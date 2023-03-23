@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 20:34:11
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 22:43:58
+ * @LastEditTime: 2023-03-23 23:27:44
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/client/client.go
  * @Description:
  *
@@ -23,7 +23,7 @@ import (
 
 func main() {
 	cancelCtx, cancelFunc := context.WithCancel(context.Background())
-	clientNum := 1
+	clientNum := 4
 	for i := 0; i < clientNum; i++ {
 		go func(ctx context.Context) {
 			// 创建 Client
