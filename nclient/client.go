@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 17:33:24
+ * @LastEditTime: 2023-03-23 17:58:45
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -200,7 +200,7 @@ func (c *Client) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 			nlog.Error(c.ctx, "Client OnTraffic Unpack Error", zap.Error(err))
 			return
 		}
-		nlog.Debug(c.ctx, "Client OnTraffic", zap.Int("connID", conn.Fd()), zap.Uint16("MsgID", msg.GetMsgID()), zap.Int("DataLen", msg.GetDataLen()), zap.ByteString("Data", msg.GetData()))
+		nlog.Debug(c.ctx, "Client OnTraffic", zap.Int("connID", conn.Fd()), zap.Uint16("MsgID", msg.GetMsgID()))
 		// 更新连接活动时间
 		c.conn.UpdateActivity()
 		// 得到当前客户端请求的 Request 数据
