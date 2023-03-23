@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 23:29:51
+ * @LastEditTime: 2023-03-23 23:37:11
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -207,6 +207,8 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	// 检测允许的客户端连接最大数量
 	if s.GetConnections() > s.serverConf.MaxConn {
 		out = s.packet.Pack(npack.NewMsgPackage(s.overLoadMsg.GetMsgID(), s.overLoadMsg.GetMsgData()))
+		// 踢连接
+		go s.doKickConn(conn)
 		return
 	}
 	// 创建一个 Server 服务端特性的连接
@@ -259,4 +261,13 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		s.msgHandler.HandleRequest(request)
 	}
 	return
+}
+
+// doKickConn 踢连接
+func (s *Server) doKickConn(conn gnet.Conn) {
+	ticker := time.NewTicker(10 * time.Millisecond)
+	select {
+	case <-ticker.C:
+		_ = conn.Close()
+	}
 }
