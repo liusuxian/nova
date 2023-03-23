@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 19:28:44
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 17:23:00
+ * @LastEditTime: 2023-03-23 19:36:38
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nheartbeat/heartbeat.go
  * @Description:
  *
@@ -93,6 +93,11 @@ func (hbc *HeartbeatChecker) BindRouter(msgID uint16, router niface.IRouter) {
 // GetMsgID 获取心跳检测消息ID
 func (hbc *HeartbeatChecker) GetMsgID() uint16 {
 	return hbc.msgID
+}
+
+// GetMsgData 获取心跳检测消息
+func (hbc *HeartbeatChecker) GetMsgData() []byte {
+	return hbc.makeMsg()
 }
 
 // GetRouter 获取心跳检测消息业务处理路由

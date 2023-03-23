@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-22 21:38:25
+ * @LastEditTime: 2023-03-23 20:05:12
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -300,7 +300,8 @@ func init() {
 	// 设置默认值
 	// 服务器配置
 	SetDefault("server.name", "Nova")        // 服务器应用名称，默认"Nova"
-	SetDefault("server.maxHeartbeat", 5000)  // 最长心跳检测间隔时间（单位:毫秒），默认 5000
+	SetDefault("server.heartbeat", 3000)     // 心跳发送间隔时间（单位:毫秒，一定要小于 maxHeartbeat 配置），默认 3000
+	SetDefault("server.maxHeartbeat", 5000)  // 最长心跳检测间隔时间（单位:毫秒，一定要大于 heartbeat 配置），默认 5000
 	SetDefault("server.maxConn", 3)          // 允许的客户端连接最大数量，默认 3
 	SetDefault("server.workerPoolSize", 10)  // 工作任务池最大工作 Goroutine 数量，默认 10
 	SetDefault("server.maxPacketSize", 4096) // 数据包的最大值（单位:字节），默认 4096

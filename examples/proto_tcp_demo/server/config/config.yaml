@@ -3,7 +3,8 @@ server:
   name: "Nova" # 服务器应用名称，默认"Nova"
   network: "tcp" # 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
   port: 8888 # 服务器监听端口
-  maxHeartbeat: 5000 # 最长心跳检测间隔时间（单位:毫秒），默认 5000
+  heartbeat: 3000 # 心跳发送间隔时间（单位:毫秒，一定要小于 maxHeartbeat 配置），默认 3000
+  maxHeartbeat: 5000 # 最长心跳检测间隔时间（单位:毫秒，一定要大于 heartbeat 配置），默认 5000
   maxConn: 3 # 允许的客户端连接最大数量，默认 3
   workerPoolSize: 10 # 工作任务池最大工作 Goroutine 数量，默认 10
   maxPacketSize: 4096 # 数据包的最大值（单位:字节），默认 4096
