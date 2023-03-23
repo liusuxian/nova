@@ -2,10 +2,12 @@ syntax = "proto3";
 
 package pb;
 option go_package = "./;pb";
+option csharp_namespace = "Pb"; // 给 C# 提供的选项
 
 // 消息ID
 enum MsgID {
-  UNKNOWN_MSGID = 0; // 未知消息ID
-  HEARTBEAT = 1;     // 心跳
-  LOGIN = 2;         // 登录
+  UNKNOWN_MSGID = 0;   // 未知消息ID
+  SERVER_OVERLOAD = 1; // 服务器人数超载
+  HEARTBEAT = 2;       // 心跳
+  LOGIN = 3;           // 登录
 }

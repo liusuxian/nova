@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-22 22:19:28
+ * @LastEditTime: 2023-03-23 14:30:49
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -20,6 +20,7 @@ import (
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nmsghandler"
 	"github.com/liusuxian/nova/npack"
+	"github.com/liusuxian/nova/nrequest"
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
 	"os"
@@ -36,7 +37,7 @@ type Server struct {
 	action            gnet.Action                   // gnet 事件完成后发生的动作，None 无任何操作，Close 关闭连接，Shutdown 停止整个gnet引擎
 	serverConf        *ServerConfig                 // 服务器配置
 	addr              string                        // 服务器绑定的地址
-	ctx               context.Context               // 当前 Server 的根 Context
+	ctx               context.Context               // 当前 Server 的 Context
 	msgHandler        niface.IMsgHandle             // 当前 Server 绑定的消息处理模块
 	connMgr           niface.IConnManager           // 当前 Server 的连接管理模块
 	onConnStart       func(conn niface.IConnection) // 当前 Server 的连接创建时的 Hook 函数
@@ -203,7 +204,7 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 		return
 	}
 	// 创建一个 Server 服务端特性的连接
-	serverConn := nconn.NewServerConn(s.ctx, s, conn, s.heartbeatInterval)
+	serverConn := nconn.NewServerConn(s, conn, s.heartbeatInterval)
 	// 启动连接
 	go serverConn.Start()
 	// 获取心跳消息数据
@@ -243,6 +244,10 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		}
 		// 更新连接活动时间
 		iConn.UpdateActivity()
+		// 得到当前客户端请求的 Request 数据
+		request := nrequest.NewRequest(iConn, msg)
+		// 将消息交给 WorkerPool，由 Worker 进行处理
+		s.msgHandler.SendMsgToWorkerPool(request)
 	}
 	return
 }

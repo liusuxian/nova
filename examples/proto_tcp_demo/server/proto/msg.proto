@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package pb;
 option go_package = "./;pb";
+option csharp_namespace = "Pb"; // 给 C# 提供的选项
 
 // 心跳
 message Heartbeat {
