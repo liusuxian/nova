@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 20:27:13
+ * @LastEditTime: 2023-03-23 22:42:59
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -17,6 +17,7 @@ import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nmsghandler"
+	"github.com/liusuxian/nova/noverload"
 	"github.com/liusuxian/nova/npack"
 	"github.com/liusuxian/nova/nrequest"
 	"github.com/panjf2000/gnet/v2"
@@ -38,6 +39,7 @@ type Client struct {
 	onConnStart      func(conn niface.IConnection) // 当前 Client 的连接创建时的 Hook 函数
 	onConnStop       func(conn niface.IConnection) // 当前 Client 的连接断开时的 Hook 函数
 	packet           niface.IDataPack              // 当前 Client 绑定的数据协议封包方式
+	overLoadMsg      *noverload.OverLoadMsg        // 服务器人数超载消息
 	heartbeat        time.Duration                 // 心跳发送间隔时间
 	maxHeartbeat     time.Duration                 // 最长心跳检测间隔时间
 	heartbeatChecker *nheartbeat.HeartbeatChecker  // 心跳检测器
@@ -130,6 +132,19 @@ func (c *Client) GetPacket() niface.IDataPack {
 // GetMsgHandler 获取当前 Client 绑定的消息处理模块
 func (c *Client) GetMsgHandler() niface.IMsgHandle {
 	return c.msgHandler
+}
+
+// SetOverLoadMsg 设置当前 Client 的服务器人数超载消息
+func (c *Client) SetOverLoadMsg(option *niface.OverLoadMsgOption) {
+	overLoadMsg := noverload.NewOverLoadMsgClient(c)
+	// 用户自定义
+	if option != nil {
+		overLoadMsg.SetOverLoadMsgFunc(option.MakeMsg)
+		overLoadMsg.BindRouter(option.MsgID, option.Router)
+	}
+	// 添加服务器人数超载消息的路由
+	c.AddRouter(overLoadMsg.GetMsgID(), overLoadMsg.GetRouter())
+	c.overLoadMsg = overLoadMsg
 }
 
 // SetHeartBeat 设置当前 Client 的心跳检测

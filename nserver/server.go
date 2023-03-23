@@ -157,11 +157,11 @@ func (s *Server) GetMsgHandler() niface.IMsgHandle {
 
 // SetOverLoadMsg 设置当前 Server 的服务器人数超载消息
 func (s *Server) SetOverLoadMsg(option *niface.OverLoadMsgOption) {
-	overLoadMsg := noverload.NewOverLoadMsg()
+	overLoadMsg := noverload.NewOverLoadMsgServer(s)
 	// 用户自定义
 	if option != nil {
-		overLoadMsg.SetOverLoadMsgID(option.MsgID)
 		overLoadMsg.SetOverLoadMsgFunc(option.MakeMsg)
+		overLoadMsg.BindRouter(option.MsgID, option.Router)
 	}
 	s.overLoadMsg = overLoadMsg
 }

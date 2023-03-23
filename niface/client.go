@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 13:38:19
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 17:32:48
+ * @LastEditTime: 2023-03-23 22:26:35
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/client.go
  * @Description:
  *
@@ -26,5 +26,6 @@ type IClient interface {
 	SetPacket(IDataPack)                    // 设置当前 Client 绑定的数据协议封包和拆包方式
 	GetPacket() IDataPack                   // 获取当前 Client 绑定的数据协议封包和拆包方式
 	GetMsgHandler() IMsgHandle              // 获取当前 Client 绑定的消息处理模块
+	SetOverLoadMsg(*OverLoadMsgOption)      // 设置当前 Client 的服务器人数超载消息
 	SetHeartBeat(*HeartBeatOption)          // 设置当前 Client 的心跳检测
 }

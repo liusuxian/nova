@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 21:46:10
+ * @LastEditTime: 2023-03-23 22:18:14
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/server.go
  * @Description:
  *
@@ -38,6 +38,7 @@ type OverLoadMsgFunc func() []byte
 type OverLoadMsgOption struct {
 	MakeMsg OverLoadMsgFunc // 用户自定义的服务器人数超载消息处理方法
 	MsgID   uint16          // 用户自定义的服务器人数超载消息ID
+	Router  IRouter         // 用户自定义的服务器人数超载消息业务处理路由
 }
 
 const (
