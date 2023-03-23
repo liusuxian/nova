@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 18:10:57
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 16:51:26
+ * @LastEditTime: 2023-03-23 17:34:57
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/server/server.go
  * @Description:
  *
@@ -11,7 +11,6 @@
 package main
 
 import (
-	"context"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nserver"
 	"go.uber.org/zap"
@@ -39,7 +38,7 @@ func main() {
 		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 		// 等待信号
 		sig := <-sc
-		nlog.Info(context.Background(), "Server Interrupt Signal", zap.String("Signal", sig.String()))
+		nlog.Info(s.GetCtx(), "Server Interrupt Signal", zap.String("Signal", sig.String()))
 		// 停止服务器
 		s.Stop()
 	}()

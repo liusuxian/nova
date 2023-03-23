@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 17:31:42
+ * @LastEditTime: 2023-03-23 17:53:03
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -231,7 +231,7 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 			nlog.Error(s.ctx, "Server OnTraffic Unpack Error", zap.Error(err))
 			return gnet.Close
 		}
-		nlog.Debug(s.ctx, "Server OnTraffic", zap.Int("connID", conn.Fd()), zap.Uint16("MsgID", msg.GetMsgID()), zap.Int("DataLen", msg.GetDataLen()), zap.ByteString("Data", msg.GetData()))
+		nlog.Debug(s.ctx, "Server OnTraffic", zap.Int("connID", conn.Fd()), zap.Uint16("MsgID", msg.GetMsgID()))
 		iConn, err := s.connMgr.GetConn(conn.Fd())
 		if err != nil {
 			nlog.Error(s.ctx, "Server OnTraffic GetConn Error", zap.Error(err))

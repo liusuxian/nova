@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-22 22:02:05
+ * @LastEditTime: 2023-03-23 17:45:49
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/server.go
  * @Description:
  *
@@ -11,10 +11,13 @@
 package main
 
 import (
-	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/proto/pb"
-	"github.com/liusuxian/nova/niface"
+	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/heartbeat"
+	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nserver"
-	"google.golang.org/protobuf/proto"
+	"go.uber.org/zap"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -28,17 +31,20 @@ func main() {
 		nserver.WithTicker(true),
 	)
 	// 设置当前 Server 的心跳检测
-	s.SetHeartBeat(&niface.HeartBeatOption{
-		MakeMsg: func() []byte {
-			msg := &pb.Heartbeat{Timestamp: time.Now().Unix()}
-			buf, _ := proto.Marshal(msg)
-			if len(buf) == 0 {
-				return []byte("ping")
-			}
-			return buf
-		},
-		MsgID: uint16(pb.MsgID_HEARTBEAT),
-	})
+	heartbeat.SetHeartBeat(s)
+	go func() {
+		// 创建一个通道，用于接收信号
+		sc := make(chan os.Signal, 1)
+		// 注册信号接收器
+		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
+		// 等待信号
+		sig := <-sc
+		nlog.Info(s.GetCtx(), "Server Interrupt Signal", zap.String("Signal", sig.String()))
+		// 停止服务器
+		s.Stop()
+	}()
 	// 启动服务器
 	s.Start()
+	// 等待一段时间
+	time.Sleep(5 * time.Second)
 }
