@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:00:23
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 15:49:30
+ * @LastEditTime: 2023-03-23 20:17:53
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -25,40 +25,40 @@ import (
 
 // Connection 连接结构
 type Connection struct {
-	conn              gnet.Conn                     // 当前连接的 Socket 套接字
-	connID            int                           // 当前连接的 ID，也可以称作为 SessionID，ID 全局唯一
-	msgHandler        niface.IMsgHandle             // 消息管理和对应处理方法的消息管理模块
-	ctx               context.Context               // 当前连接的 Context
-	cancelCtx         context.Context               // 当前连接的 Cancel Context
-	cancelFunc        context.CancelFunc            // 当前连接的 Cancel Func
-	sendMsgErrChan    chan error                    // 将 Message 数据发送给远程的对端时报错
-	property          map[string]any                // 连接属性
-	propertyLock      sync.Mutex                    // 连接属性的并发锁
-	isClosed          bool                          // 当前连接的关闭状态
-	connManager       niface.IConnManager           // 当前连接属于哪个 Connection Manager
-	onConnStart       func(conn niface.IConnection) // 当前连接创建时的 Hook 函数
-	onConnStop        func(conn niface.IConnection) // 当前连接断开时的 Hook 函数
-	packet            niface.IDataPack              // 数据协议封包和拆包方式
-	heartbeatInterval time.Duration                 // 心跳检测间隔时间
-	lastActivityTime  time.Time                     // 最后一次活动时间
+	conn             gnet.Conn                     // 当前连接的 Socket 套接字
+	connID           int                           // 当前连接的 ID，也可以称作为 SessionID，ID 全局唯一
+	msgHandler       niface.IMsgHandle             // 消息管理和对应处理方法的消息管理模块
+	ctx              context.Context               // 当前连接的 Context
+	cancelCtx        context.Context               // 当前连接的 Cancel Context
+	cancelFunc       context.CancelFunc            // 当前连接的 Cancel Func
+	sendMsgErrChan   chan error                    // 将 Message 数据发送给远程的对端时报错
+	property         map[string]any                // 连接属性
+	propertyLock     sync.Mutex                    // 连接属性的并发锁
+	isClosed         bool                          // 当前连接的关闭状态
+	connManager      niface.IConnManager           // 当前连接属于哪个 Connection Manager
+	onConnStart      func(conn niface.IConnection) // 当前连接创建时的 Hook 函数
+	onConnStop       func(conn niface.IConnection) // 当前连接断开时的 Hook 函数
+	packet           niface.IDataPack              // 数据协议封包和拆包方式
+	maxHeartbeat     time.Duration                 // 最长心跳检测间隔时间
+	lastActivityTime time.Time                     // 最后一次活动时间
 }
 
 // NewServerConn 创建一个 Server 服务端特性的连接
-func NewServerConn(server niface.IServer, conn gnet.Conn, heartbeatInterval time.Duration) *Connection {
+func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Duration) *Connection {
 	// 初始化 Connection 属性
 	c := &Connection{
-		conn:              conn,
-		connID:            conn.Fd(),
-		msgHandler:        server.GetMsgHandler(),
-		ctx:               context.Background(),
-		sendMsgErrChan:    make(chan error, 1),
-		property:          nil,
-		isClosed:          false,
-		connManager:       server.GetConnManager(),
-		onConnStart:       server.GetOnConnStart(),
-		onConnStop:        server.GetOnConnStop(),
-		packet:            server.GetPacket(),
-		heartbeatInterval: heartbeatInterval,
+		conn:           conn,
+		connID:         conn.Fd(),
+		msgHandler:     server.GetMsgHandler(),
+		ctx:            context.Background(),
+		sendMsgErrChan: make(chan error, 1),
+		property:       nil,
+		isClosed:       false,
+		connManager:    server.GetConnManager(),
+		onConnStart:    server.GetOnConnStart(),
+		onConnStop:     server.GetOnConnStop(),
+		packet:         server.GetPacket(),
+		maxHeartbeat:   maxHeartbeat,
 	}
 	// 将新创建的 Connection 添加到连接管理中
 	server.GetConnManager().AddConn(c)
@@ -66,20 +66,20 @@ func NewServerConn(server niface.IServer, conn gnet.Conn, heartbeatInterval time
 }
 
 // NewClientConn 创建一个 Client 客户端特性的连接
-func NewClientConn(client niface.IClient, conn gnet.Conn, heartbeatInterval time.Duration) *Connection {
+func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Duration) *Connection {
 	// 初始化 Connection 属性
 	c := &Connection{
-		conn:              conn,
-		connID:            conn.Fd(),
-		msgHandler:        client.GetMsgHandler(),
-		ctx:               context.Background(),
-		sendMsgErrChan:    make(chan error, 1),
-		property:          nil,
-		isClosed:          false,
-		onConnStart:       client.GetOnConnStart(),
-		onConnStop:        client.GetOnConnStop(),
-		packet:            client.GetPacket(),
-		heartbeatInterval: heartbeatInterval,
+		conn:           conn,
+		connID:         conn.Fd(),
+		msgHandler:     client.GetMsgHandler(),
+		ctx:            context.Background(),
+		sendMsgErrChan: make(chan error, 1),
+		property:       nil,
+		isClosed:       false,
+		onConnStart:    client.GetOnConnStart(),
+		onConnStop:     client.GetOnConnStop(),
+		packet:         client.GetPacket(),
+		maxHeartbeat:   maxHeartbeat,
 	}
 	return c
 }
@@ -198,7 +198,7 @@ func (c *Connection) IsAlive() bool {
 		return false
 	}
 	// 检查连接最后一次活动时间，如果超过心跳间隔，则认为连接已经死亡
-	return time.Now().Sub(c.lastActivityTime) < c.heartbeatInterval
+	return time.Now().Sub(c.lastActivityTime) < c.maxHeartbeat
 }
 
 // UpdateActivity 更新连接活动时间

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 17:53:03
+ * @LastEditTime: 2023-03-23 20:13:35
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -30,18 +30,18 @@ import (
 // Server 服务器结构
 type Server struct {
 	gnet.BuiltinEventEngine
-	eng               gnet.Engine
-	options           gnet.Options                  // 服务器 gnet 启动选项
-	serverConf        *ServerConfig                 // 服务器配置
-	addr              string                        // 服务器绑定的地址
-	ctx               context.Context               // 当前 Server 的 Context
-	msgHandler        niface.IMsgHandle             // 当前 Server 绑定的消息处理模块
-	connMgr           niface.IConnManager           // 当前 Server 的连接管理模块
-	onConnStart       func(conn niface.IConnection) // 当前 Server 的连接创建时的 Hook 函数
-	onConnStop        func(conn niface.IConnection) // 当前 Server 的连接断开时的 Hook 函数
-	packet            niface.IDataPack              // 当前 Server 绑定的数据协议封包方式
-	heartbeatInterval time.Duration                 // 心跳检测间隔时间
-	heartbeatChecker  *nheartbeat.HeartbeatChecker  // 心跳检测器
+	eng              gnet.Engine
+	options          gnet.Options                  // 服务器 gnet 启动选项
+	serverConf       *ServerConfig                 // 服务器配置
+	addr             string                        // 服务器绑定的地址
+	ctx              context.Context               // 当前 Server 的 Context
+	msgHandler       niface.IMsgHandle             // 当前 Server 绑定的消息处理模块
+	connMgr          niface.IConnManager           // 当前 Server 的连接管理模块
+	onConnStart      func(conn niface.IConnection) // 当前 Server 的连接创建时的 Hook 函数
+	onConnStop       func(conn niface.IConnection) // 当前 Server 的连接断开时的 Hook 函数
+	packet           niface.IDataPack              // 当前 Server 绑定的数据协议封包方式
+	heartbeat        time.Duration                 // 心跳发送间隔时间
+	heartbeatChecker *nheartbeat.HeartbeatChecker  // 心跳检测器
 }
 
 // ServerConfig 服务器配置
@@ -49,7 +49,8 @@ type ServerConfig struct {
 	Name           string // 服务器应用名称，默认"Nova"
 	Network        string // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
 	Port           int    // 服务器监听端口
-	MaxHeartbeat   int    // 最长心跳检测间隔时间（单位:毫秒），默认 5000
+	Heartbeat      int    // 心跳发送间隔时间（单位:毫秒，一定要小于 maxHeartbeat 配置），默认 3000
+	MaxHeartbeat   int    // 最长心跳检测间隔时间（单位:毫秒，一定要大于 heartbeat 配置），默认 5000
 	MaxConn        int    // 允许的客户端连接最大数量，默认 3
 	WorkerPoolSize int    // 工作任务池最大工作 Goroutine 数量，默认 10
 	MaxPacketSize  int    // 数据包的最大值（单位:字节），默认 4096
@@ -66,15 +67,15 @@ func NewServer(opts ...Option) niface.IServer {
 		nlog.Fatal(ctx, "New Server Error", zap.Error(err))
 	}
 	// 初始化 Server 属性
-	heartbeatInterval := time.Duration(serCfg.MaxHeartbeat) * time.Millisecond
+	heartbeat := time.Duration(serCfg.Heartbeat) * time.Millisecond
 	s := &Server{
-		serverConf:        serCfg,
-		addr:              fmt.Sprintf("%s://:%d", serCfg.Network, serCfg.Port),
-		ctx:               ctx,
-		msgHandler:        nmsghandler.NewMsgHandle(serCfg.WorkerPoolSize),
-		connMgr:           nconn.NewConnManager(ctx),
-		packet:            npack.NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
-		heartbeatInterval: heartbeatInterval,
+		serverConf: serCfg,
+		addr:       fmt.Sprintf("%s://:%d", serCfg.Network, serCfg.Port),
+		ctx:        ctx,
+		msgHandler: nmsghandler.NewMsgHandle(serCfg.WorkerPoolSize),
+		connMgr:    nconn.NewConnManager(ctx),
+		packet:     npack.NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
+		heartbeat:  heartbeat,
 	}
 	// 处理服务选项
 	for _, opt := range opts {
@@ -197,9 +198,11 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 		return
 	}
 	// 创建一个 Server 服务端特性的连接
-	serverConn := nconn.NewServerConn(s, conn, s.heartbeatInterval)
+	serverConn := nconn.NewServerConn(s, conn, time.Duration(s.serverConf.MaxHeartbeat)*time.Millisecond)
 	// 启动连接
 	go serverConn.Start()
+	// 发送心跳
+	out = s.packet.Pack(npack.NewMsgPackage(s.heartbeatChecker.GetMsgID(), s.heartbeatChecker.GetMsgData()))
 	return
 }
 
@@ -216,7 +219,7 @@ func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
 	if s.heartbeatChecker != nil {
 		go s.heartbeatChecker.Check()
 	}
-	delay = s.heartbeatInterval
+	delay = s.heartbeat
 	return
 }
 

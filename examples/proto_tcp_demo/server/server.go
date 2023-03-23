@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 17:45:49
+ * @LastEditTime: 2023-03-23 20:38:00
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/server.go
  * @Description:
  *
@@ -46,5 +46,9 @@ func main() {
 	// 启动服务器
 	s.Start()
 	// 等待一段时间
-	time.Sleep(5 * time.Second)
+	idleTimeout := time.NewTimer(2 * time.Second)
+	defer idleTimeout.Stop()
+	select {
+	case <-idleTimeout.C:
+	}
 }

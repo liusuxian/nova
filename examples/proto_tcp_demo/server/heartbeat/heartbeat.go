@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 17:18:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 17:51:24
+ * @LastEditTime: 2023-03-23 19:18:07
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/heartbeat/heartbeat.go
  * @Description:
  *
@@ -27,12 +27,13 @@ type HeartBeatRouter struct {
 
 // Handle 处理心跳消息
 func (hbr *HeartBeatRouter) Handle(request niface.IRequest) {
-	msg := &pb.Heartbeat{}
-	if err := proto.Unmarshal(request.GetData(), msg); err != nil {
+	// 收到心跳消息
+	reqMsg := &pb.Heartbeat{}
+	if err := proto.Unmarshal(request.GetData(), reqMsg); err != nil {
 		nlog.Error(request.GetCtx(), "Unmarshal Heartbeat Msg Error", zap.Error(err))
 		return
 	}
-	nlog.Debug(request.GetCtx(), "Handle Heartbeat", zap.String("From", request.GetConnection().RemoteAddr().String()), zap.Uint16("MsgID", request.GetMsgID()), zap.Reflect("Data", msg))
+	nlog.Debug(request.GetCtx(), "Handle Heartbeat", zap.String("From", request.GetConnection().RemoteAddr().String()), zap.Uint16("MsgID", request.GetMsgID()), zap.Reflect("ReqMsg", reqMsg))
 }
 
 // 设置当前 Server 的心跳检测

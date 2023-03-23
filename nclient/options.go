@@ -24,6 +24,20 @@ func WithPacket(pack niface.IDataPack) Option {
 	}
 }
 
+// WithHeartbeat 设置心跳发送间隔时间
+func WithHeartbeat(heartbeat time.Duration) Option {
+	return func(c *Client) {
+		c.heartbeat = heartbeat
+	}
+}
+
+// WithMaxHeartbeat 设置最长心跳检测间隔时间
+func WithMaxHeartbeat(maxHeartbeat time.Duration) Option {
+	return func(c *Client) {
+		c.maxHeartbeat = maxHeartbeat
+	}
+}
+
 // WithReadBufferCap 是在可读事件到来时从对端读取的最大字节数。
 // 默认值为64KB，可以减小它以避免影响后续连接，也可以增加它以从套接字读取更多数据。
 //
