@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 23:37:11
+ * @LastEditTime: 2023-03-23 23:44:14
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -265,9 +265,10 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 
 // doKickConn 踢连接
 func (s *Server) doKickConn(conn gnet.Conn) {
-	ticker := time.NewTicker(10 * time.Millisecond)
+	idleTimeout := time.NewTimer(10 * time.Millisecond)
+	defer idleTimeout.Stop()
 	select {
-	case <-ticker.C:
+	case <-idleTimeout.C:
 		_ = conn.Close()
 	}
 }
