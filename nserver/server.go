@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 20:13:35
+ * @LastEditTime: 2023-03-23 22:07:22
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -19,6 +19,7 @@ import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nmsghandler"
+	"github.com/liusuxian/nova/noverload"
 	"github.com/liusuxian/nova/npack"
 	"github.com/liusuxian/nova/nrequest"
 	"github.com/panjf2000/gnet/v2"
@@ -40,6 +41,7 @@ type Server struct {
 	onConnStart      func(conn niface.IConnection) // 当前 Server 的连接创建时的 Hook 函数
 	onConnStop       func(conn niface.IConnection) // 当前 Server 的连接断开时的 Hook 函数
 	packet           niface.IDataPack              // 当前 Server 绑定的数据协议封包方式
+	overLoadMsg      *noverload.OverLoadMsg        // 服务器人数超载消息
 	heartbeat        time.Duration                 // 心跳发送间隔时间
 	heartbeatChecker *nheartbeat.HeartbeatChecker  // 心跳检测器
 }
@@ -153,6 +155,17 @@ func (s *Server) GetMsgHandler() niface.IMsgHandle {
 	return s.msgHandler
 }
 
+// SetOverLoadMsg 设置当前 Server 的服务器人数超载消息
+func (s *Server) SetOverLoadMsg(option *niface.OverLoadMsgOption) {
+	overLoadMsg := noverload.NewOverLoadMsg()
+	// 用户自定义
+	if option != nil {
+		overLoadMsg.SetOverLoadMsgID(option.MsgID)
+		overLoadMsg.SetOverLoadMsgFunc(option.MakeMsg)
+	}
+	s.overLoadMsg = overLoadMsg
+}
+
 // SetHeartBeat 设置当前 Server 的心跳检测
 func (s *Server) SetHeartBeat(option *niface.HeartBeatOption) {
 	checker := nheartbeat.NewHeartbeatCheckerServer(s)
@@ -193,7 +206,7 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", conn.Fd()), zap.Int("Connections", s.GetConnections()))
 	// 检测允许的客户端连接最大数量
 	if s.GetConnections() > s.serverConf.MaxConn {
-		// TODO
+		out = s.packet.Pack(npack.NewMsgPackage(s.overLoadMsg.GetMsgID(), s.overLoadMsg.GetMsgData()))
 		action = gnet.Close
 		return
 	}

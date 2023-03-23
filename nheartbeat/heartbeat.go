@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 19:28:44
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 20:57:28
+ * @LastEditTime: 2023-03-23 21:42:55
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nheartbeat/heartbeat.go
  * @Description:
  *
@@ -21,7 +21,6 @@ import (
 // HeartbeatChecker 心跳检测器结构
 type HeartbeatChecker struct {
 	ctx              context.Context         // 心跳检测器的 Context
-	hearbeatMsg      []byte                  // 心跳消息，也可以通过 makeMsgFunc 来动态生成
 	makeMsg          niface.HeartBeatMsgFunc // 用户自定义的心跳检测消息处理方法
 	onRemoteNotAlive niface.OnRemoteNotAlive // 用户自定义的远程连接不存活时的处理方法
 	msgID            uint16                  // 用户自定义的心跳检测消息ID

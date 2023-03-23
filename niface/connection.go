@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 20:17:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 15:28:40
+ * @LastEditTime: 2023-03-23 21:59:17
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/connection.go
  * @Description:
  *
@@ -48,5 +48,5 @@ type HeartBeatOption struct {
 }
 
 const (
-	HeartBeatDefaultMsgID uint16 = 0 // 默认心跳检测消息ID
+	HeartBeatDefaultMsgID uint16 = 1 // 默认心跳检测消息ID
 )
