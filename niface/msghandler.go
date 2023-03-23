@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:49:21
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 20:15:58
+ * @LastEditTime: 2023-03-23 15:13:50
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/msghandler.go
  * @Description:
  *
@@ -12,7 +12,7 @@ package niface
 
 // IMsgHandle 消息处理接口
 type IMsgHandle interface {
-	DoMsgHandler(request IRequest)          // 马上以非阻塞方式处理消息
+	HandlerMsg(request IRequest)            // 处理消息
 	AddRouter(msgID uint16, router IRouter) // 为消息添加具体的处理逻辑
 	StartWorkerPool()                       // 启动 Worker 工作池
 	StopWorkerPool()                        // 停止 Worker 工作池

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 20:47:53
+ * @LastEditTime: 2023-03-23 15:13:16
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -20,26 +20,26 @@ import (
 
 // MsgHandle 消息处理回调结构
 type MsgHandle struct {
-	ctx            context.Context           // 当前 Server 的根 Context
+	ctx            context.Context           // 消息处理的 Context
 	apis           map[uint16]niface.IRouter // 存放每个 MsgID 所对应的处理方法
 	workerPool     *ants.Pool                // Worker 工作池
 	workerPoolSize int                       // Worker 池的最大 Worker 数量
 }
 
 // NewMsgHandle 创建消息处理
-func NewMsgHandle(ctx context.Context, workerPoolSize int) *MsgHandle {
+func NewMsgHandle(workerPoolSize int) *MsgHandle {
 	return &MsgHandle{
-		ctx:            ctx,
+		ctx:            context.Background(),
 		apis:           make(map[uint16]niface.IRouter),
 		workerPoolSize: workerPoolSize,
 	}
 }
 
-// DoMsgHandler 马上以非阻塞方式处理消息
-func (mh *MsgHandle) DoMsgHandler(request niface.IRequest) {
+// HandlerMsg 处理消息
+func (mh *MsgHandle) HandlerMsg(request niface.IRequest) {
 	handler, ok := mh.apis[request.GetMsgID()]
 	if !ok {
-		nlog.Error(request.GetCtx(), "DoMsgHandler Api Not Found", zap.Uint16("MsgID", request.GetMsgID()))
+		nlog.Error(request.GetCtx(), "HandlerMsg Api Not Found", zap.Uint16("MsgID", request.GetMsgID()))
 		return
 	}
 	// Request 请求绑定 Router
@@ -89,10 +89,7 @@ func (mh *MsgHandle) RebootWorkerPool() {
 func (mh *MsgHandle) SendMsgToWorkerPool(request niface.IRequest) {
 	if mh.workerPool != nil {
 		mh.workerPool.Submit(func() {
-			mh.DoMsgHandler(request)
+			mh.HandlerMsg(request)
 		})
-	} else {
-		go mh.DoMsgHandler(request)
-		nlog.Error(request.GetCtx(), "SendMsgToWorkerPool WorkerPool Not Found", zap.Uint16("MsgID", request.GetMsgID()))
 	}
 }
