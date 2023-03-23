@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 17:01:43
+ * @LastEditTime: 2023-03-23 17:33:24
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -85,6 +85,11 @@ func (c *Client) Stop() {
 // AddRouter 给当前 Client 添加路由
 func (c *Client) AddRouter(msgID uint16, router niface.IRouter) {
 	c.msgHandler.AddRouter(msgID, router)
+}
+
+// GetCtx 获取当前 Client 的 Context
+func (c *Client) GetCtx() context.Context {
+	return c.ctx
 }
 
 // Conn 当前 Client 的连接信息

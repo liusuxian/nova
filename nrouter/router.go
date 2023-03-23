@@ -21,16 +21,16 @@ type BaseRouter struct {
 // 所以 Router 全部复合 BaseRouter 的好处是，不需要实现 PreHandle 和 PostHandle 也可以实例化
 
 // PreHandle 在处理 Connection 业务之前的钩子
-func (br *BaseRouter) PreHandle(req niface.IRequest) {
+func (br *BaseRouter) PreHandle(request niface.IRequest) {
 
 }
 
 // Handle 处理 Connection 业务
-func (br *BaseRouter) Handle(req niface.IRequest) {
+func (br *BaseRouter) Handle(request niface.IRequest) {
 
 }
 
 // PostHandle 处理 Connection 业务之后的钩子
-func (br *BaseRouter) PostHandle(req niface.IRequest) {
+func (br *BaseRouter) PostHandle(request niface.IRequest) {
 
 }

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 13:38:19
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 14:36:56
+ * @LastEditTime: 2023-03-23 17:32:48
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/client.go
  * @Description:
  *
@@ -10,11 +10,14 @@
  */
 package niface
 
+import "context"
+
 // IClient 客户端接口
 type IClient interface {
 	Start()                                 // 启动 Client
 	Stop()                                  // 停止 Client
 	AddRouter(msgID uint16, router IRouter) // 给当前 Client 添加路由
+	GetCtx() context.Context                // 获取当前 Client 的 Context
 	Conn() IConnection                      // 当前 Client 的连接信息
 	SetOnConnStart(func(IConnection))       // 设置当前 Client 的连接创建时的 Hook 函数
 	SetOnConnStop(func(IConnection))        // 设置当前 Client 的连接断开时的 Hook 函数
