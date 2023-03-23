@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 18:10:57
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 20:42:45
+ * @LastEditTime: 2023-03-23 22:09:30
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/server/server.go
  * @Description:
  *
@@ -29,6 +29,8 @@ func main() {
 		nserver.WithLockOSThread(true),
 		nserver.WithTicker(true),
 	)
+	// 设置当前 Server 的服务器人数超载消息
+	s.SetOverLoadMsg(nil)
 	// 设置当前 Server 的心跳检测
 	s.SetHeartBeat(nil)
 	go func() {
