@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 20:34:11
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 21:06:00
+ * @LastEditTime: 2023-03-23 16:52:48
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/client/client.go
  * @Description:
  *
@@ -11,32 +11,48 @@
 package main
 
 import (
+	"context"
 	"github.com/liusuxian/nova/nclient"
-	"github.com/panjf2000/gnet/v2"
-	"log"
+	"github.com/liusuxian/nova/nlog"
+	"go.uber.org/zap"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
+	"time"
 )
 
 func main() {
-	var wg sync.WaitGroup
-	for i := 0; i < 4; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			c := nclient.NewClient("tcp", "05807165157c4471.natapp.cc:1688", gnet.Options{})
+	cancelCtx, cancelFunc := context.WithCancel(context.Background())
+	clientNum := 4
+	for i := 0; i < clientNum; i++ {
+		go func(ctx context.Context) {
+			// 创建 Client
+			c := nclient.NewClient(
+				"tcp",
+				"05807165157c4471.natapp.cc:1688",
+				nclient.WithLockOSThread(true),
+				nclient.WithTicker(true),
+			)
+			// 设置当前 Client 的心跳检测
+			c.SetHeartBeat(nil)
+			// 启动 Client
 			c.Start()
-		}()
+			select {
+			case <-ctx.Done():
+				c.Stop()
+				return
+			}
+		}(cancelCtx)
 	}
-	wg.Wait()
-
 	// 创建一个通道，用于接收信号
-	c := make(chan os.Signal, 1)
+	sc := make(chan os.Signal, 1)
 	// 注册信号接收器
-	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 	// 等待信号
-	sig := <-c
-	log.Printf("收到退出信号 %s 客户端将退出\n", sig.String())
+	sig := <-sc
+	nlog.Info(cancelCtx, "Client Interrupt Signal", zap.String("Signal", sig.String()))
+	// 取消任务
+	cancelFunc()
+	// 等待一段时间
+	time.Sleep(5 * time.Second)
 }

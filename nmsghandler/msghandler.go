@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 16:37:04
+ * @LastEditTime: 2023-03-23 17:05:25
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -73,6 +73,7 @@ func (mh *MsgHandle) StartWorkerPool() {
 func (mh *MsgHandle) StopWorkerPool() {
 	if mh.workerPool != nil {
 		mh.workerPool.Release()
+		nlog.Info(mh.ctx, "StopWorkerPool Succeed")
 	}
 }
 

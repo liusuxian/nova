@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 14:30:49
+ * @LastEditTime: 2023-03-23 17:06:03
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -24,8 +24,6 @@ import (
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 )
 
@@ -34,7 +32,6 @@ type Server struct {
 	gnet.BuiltinEventEngine
 	eng               gnet.Engine
 	options           gnet.Options                  // 服务器 gnet 启动选项
-	action            gnet.Action                   // gnet 事件完成后发生的动作，None 无任何操作，Close 关闭连接，Shutdown 停止整个gnet引擎
 	serverConf        *ServerConfig                 // 服务器配置
 	addr              string                        // 服务器绑定的地址
 	ctx               context.Context               // 当前 Server 的 Context
@@ -71,16 +68,15 @@ func NewServer(opts ...Option) niface.IServer {
 	// 初始化 Server 属性
 	heartbeatInterval := time.Duration(serCfg.MaxHeartbeat) * time.Millisecond
 	s := &Server{
-		action:            gnet.None,
 		serverConf:        serCfg,
 		addr:              fmt.Sprintf("%s://:%d", serCfg.Network, serCfg.Port),
 		ctx:               ctx,
-		msgHandler:        nmsghandler.NewMsgHandle(ctx, serCfg.WorkerPoolSize),
+		msgHandler:        nmsghandler.NewMsgHandle(serCfg.WorkerPoolSize),
 		connMgr:           nconn.NewConnManager(ctx),
 		packet:            npack.NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
 		heartbeatInterval: heartbeatInterval,
 	}
-	s.heartbeatChecker = nheartbeat.NewHeartbeatCheckerServer(ctx, s)
+	// 处理服务选项
 	for _, opt := range opts {
 		opt(s)
 	}
@@ -90,19 +86,6 @@ func NewServer(opts ...Option) niface.IServer {
 // Start 启动 Server
 func (s *Server) Start() {
 	nlog.Info(s.ctx, "Start Server......", zap.String("ServerName", s.serverConf.Name), zap.Int("Pid", os.Getpid()))
-
-	go func() {
-		// 创建一个通道，用于接收信号
-		sc := make(chan os.Signal, 1)
-		// 注册信号接收器
-		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
-		// 等待信号
-		sig := <-sc
-		nlog.Info(s.ctx, "Server Interrupt Signal", zap.String("ServerName", s.serverConf.Name), zap.String("Signal", sig.String()))
-		// 停止服务器
-		s.Stop()
-	}()
-
 	if err := gnet.Run(s, s.addr, gnet.WithOptions(s.options)); err != nil {
 		nlog.Fatal(s.ctx, "Start Server Error", zap.Error(err))
 	}
@@ -111,7 +94,7 @@ func (s *Server) Start() {
 // Stop 停止 Server
 func (s *Server) Stop() {
 	nlog.Info(s.ctx, "Stop Server......", zap.String("ServerName", s.serverConf.Name), zap.Int("Pid", os.Getpid()))
-	s.action = gnet.Shutdown
+	s.eng.Stop(s.ctx)
 }
 
 // AddRouter 给当前 Server 添加路由
@@ -166,11 +149,16 @@ func (s *Server) GetMsgHandler() niface.IMsgHandle {
 
 // SetHeartBeat 设置当前 Server 的心跳检测
 func (s *Server) SetHeartBeat(option *niface.HeartBeatOption) {
+	checker := nheartbeat.NewHeartbeatCheckerServer(s)
+	// 用户自定义
 	if option != nil {
-		s.heartbeatChecker.SetHeartBeatMsgFunc(option.MakeMsg)
-		s.heartbeatChecker.SetOnRemoteNotAlive(option.OnRemoteNotAlive)
-		s.heartbeatChecker.BindRouter(option.MsgID, option.Router)
+		checker.SetHeartBeatMsgFunc(option.MakeMsg)
+		checker.SetOnRemoteNotAlive(option.OnRemoteNotAlive)
+		checker.BindRouter(option.MsgID, option.Router)
 	}
+	// 添加心跳检测的路由
+	s.AddRouter(checker.GetMsgID(), checker.GetRouter())
+	s.heartbeatChecker = checker
 }
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
@@ -207,22 +195,24 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	serverConn := nconn.NewServerConn(s, conn, s.heartbeatInterval)
 	// 启动连接
 	go serverConn.Start()
-	// 获取心跳消息数据
-	out = s.heartbeatChecker.GetHeartbeatMsgData()
 	return
 }
 
 // OnShutdown 在引擎被关闭时触发，它在所有事件循环和连接关闭后立即调用。
 func (s *Server) OnShutdown(eng gnet.Engine) {
 	nlog.Info(s.ctx, "Server OnShutdown")
+	// 停止 Worker 工作池
+	s.msgHandler.StopWorkerPool()
 	return
 }
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
 func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
-	nlog.Debug(s.ctx, "Server OnTick")
-	go s.heartbeatChecker.Check()
-	return s.heartbeatInterval, s.action
+	if s.heartbeatChecker != nil {
+		go s.heartbeatChecker.Check()
+	}
+	delay = s.heartbeatInterval
+	return
 }
 
 // OnTraffic 在本地套接字从对等方接收数据时触发。
@@ -246,8 +236,8 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		iConn.UpdateActivity()
 		// 得到当前客户端请求的 Request 数据
 		request := nrequest.NewRequest(iConn, msg)
-		// 将消息交给 WorkerPool，由 Worker 进行处理
-		s.msgHandler.SendMsgToWorkerPool(request)
+		// 处理请求消息
+		s.msgHandler.HandleRequest(request)
 	}
 	return
 }
