@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:23:33
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-15 21:38:23
+ * @LastEditTime: 2023-03-23 13:38:27
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrequest/request.go
  * @Description:
  *
@@ -18,7 +18,6 @@ import (
 
 // Request 请求结构
 type Request struct {
-	rootCtx  context.Context    // 当前 Server 的根 Context
 	ctx      context.Context    // 请求的 Context
 	conn     niface.IConnection // 已经和客户端建立好的连接
 	msg      niface.IMessage    // 客户端请求的数据
@@ -39,9 +38,8 @@ const (
 )
 
 // NewRequest 创建请求
-func NewRequest(ctx context.Context, conn niface.IConnection, msg niface.IMessage) (req *Request) {
+func NewRequest(conn niface.IConnection, msg niface.IMessage) (req *Request) {
 	req = new(Request)
-	req.rootCtx = ctx
 	req.conn = conn
 	req.msg = msg
 	req.step = PRE_HANDLE

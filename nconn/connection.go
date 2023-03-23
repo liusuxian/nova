@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:00:23
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-22 21:35:35
+ * @LastEditTime: 2023-03-23 14:07:04
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -28,9 +28,8 @@ type Connection struct {
 	conn              gnet.Conn                     // 当前连接的 Socket 套接字
 	connID            int                           // 当前连接的 ID，也可以称作为 SessionID，ID 全局唯一
 	msgHandler        niface.IMsgHandle             // 消息管理和对应处理方法的消息管理模块
-	rootCtx           context.Context               // 当前 Server/Client 的根 Context
-	ctx               context.Context               // 当前连接的 Context
-	cancel            context.CancelFunc            // 当前连接的 Cancel Context
+	cancelCtx         context.Context               // 当前连接的 Cancel Context
+	cancelFunc        context.CancelFunc            // 当前连接的 Cancel Func
 	sendMsgErrChan    chan error                    // 将 Message 数据发送给远程的对端时报错
 	property          map[string]any                // 连接属性
 	propertyLock      sync.Mutex                    // 连接属性的并发锁
@@ -44,13 +43,12 @@ type Connection struct {
 }
 
 // NewServerConn 创建一个 Server 服务端特性的连接
-func NewServerConn(ctx context.Context, server niface.IServer, conn gnet.Conn, heartbeatInterval time.Duration) *Connection {
+func NewServerConn(server niface.IServer, conn gnet.Conn, heartbeatInterval time.Duration) *Connection {
 	// 初始化 Connection 属性
 	c := &Connection{
 		conn:              conn,
 		connID:            conn.Fd(),
 		msgHandler:        server.GetMsgHandler(),
-		rootCtx:           ctx,
 		sendMsgErrChan:    make(chan error, 1),
 		property:          nil,
 		isClosed:          false,
@@ -66,13 +64,12 @@ func NewServerConn(ctx context.Context, server niface.IServer, conn gnet.Conn, h
 }
 
 // NewClientConn 创建一个 Client 客户端特性的连接
-func NewClientConn(ctx context.Context, client niface.IClient, conn gnet.Conn, heartbeatInterval time.Duration) *Connection {
+func NewClientConn(client niface.IClient, conn gnet.Conn, heartbeatInterval time.Duration) *Connection {
 	// 初始化 Connection 属性
 	c := &Connection{
 		conn:              conn,
 		connID:            conn.Fd(),
 		msgHandler:        client.GetMsgHandler(),
-		rootCtx:           ctx,
 		sendMsgErrChan:    make(chan error, 1),
 		property:          nil,
 		isClosed:          false,
@@ -86,12 +83,12 @@ func NewClientConn(ctx context.Context, client niface.IClient, conn gnet.Conn, h
 
 // Start 启动连接
 func (c *Connection) Start() {
-	c.ctx, c.cancel = context.WithCancel(context.Background())
+	c.cancelCtx, c.cancelFunc = context.WithCancel(context.Background())
 	// 调用连接创建时的 Hook 函数
 	c.callOnConnStart()
 
 	select {
-	case <-c.ctx.Done():
+	case <-c.cancelCtx.Done():
 		c.finalizer()
 		return
 	}
@@ -99,12 +96,12 @@ func (c *Connection) Start() {
 
 // Stop 停止连接
 func (c *Connection) Stop() {
-	c.cancel()
+	c.cancelFunc()
 }
 
-// GetCtx 返回 Context，用于用户自定义的 Goroutine 获取连接退出状态
-func (c *Connection) GetCtx() context.Context {
-	return c.ctx
+// GetCancelCtx 返回 Cancel Context，用于用户自定义的 Goroutine 获取连接退出状态
+func (c *Connection) GetCancelCtx() context.Context {
+	return c.cancelCtx
 }
 
 // GetConnection 从当前连接获取原始的 gnet.Conn
@@ -144,28 +141,19 @@ func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCa
 			c.sendMsgErrChan <- c.conn.AsyncWrite(buf, nil)
 		}
 	}()
-	// 定时器
-	idleTimeout := time.NewTimer(5 * time.Millisecond)
-	defer idleTimeout.Stop()
 	// 接收错误
 	select {
-	case <-idleTimeout.C:
-		nlog.Error(c.rootCtx, "Connection Send Msg Timeout", zap.Int("connID", c.connID), zap.Uint16("MsgID", msgID))
-		err = errors.New("Connection Send Msg Timeout")
-		return
 	case err = <-c.sendMsgErrChan:
 		if err != nil {
-			nlog.Error(c.rootCtx, "Connection Send Msg Error", zap.Int("connID", c.connID), zap.Uint16("MsgID", msgID), zap.Error(err))
+			err = errors.Wrap(err, "Connection Send Msg Error")
 			return
 		}
-	case <-c.ctx.Done():
-		nlog.Info(c.rootCtx, "Connection Closed When Send Msg", zap.Int("connID", c.connID))
-		err = errors.New("Connection Closed When Send Msg")
+	case <-c.cancelCtx.Done():
+		err = errors.New("Connection Stop When Send Msg")
 		return
 	}
 	// 发送给客户端成功, 更新连接活动时间
 	c.UpdateActivity()
-	nlog.Debug(c.rootCtx, "Connection Send Msg Succeed", zap.Int("connID", c.connID))
 	return
 }
 
@@ -237,13 +225,13 @@ func (c *Connection) finalizer() {
 	}
 	// 设置当前连接的关闭状态
 	c.isClosed = true
-	nlog.Info(c.rootCtx, "Connection Stop", zap.Int("ConnID", c.connID))
+	nlog.Info(c.cancelCtx, "Connection Stop", zap.Int("ConnID", c.connID))
 }
 
 // callOnConnStart 调用连接创建时的 Hook 函数
 func (c *Connection) callOnConnStart() {
 	if c.onConnStart != nil {
-		nlog.Info(c.rootCtx, "Connection CallOnConnStart...", zap.Int("connID", c.connID))
+		nlog.Info(c.cancelCtx, "Connection CallOnConnStart...", zap.Int("connID", c.connID))
 		c.onConnStart(c)
 	}
 }
@@ -251,7 +239,7 @@ func (c *Connection) callOnConnStart() {
 // callOnConnStop 调用连接断开时的 Hook 函数
 func (c *Connection) callOnConnStop() {
 	if c.onConnStop != nil {
-		nlog.Info(c.rootCtx, "Connection CallOnConnStop...", zap.Int("connID", c.connID))
+		nlog.Info(c.cancelCtx, "Connection CallOnConnStop...", zap.Int("connID", c.connID))
 		c.onConnStop(c)
 	}
 }
