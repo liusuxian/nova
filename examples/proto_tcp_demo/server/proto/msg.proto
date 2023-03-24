@@ -4,6 +4,9 @@ package pb;
 option go_package = "./;pb";
 option csharp_namespace = "Pb"; // 给 C# 提供的选项
 
+// 服务器人数超载
+message OverLoad {}
+
 // 心跳
 message Heartbeat {
   int64 timestamp = 1; // 服务器当前时间戳，秒级

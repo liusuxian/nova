@@ -173,7 +173,7 @@ func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
 
 // OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
 func (c *Client) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
-	nlog.Info(c.ctx, "Client OnClose", zap.Int("connID", conn.Fd()), zap.String("LocalAddr", conn.LocalAddr().String()))
+	nlog.Info(c.ctx, "Client OnClose", zap.Int("connID", conn.Fd()), zap.String("RemoteAddr", conn.RemoteAddr().String()))
 	// 停止连接
 	c.conn.Stop()
 	return

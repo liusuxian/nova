@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 20:38:00
+ * @LastEditTime: 2023-03-24 14:44:06
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/server.go
  * @Description:
  *
@@ -12,6 +12,7 @@ package main
 
 import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/heartbeat"
+	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/overload"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nserver"
 	"go.uber.org/zap"
@@ -30,8 +31,10 @@ func main() {
 		nserver.WithLockOSThread(true),
 		nserver.WithTicker(true),
 	)
+	// 设置当前 Server 的服务器人数超载消息
+	overload.SetOverLoadMsg(s)
 	// 设置当前 Server 的心跳检测
-	heartbeat.SetHeartBeat(s)
+	heartbeat.SetHeartBeat(s, true)
 	go func() {
 		// 创建一个通道，用于接收信号
 		sc := make(chan os.Signal, 1)

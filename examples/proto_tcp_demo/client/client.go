@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 20:41:13
+ * @LastEditTime: 2023-03-24 14:51:26
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/client.go
  * @Description:
  *
@@ -13,6 +13,7 @@ package main
 import (
 	"context"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/heartbeat"
+	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/overload"
 	"github.com/liusuxian/nova/nclient"
 	"github.com/liusuxian/nova/nlog"
 	"go.uber.org/zap"
@@ -32,12 +33,14 @@ func main() {
 				"tcp",
 				"05807165157c4471.natapp.cc:1688",
 				nclient.WithLockOSThread(true),
-				// nclient.WithTicker(true),
+				nclient.WithTicker(true),
 				nclient.WithHeartbeat(time.Duration(3000)*time.Millisecond),
 				nclient.WithMaxHeartbeat(time.Duration(5000)*time.Millisecond),
 			)
+			// 设置当前 Client 的服务器人数超载消息
+			overload.SetOverLoadMsg(c)
 			// 设置当前 Client 的心跳检测
-			heartbeat.SetHeartBeat(c)
+			heartbeat.SetHeartBeat(c, false)
 			// 启动 Client
 			c.Start()
 			select {
