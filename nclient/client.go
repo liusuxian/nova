@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 22:42:59
+ * @LastEditTime: 2023-03-24 14:24:11
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -136,7 +136,7 @@ func (c *Client) GetMsgHandler() niface.IMsgHandle {
 
 // SetOverLoadMsg 设置当前 Client 的服务器人数超载消息
 func (c *Client) SetOverLoadMsg(option *niface.OverLoadMsgOption) {
-	overLoadMsg := noverload.NewOverLoadMsgClient(c)
+	overLoadMsg := noverload.NewOverLoadMsgClient()
 	// 用户自定义
 	if option != nil {
 		overLoadMsg.SetOverLoadMsgFunc(option.MakeMsg)
@@ -148,8 +148,8 @@ func (c *Client) SetOverLoadMsg(option *niface.OverLoadMsgOption) {
 }
 
 // SetHeartBeat 设置当前 Client 的心跳检测
-func (c *Client) SetHeartBeat(option *niface.HeartBeatOption) {
-	checker := nheartbeat.NewHeartbeatCheckerClient(c)
+func (c *Client) SetHeartBeat(option *niface.HeartBeatOption, initiate bool) {
+	checker := nheartbeat.NewHeartbeatCheckerClient(c, initiate)
 	// 用户自定义
 	if option != nil {
 		checker.SetHeartBeatMsgFunc(option.MakeMsg)

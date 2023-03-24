@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 20:34:11
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 23:27:44
+ * @LastEditTime: 2023-03-24 14:26:48
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/client/client.go
  * @Description:
  *
@@ -31,14 +31,14 @@ func main() {
 				"tcp",
 				"05807165157c4471.natapp.cc:1688",
 				nclient.WithLockOSThread(true),
-				// nclient.WithTicker(true),
+				nclient.WithTicker(true),
 				nclient.WithHeartbeat(time.Duration(3000)*time.Millisecond),
 				nclient.WithMaxHeartbeat(time.Duration(5000)*time.Millisecond),
 			)
 			// 设置当前 Client 的服务器人数超载消息
 			c.SetOverLoadMsg(nil)
 			// 设置当前 Client 的心跳检测
-			c.SetHeartBeat(nil)
+			c.SetHeartBeat(nil, false)
 			// 启动 Client
 			c.Start()
 			select {
