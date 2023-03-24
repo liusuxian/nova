@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 21:39:16
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 22:40:03
+ * @LastEditTime: 2023-03-24 14:18:23
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/noverload/overload.go
  * @Description:
  *
@@ -19,11 +19,10 @@ import (
 
 // OverLoadMsg 服务器人数超载消息结构
 type OverLoadMsg struct {
-	makeMsg niface.OverLoadMsgFunc // 用户自定义的服务器人数超载消息处理方法
-	msgID   uint16                 // 用户自定义的服务器人数超载消息ID
-	router  niface.IRouter         // 用户自定义的服务器人数超载消息业务处理路由
-	server  niface.IServer         // 所属服务端
-	client  niface.IClient         // 所属客户端
+	makeMsg  niface.OverLoadMsgFunc // 用户自定义的服务器人数超载消息处理方法
+	msgID    uint16                 // 用户自定义的服务器人数超载消息ID
+	router   niface.IRouter         // 用户自定义的服务器人数超载消息业务处理路由
+	initiate bool                   // 发起服务器人数超载消息
 }
 
 // OverLoadMsgDefaultRouter 服务器人数超载消息的默认回调路由
@@ -37,25 +36,23 @@ func (olr *OverLoadMsgDefaultRouter) Handle(request niface.IRequest) {
 }
 
 // NewOverLoadMsgServer Server 创建服务器人数超载消息
-func NewOverLoadMsgServer(server niface.IServer) *OverLoadMsg {
+func NewOverLoadMsgServer() *OverLoadMsg {
 	overLoadMsg := &OverLoadMsg{
-		makeMsg: makeMsgDefaultFunc,
-		msgID:   niface.OverLoadDefaultMsgID,
-		router:  nil,
-		server:  server,
-		client:  nil,
+		makeMsg:  makeMsgDefaultFunc,
+		msgID:    niface.OverLoadDefaultMsgID,
+		router:   nil,
+		initiate: true,
 	}
 	return overLoadMsg
 }
 
 // NewOverLoadMsgClient Client 创建服务器人数超载消息
-func NewOverLoadMsgClient(client niface.IClient) *OverLoadMsg {
+func NewOverLoadMsgClient() *OverLoadMsg {
 	overLoadMsg := &OverLoadMsg{
-		makeMsg: makeMsgDefaultFunc,
-		msgID:   niface.OverLoadDefaultMsgID,
-		router:  &OverLoadMsgDefaultRouter{},
-		server:  nil,
-		client:  client,
+		makeMsg:  makeMsgDefaultFunc,
+		msgID:    niface.OverLoadDefaultMsgID,
+		router:   &OverLoadMsgDefaultRouter{},
+		initiate: false,
 	}
 	return overLoadMsg
 }
@@ -69,11 +66,11 @@ func (ol *OverLoadMsg) SetOverLoadMsgFunc(f niface.OverLoadMsgFunc) {
 
 // BindRouter 绑定服务器人数超载消息业务处理路由
 func (ol *OverLoadMsg) BindRouter(msgID uint16, router niface.IRouter) {
-	if ol.server != nil {
+	if ol.initiate {
 		if msgID != niface.OverLoadDefaultMsgID {
 			ol.msgID = msgID
 		}
-	} else if ol.client != nil {
+	} else {
 		if router != nil && msgID != niface.OverLoadDefaultMsgID {
 			ol.msgID = msgID
 			ol.router = router
