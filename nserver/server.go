@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-25 17:34:39
+ * @LastEditTime: 2023-03-26 03:23:55
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -24,7 +24,6 @@ import (
 	"github.com/liusuxian/nova/nrequest"
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
-	"os"
 	"time"
 )
 
@@ -88,7 +87,6 @@ func NewServer(opts ...Option) niface.IServer {
 
 // Start 启动 Server
 func (s *Server) Start() {
-	nlog.Info(s.ctx, "Start Server......", zap.String("ServerName", s.serverConf.Name), zap.Int("Pid", os.Getpid()))
 	if err := gnet.Run(s, s.addr, gnet.WithOptions(s.options)); err != nil {
 		nlog.Fatal(s.ctx, "Start Server Error", zap.Error(err))
 	}
@@ -96,7 +94,6 @@ func (s *Server) Start() {
 
 // Stop 停止 Server
 func (s *Server) Stop() {
-	nlog.Info(s.ctx, "Stop Server......", zap.String("ServerName", s.serverConf.Name), zap.Int("Pid", os.Getpid()))
 	s.eng.Stop(s.ctx)
 }
 

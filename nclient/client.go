@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 02:20:07
+ * @LastEditTime: 2023-03-26 03:24:28
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -71,7 +71,6 @@ func NewClient(network, addr string, opts ...Option) niface.IClient {
 
 // Start 启动 Client
 func (c *Client) Start() {
-	nlog.Info(c.ctx, "Start Client......")
 	// 启动 Client
 	if err := c.client.Start(); err != nil {
 		nlog.Fatal(c.ctx, "Start Client Error", zap.Error(err))
@@ -80,7 +79,6 @@ func (c *Client) Start() {
 
 // Stop 停止 Client
 func (c *Client) Stop() {
-	nlog.Info(c.ctx, "Stop Client......")
 	_ = c.client.Stop()
 }
 
