@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 00:42:13
+ * @LastEditTime: 2023-03-26 01:00:53
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -29,6 +29,7 @@ import (
 // LogConfig 日志配置
 type LogConfig struct {
 	CtxKeys []string          // 自定义 Context 上下文变量名称，自动打印 Context 的变量到日志中。默认为空
+	Path    string            // 输出日志文件路径
 	Details []LogDetailConfig // 日志详细配置
 }
 
@@ -37,7 +38,6 @@ type LogDetailConfig struct {
 	Type       string // 日志类型 ALL(打印所有级别)、INFO(打印 DEBUG、INFO、WARN 级别)、ERROR(打印 ERROR、DPANIC、PANIC、FATAL 级别)
 	Level      string // 日志打印级别 DEBUG、INFO、WARN、ERROR、DPANIC、PANIC、FATAL
 	Format     string // 输出日志格式 logfmt、json
-	Path       string // 输出日志文件路径
 	Filename   string // 输出日志文件名称
 	MaxSize    int    // 单个日志文件最多存储量（单位:MB）
 	MaxBackups int    // 日志备份文件最多数量
@@ -73,13 +73,13 @@ func init() {
 		panic(errors.Wrapf(err, "Get Logger Config Error"))
 	}
 	// 初始化日志
-	if err = initLogger(logConfig.Details); err != nil {
+	if err = initLogger(logConfig.Path, logConfig.Details); err != nil {
 		panic(errors.Wrapf(err, "Init Logger Error"))
 	}
 }
 
 // 初始化日志
-func initLogger(details []LogDetailConfig) (err error) {
+func initLogger(logPath string, details []LogDetailConfig) (err error) {
 	detailsLen := len(details)
 	if detailsLen == 0 {
 		err = errors.Errorf("Logger Details Config Empty: %+v", details)
@@ -89,7 +89,7 @@ func initLogger(details []LogDetailConfig) (err error) {
 	for _, conf := range details {
 		// 获取日志输出方式
 		var writeSyncer zapcore.WriteSyncer
-		if writeSyncer, err = getWriter(conf); err != nil {
+		if writeSyncer, err = getWriter(logPath, conf); err != nil {
 			return
 		}
 		// 获取编码器
@@ -152,16 +152,16 @@ func getEncoder(conf LogDetailConfig) zapcore.Encoder {
 }
 
 // 获取日志输出方式
-func getWriter(conf LogDetailConfig) (writeSyncer zapcore.WriteSyncer, err error) {
+func getWriter(logPath string, conf LogDetailConfig) (writeSyncer zapcore.WriteSyncer, err error) {
 	// 判断日志路径是否存在，如果不存在就创建
-	conf.Path = strings.TrimSpace(conf.Path)
-	if !nfile.PathExists(conf.Path) {
-		if conf.Path == "" {
-			conf.Path = defaultPath
+	logPath = strings.TrimSpace(logPath)
+	if !nfile.PathExists(logPath) {
+		if logPath == "" {
+			logPath = defaultPath
 		}
-		if err = os.MkdirAll(conf.Path, os.ModePerm); err != nil {
-			conf.Path = defaultPath
-			if err = os.MkdirAll(conf.Path, os.ModePerm); err != nil {
+		if err = os.MkdirAll(logPath, os.ModePerm); err != nil {
+			logPath = defaultPath
+			if err = os.MkdirAll(logPath, os.ModePerm); err != nil {
 				return
 			}
 		}
@@ -178,7 +178,7 @@ func getWriter(conf LogDetailConfig) (writeSyncer zapcore.WriteSyncer, err error
 		filename = fmt.Sprintf("nova-%s.log", time.Now().Format("2006-01-02"))
 	}
 	lumberJackLogger := &lumberjack.Logger{
-		Filename:   filepath.Join(conf.Path, filename),
+		Filename:   filepath.Join(logPath, filename),
 		MaxSize:    conf.MaxSize,    // 单个日志文件最多存储量，单位(mb)，超过则切割
 		MaxBackups: conf.MaxBackups, // 日志备份文件最多数量，超过就删除最老的日志文件
 		MaxAge:     conf.MaxAge,     // 日志保留时间，单位:天(day)

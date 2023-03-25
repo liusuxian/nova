@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 00:24:00
+ * @LastEditTime: 2023-03-26 01:03:06
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -309,10 +309,10 @@ func init() {
 	SetDefault("server.endian", 1)           // 字节存储次序，1: 小端 2: 大端，默认 1
 	// 日志配置
 	SetDefault("logger.ctxKeys", []string{})      // 自定义 Context 上下文变量名称，自动打印 Context 的变量到日志中。默认为空
+	SetDefault("logger.path", "logs")             // 输出日志文件路径
 	SetDefault("logger.details.type", "ALL")      // 日志类型 ALL(打印所有级别)、INFO(打印 DEBUG、INFO、WARN 级别)、ERROR(打印 ERROR、DPANIC、PANIC、FATAL 级别)
 	SetDefault("logger.details.level", "DEBUG")   // 日志打印级别 DEBUG、INFO、WARN、ERROR、DPANIC、PANIC、FATAL
 	SetDefault("logger.details.format", "json")   // 输出日志格式 logfmt、json
-	SetDefault("logger.details.path", "logs")     // 输出日志文件路径
 	SetDefault("logger.details.filename", "nova") // 输出日志文件名称
 	SetDefault("logger.details.maxSize", 10)      // 单个日志文件最多存储量（单位:MB）
 	SetDefault("logger.details.maxBackups", 10)   // 日志备份文件最多数量
