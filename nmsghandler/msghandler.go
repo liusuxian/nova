@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 17:05:25
+ * @LastEditTime: 2023-03-26 02:59:05
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -11,11 +11,20 @@
 package nmsghandler
 
 import (
+	"bytes"
 	"context"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
+	"github.com/olekukonko/tablewriter"
 	"github.com/panjf2000/ants/v2"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"io"
+	"os"
+	"reflect"
+	"strconv"
+	"strings"
+	"time"
 )
 
 // MsgHandle 消息处理回调结构
@@ -54,7 +63,60 @@ func (mh *MsgHandle) AddRouter(msgID uint16, router niface.IRouter) {
 	}
 	// 添加 msgID 与 API 的绑定关系
 	mh.apis[msgID] = router
-	nlog.Info(mh.ctx, "AddRouter Add Api", zap.Uint16("MsgID", msgID))
+}
+
+// PrintRouters 打印所有路由
+func (mh *MsgHandle) PrintRouters() {
+	routerNum := len(mh.apis)
+	if routerNum == 0 {
+		return
+	}
+	// 组装打印数据
+	printData := make([][]string, 0, routerNum)
+	for msgID, router := range mh.apis {
+		rowData := make([]string, 0, 3)
+		// msgID
+		rowData = append(rowData, strconv.FormatInt(int64(msgID), 10))
+		// 获取 Router 的类型信息
+		t := reflect.TypeOf(router)
+		// Router
+		rowData = append(rowData, t.Elem().String())
+		// handler
+		handler := strings.Builder{}
+		for i := t.NumMethod() - 1; i >= 0; i-- {
+			handler.WriteString(t.Elem().PkgPath())
+			handler.WriteString(".(*")
+			handler.WriteString(t.Elem().Name())
+			handler.WriteString(").")
+			handler.WriteString(t.Method(i).Name)
+			handler.WriteString("\n")
+		}
+		rowData = append(rowData, handler.String())
+		printData = append(printData, rowData)
+	}
+	// 打印数据
+	buff := &bytes.Buffer{}
+	table := tablewriter.NewWriter(io.MultiWriter(os.Stdout, buff))
+	table.SetHeader([]string{"MSGID", "ROUTER", "HANDLER"})
+	table.SetCaption(true, time.Now().Local().String())
+	for _, v := range printData {
+		table.Append(v)
+		table.SetAlignment(tablewriter.ALIGN_LEFT)
+		table.SetRowLine(true)
+	}
+	table.Render()
+	// 输出到日志文件
+	// 打开文件，如果不存在则创建
+	fileName := nlog.GetLoggerPath() + "/router.log"
+	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+	if err != nil {
+		panic(errors.Wrapf(err, "PrintRouters OpenFile[%s] Error", fileName))
+	}
+	defer f.Close()
+	// 写入文件
+	if _, err := io.WriteString(f, buff.String()); err != nil {
+		panic(errors.Wrapf(err, "PrintRouters WriteFile[%s] Error", fileName))
+	}
 }
 
 // StartWorkerPool 启动 Worker 工作池

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 01:00:53
+ * @LastEditTime: 2023-03-26 02:39:40
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -49,6 +49,13 @@ type LogDetailConfig struct {
 // 默认输出日志文件路径
 const defaultPath = "logs"
 
+// 日志类型
+const (
+	LOGTYPE_ALL   = "ALL"   // 打印所有级别
+	LOGTYPE_INFO  = "INFO"  // 打印 DEBUG、INFO、WARN 级别
+	LOGTYPE_ERROR = "ERROR" // 打印 ERROR、DPANIC、PANIC、FATAL 级别
+)
+
 // 日志打印级别
 var logLevel = map[string]zapcore.Level{
 	"DEBUG":  zapcore.DebugLevel,
@@ -62,6 +69,9 @@ var logLevel = map[string]zapcore.Level{
 
 // 只能输出结构化日志，但是性能要高于SugaredLogger
 var logger *zap.Logger
+
+// 输出日志文件路径
+var loggerPath string
 
 // 日志配置
 var logConfig LogConfig
@@ -102,15 +112,15 @@ func initLogger(logPath string, details []LogDetailConfig) (err error) {
 		}
 		var levelEnabler zapcore.LevelEnabler
 		switch conf.Type {
-		case "ALL":
+		case LOGTYPE_ALL:
 			levelEnabler = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 				return lvl <= zapcore.FatalLevel && lvl >= level
 			})
-		case "INFO":
+		case LOGTYPE_INFO:
 			levelEnabler = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 				return lvl < zapcore.ErrorLevel && lvl >= level
 			})
-		case "ERROR":
+		case LOGTYPE_ERROR:
 			levelEnabler = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 				return lvl >= zapcore.ErrorLevel && lvl >= level
 			})
@@ -166,6 +176,7 @@ func getWriter(logPath string, conf LogDetailConfig) (writeSyncer zapcore.WriteS
 			}
 		}
 	}
+	loggerPath = logPath
 	// 日志文件与日志切割配置
 	filenameList := nstr.Split(conf.Filename, ".")
 	filenameListLen := len(filenameList)
@@ -238,6 +249,11 @@ func Level() zapcore.Level {
 // LevelEnabled
 func LevelEnabled(lvl zapcore.Level) bool {
 	return logger.Level().Enabled(lvl)
+}
+
+// 获取输出日志文件路径
+func GetLoggerPath() string {
+	return loggerPath
 }
 
 func withCtxLogger(ctx context.Context, fields ...zap.Field) *zap.Logger {

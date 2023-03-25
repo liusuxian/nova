@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-24 14:24:11
+ * @LastEditTime: 2023-03-26 02:20:07
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -168,6 +168,8 @@ func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	if _, err := c.client.Dial(c.network, c.addr); err != nil {
 		nlog.Fatal(c.ctx, "Client OnBoot Error", zap.Error(err))
 	}
+	// 打印所有路由
+	c.msgHandler.PrintRouters()
 	return
 }
 
