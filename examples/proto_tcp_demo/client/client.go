@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-24 14:59:08
+ * @LastEditTime: 2023-03-26 03:15:42
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/client.go
  * @Description:
  *
@@ -60,9 +60,7 @@ func main() {
 	// 取消任务
 	cancelFunc()
 	// 等待一段时间
-	idleTimeout := time.NewTimer(2 * time.Second)
-	defer idleTimeout.Stop()
 	select {
-	case <-idleTimeout.C:
+	case <-time.After(1 * time.Second):
 	}
 }
