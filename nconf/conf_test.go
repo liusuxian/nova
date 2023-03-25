@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-22 11:05:59
+ * @LastEditTime: 2023-03-25 23:59:56
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf_test.go
  * @Description:
  *
@@ -37,7 +37,8 @@ type LogConfig struct {
 
 // LogDetailConfig 日志详细配置
 type LogDetailConfig struct {
-	Level      string // 日志打印级别 debug、info、warn、error、dpanic、panic、fatal
+	Type       string // 日志类型 ALL(打印所有级别)、INFO(打印 DEBUG、INFO、WARN 级别)、ERROR(打印 ERROR、DPANIC、PANIC、FATAL 级别)
+	Level      string // 日志打印级别 DEBUG、INFO、WARN、ERROR、DPANIC、PANIC、FATAL
 	Format     string // 输出日志格式 logfmt、json
 	Path       string // 输出日志文件路径
 	Filename   string // 输出日志文件名称

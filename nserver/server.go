@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-24 14:23:32
+ * @LastEditTime: 2023-03-25 17:34:39
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -186,6 +186,8 @@ func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	s.eng = eng
 	// 启动 Worker 工作池
 	s.msgHandler.StartWorkerPool()
+	// 打印所有路由
+	s.msgHandler.PrintRouters()
 	return
 }
 

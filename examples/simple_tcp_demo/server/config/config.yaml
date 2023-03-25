@@ -15,7 +15,8 @@ server:
 logger:
   ctxKeys: [] # 自定义 Context 上下文变量名称，自动打印 Context 的变量到日志中。默认为空
   details:
-    - level: "debug" # 日志打印级别 debug、info、warn、error、dpanic、panic、fatal
+    - type: "INFO" # 日志类型 ALL(打印所有级别)、INFO(打印 DEBUG、INFO、WARN 级别)、ERROR(打印 ERROR、DPANIC、PANIC、FATAL 级别)
+      level: "DEBUG" # 日志打印级别 DEBUG、INFO、WARN、ERROR、DPANIC、PANIC、FATAL
       format: "json" # 输出日志格式 logfmt、json
       path: "logs" # 输出日志文件路径
       filename: "info.log" # 输出日志文件名称
@@ -24,7 +25,8 @@ logger:
       maxAge: 7 # 日志保留时间（单位:天）
       compress: false # 是否压缩日志
       stdout: true # 是否输出到控制台
-    - level: "error" # 日志打印级别 debug、info、warn、error、dpanic、panic、fatal
+    - type: "ERROR" # 日志类型 ALL(打印所有级别)、INFO(打印 DEBUG、INFO、WARN 级别)、ERROR(打印 ERROR、DPANIC、PANIC、FATAL 级别)
+      level: "ERROR" # 日志打印级别 DEBUG、INFO、WARN、ERROR、DPANIC、PANIC、FATAL
       format: "json" # 输出日志格式 logfmt、json
       path: "logs" # 输出日志文件路径
       filename: "error.log" # 输出日志文件名称
