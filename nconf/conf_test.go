@@ -38,9 +38,9 @@ type LogConfig struct {
 
 // LogDetailConfig 日志详细配置
 type LogDetailConfig struct {
-	Type       string // 日志类型 ALL(打印所有级别)、INFO(打印 DEBUG、INFO、WARN 级别)、ERROR(打印 ERROR、DPANIC、PANIC、FATAL 级别)
-	Level      string // 日志打印级别 DEBUG、INFO、WARN、ERROR、DPANIC、PANIC、FATAL
-	Format     string // 输出日志格式 logfmt、json
+	Type       int    // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO、WARN 级别 2:打印 ERROR、DPANIC、PANIC、FATAL 级别，默认0
+	Level      int    // 日志打印级别 0:DEBUG 1:INFO 2:WARN 3:ERROR 4:DPANIC、5:PANIC、6:FATAL，默认0
+	Format     int    // 输出日志格式 0:logfmt 1:json，默认0
 	Filename   string // 输出日志文件名称
 	MaxSize    int    // 单个日志文件最多存储量（单位:MB）
 	MaxBackups int    // 日志备份文件最多数量

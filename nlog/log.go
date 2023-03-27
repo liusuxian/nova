@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 02:39:40
+ * @LastEditTime: 2023-03-27 13:34:00
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -35,9 +35,9 @@ type LogConfig struct {
 
 // LogDetailConfig 日志详细配置
 type LogDetailConfig struct {
-	Type       string // 日志类型 ALL(打印所有级别)、INFO(打印 DEBUG、INFO、WARN 级别)、ERROR(打印 ERROR、DPANIC、PANIC、FATAL 级别)
-	Level      string // 日志打印级别 DEBUG、INFO、WARN、ERROR、DPANIC、PANIC、FATAL
-	Format     string // 输出日志格式 logfmt、json
+	Type       int    // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO、WARN 级别 2:打印 ERROR、DPANIC、PANIC、FATAL 级别，默认0
+	Level      int    // 日志打印级别 0:DEBUG 1:INFO 2:WARN 3:ERROR 4:DPANIC、5:PANIC、6:FATAL，默认0
+	Format     int    // 输出日志格式 0:logfmt 1:json，默认0
 	Filename   string // 输出日志文件名称
 	MaxSize    int    // 单个日志文件最多存储量（单位:MB）
 	MaxBackups int    // 日志备份文件最多数量
@@ -51,21 +51,16 @@ const defaultPath = "logs"
 
 // 日志类型
 const (
-	LOGTYPE_ALL   = "ALL"   // 打印所有级别
-	LOGTYPE_INFO  = "INFO"  // 打印 DEBUG、INFO、WARN 级别
-	LOGTYPE_ERROR = "ERROR" // 打印 ERROR、DPANIC、PANIC、FATAL 级别
+	LOGTYPE_ALL   = 0 // 打印所有级别
+	LOGTYPE_INFO  = 1 // 打印 DEBUG、INFO、WARN 级别
+	LOGTYPE_ERROR = 2 // 打印 ERROR、DPANIC、PANIC、FATAL 级别
 )
 
-// 日志打印级别
-var logLevel = map[string]zapcore.Level{
-	"DEBUG":  zapcore.DebugLevel,
-	"INFO":   zapcore.InfoLevel,
-	"WARN":   zapcore.WarnLevel,
-	"ERROR":  zapcore.ErrorLevel,
-	"DPANIC": zapcore.DPanicLevel,
-	"PANIC":  zapcore.PanicLevel,
-	"FATAL":  zapcore.FatalLevel,
-}
+// 输出日志格式
+const (
+	FORMAT_LOGFMT = 0
+	FORMAT_JSON   = 1
+)
 
 // 只能输出结构化日志，但是性能要高于SugaredLogger
 var logger *zap.Logger
@@ -97,19 +92,12 @@ func initLogger(logPath string, details []LogDetailConfig) (err error) {
 	}
 	coreSlice := make([]zapcore.Core, 0, detailsLen)
 	for _, conf := range details {
-		// 获取日志输出方式
-		var writeSyncer zapcore.WriteSyncer
-		if writeSyncer, err = getWriter(logPath, conf); err != nil {
+		// 日志打印级别
+		if conf.Level < 0 || conf.Level > 6 {
+			err = errors.Errorf("Logger Details Config `Level[%d]` Undefined", conf.Level)
 			return
 		}
-		// 获取编码器
-		encoder := getEncoder(conf)
-		// 日志打印级别
-		var level zapcore.Level
-		var ok bool
-		if level, ok = logLevel[conf.Level]; !ok {
-			level = logLevel["DEBUG"]
-		}
+		level := zapcore.Level(conf.Level - 1)
 		var levelEnabler zapcore.LevelEnabler
 		switch conf.Type {
 		case LOGTYPE_ALL:
@@ -125,7 +113,17 @@ func initLogger(logPath string, details []LogDetailConfig) (err error) {
 				return lvl >= zapcore.ErrorLevel && lvl >= level
 			})
 		default:
-			err = errors.Errorf("Logger Details Config `Type[%s]` Fields Undefined", conf.Type)
+			err = errors.Errorf("Logger Details Config `Type[%d]` Undefined", conf.Type)
+			return
+		}
+		// 获取日志输出方式
+		var writeSyncer zapcore.WriteSyncer
+		if writeSyncer, err = getWriter(logPath, conf); err != nil {
+			return
+		}
+		// 获取编码器
+		var encoder zapcore.Encoder
+		if encoder, err = getEncoder(conf); err != nil {
 			return
 		}
 		// 新建Core
@@ -134,12 +132,12 @@ func initLogger(logPath string, details []LogDetailConfig) (err error) {
 	}
 	// 新建Logger
 	coreTee := zapcore.NewTee(coreSlice...)
-	logger = zap.New(coreTee, zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel)) // zap.Addcaller()输出日志打印文件和行数
+	logger = zap.New(coreTee, zap.ErrorOutput(zapcore.AddSync(zapcore.Lock(os.Stderr))), zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel)) // zap.Addcaller()输出日志打印文件和行数
 	return
 }
 
 // 获取编码器(如何写入日志)
-func getEncoder(conf LogDetailConfig) zapcore.Encoder {
+func getEncoder(conf LogDetailConfig) (encoder zapcore.Encoder, err error) {
 	encoderConfig := zap.NewProductionEncoderConfig() // NewJSONEncoder()输出json格式，NewConsoleEncoder()输出普通文本格式
 	encoderConfig.LevelKey = "level"
 	encoderConfig.TimeKey = "time"
@@ -153,12 +151,19 @@ func getEncoder(conf LogDetailConfig) zapcore.Encoder {
 	encoderConfig.EncodeDuration = func(d time.Duration, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendInt64(int64(d) / 1000000)
 	}
-	if conf.Format == "json" {
+	switch conf.Format {
+	case FORMAT_LOGFMT:
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 按级别显示不同颜色，不需要的话取值zapcore.CapitalLevelEncoder就可以了
+		encoder = zapcore.NewConsoleEncoder(encoderConfig)           // 以logfmt格式写入
+		return
+	case FORMAT_JSON:
 		encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
-		return zapcore.NewJSONEncoder(encoderConfig) // 以json格式写入
+		encoder = zapcore.NewJSONEncoder(encoderConfig) // 以json格式写入
+		return
+	default:
+		err = errors.Errorf("Logger Details Config `Format[%d]` Undefined", conf.Format)
+		return
 	}
-	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 按级别显示不同颜色，不需要的话取值zapcore.CapitalLevelEncoder就可以了
-	return zapcore.NewConsoleEncoder(encoderConfig)              // 以logfmt格式写入
 }
 
 // 获取日志输出方式
@@ -198,7 +203,7 @@ func getWriter(logPath string, conf LogDetailConfig) (writeSyncer zapcore.WriteS
 	// 日志输出方式
 	if conf.Stdout {
 		// 日志同时输出到控制台和日志文件中
-		writeSyncer = zapcore.NewMultiWriteSyncer(zapcore.AddSync(lumberJackLogger), zapcore.AddSync(os.Stdout))
+		writeSyncer = zapcore.NewMultiWriteSyncer(zapcore.AddSync(lumberJackLogger), zapcore.AddSync(zapcore.Lock(os.Stdout)))
 	} else {
 		// 日志只输出到日志文件
 		writeSyncer = zapcore.AddSync(lumberJackLogger)
