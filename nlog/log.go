@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-27 13:34:00
+ * @LastEditTime: 2023-03-27 18:17:05
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -46,30 +46,26 @@ type LogDetailConfig struct {
 	Stdout     bool   // 是否输出到控制台
 }
 
-// 默认输出日志文件路径
-const defaultPath = "logs"
-
-// 日志类型
 const (
+	// 默认输出日志文件路径
+	defaultPath = "logs"
+	// 日志类型
 	LOGTYPE_ALL   = 0 // 打印所有级别
 	LOGTYPE_INFO  = 1 // 打印 DEBUG、INFO、WARN 级别
 	LOGTYPE_ERROR = 2 // 打印 ERROR、DPANIC、PANIC、FATAL 级别
-)
-
-// 输出日志格式
-const (
+	// 输出日志格式
 	FORMAT_LOGFMT = 0
 	FORMAT_JSON   = 1
 )
 
-// 只能输出结构化日志，但是性能要高于SugaredLogger
-var logger *zap.Logger
-
-// 输出日志文件路径
-var loggerPath string
-
-// 日志配置
-var logConfig LogConfig
+var (
+	// 只能输出结构化日志，但是性能要高于SugaredLogger
+	logger *zap.Logger
+	// 输出日志文件路径
+	loggerPath string
+	// 日志配置
+	logConfig LogConfig
+)
 
 func init() {
 	// 读取配置
@@ -144,20 +140,23 @@ func getEncoder(conf LogDetailConfig) (encoder zapcore.Encoder, err error) {
 	encoderConfig.CallerKey = "file"
 	encoderConfig.MessageKey = "msg"
 	encoderConfig.StacktraceKey = "stack"
-	encoderConfig.FunctionKey = "func"
-	encoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-		enc.AppendString(t.Format("2006-01-02 15:04:05"))
-	} // 指定时间格式
-	encoderConfig.EncodeDuration = func(d time.Duration, enc zapcore.PrimitiveArrayEncoder) {
-		enc.AppendInt64(int64(d) / 1000000)
-	}
+	encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05.000")
+	encoderConfig.EncodeDuration = zapcore.StringDurationEncoder
 	switch conf.Format {
 	case FORMAT_LOGFMT:
-		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder // 按级别显示不同颜色，不需要的话取值zapcore.CapitalLevelEncoder就可以了
-		encoder = zapcore.NewConsoleEncoder(encoderConfig)           // 以logfmt格式写入
+		encoderConfig.EncodeLevel = func(l zapcore.Level, pae zapcore.PrimitiveArrayEncoder) {
+			pae.AppendString("[" + l.CapitalString() + "]")
+		}
+		encoderConfig.EncodeCaller = func(ec zapcore.EntryCaller, pae zapcore.PrimitiveArrayEncoder) {
+			pae.AppendString(ec.TrimmedPath() + ":")
+		}
+		encoderConfig.ConsoleSeparator = " "
+		encoder = zapcore.NewConsoleEncoder(encoderConfig) // 以logfmt格式写入
 		return
 	case FORMAT_JSON:
 		encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+		encoderConfig.FunctionKey = "func"
+		encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 		encoder = zapcore.NewJSONEncoder(encoderConfig) // 以json格式写入
 		return
 	default:
