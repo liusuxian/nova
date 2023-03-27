@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 20:45:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 02:59:05
+ * @LastEditTime: 2023-03-27 11:20:00
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -13,6 +13,7 @@ package nmsghandler
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/olekukonko/tablewriter"
@@ -82,21 +83,16 @@ func (mh *MsgHandle) PrintRouters() {
 		// Router
 		rowData = append(rowData, t.Elem().String())
 		// handler
-		handler := strings.Builder{}
+		handlerData := strings.Builder{}
 		for i := t.NumMethod() - 1; i >= 0; i-- {
-			handler.WriteString(t.Elem().PkgPath())
-			handler.WriteString(".(*")
-			handler.WriteString(t.Elem().Name())
-			handler.WriteString(").")
-			handler.WriteString(t.Method(i).Name)
-			handler.WriteString("\n")
+			handlerData.WriteString(fmt.Sprintf("%s.(*%s).%s\n", t.Elem().PkgPath(), t.Elem().Name(), t.Method(i).Name))
 		}
-		rowData = append(rowData, handler.String())
+		rowData = append(rowData, handlerData.String())
 		printData = append(printData, rowData)
 	}
 	// 打印数据
-	buff := &bytes.Buffer{}
-	table := tablewriter.NewWriter(io.MultiWriter(os.Stdout, buff))
+	tableData := &bytes.Buffer{}
+	table := tablewriter.NewWriter(io.MultiWriter(os.Stdout, tableData))
 	table.SetHeader([]string{"MSGID", "ROUTER", "HANDLER"})
 	table.SetCaption(true, time.Now().Local().String())
 	for _, v := range printData {
@@ -105,17 +101,18 @@ func (mh *MsgHandle) PrintRouters() {
 		table.SetRowLine(true)
 	}
 	table.Render()
+	os.Stdout.Sync()
 	// 输出到日志文件
 	// 打开文件，如果不存在则创建
-	fileName := nlog.GetLoggerPath() + "/router.log"
-	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+	logFileName := fmt.Sprintf("%s/router-%s.log", nlog.GetLoggerPath(), time.Now().Format("2006-01-02"))
+	f, err := os.OpenFile(logFileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
-		panic(errors.Wrapf(err, "PrintRouters OpenFile[%s] Error", fileName))
+		panic(errors.Wrapf(err, "PrintRouters OpenFile[%s] Error", logFileName))
 	}
 	defer f.Close()
 	// 写入文件
-	if _, err := io.WriteString(f, buff.String()); err != nil {
-		panic(errors.Wrapf(err, "PrintRouters WriteFile[%s] Error", fileName))
+	if _, err := io.WriteString(f, tableData.String()); err != nil {
+		panic(errors.Wrapf(err, "PrintRouters WriteFile[%s] Error", logFileName))
 	}
 }
 
