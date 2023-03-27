@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-27 11:22:04
+ * @LastEditTime: 2023-03-27 11:25:34
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -165,6 +165,8 @@ func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	if _, err := c.client.Dial(c.network, c.addr); err != nil {
 		nlog.Fatal(c.ctx, "Client OnBoot Error", zap.Error(err))
 	}
+	// 打印所有路由
+	c.msgHandler.PrintRouters()
 	return
 }
 
@@ -179,8 +181,6 @@ func (c *Client) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
 // OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
 func (c *Client) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	nlog.Info(c.ctx, "Client OnOpen", zap.Int("connID", conn.Fd()))
-	// 打印所有路由
-	c.msgHandler.PrintRouters()
 	// 创建一个 Client 客户端特性的连接
 	c.conn = nconn.NewClientConn(c, conn, c.maxHeartbeat)
 	// 启动连接
