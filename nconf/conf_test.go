@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 01:03:19
+ * @LastEditTime: 2023-03-27 23:21:25
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf_test.go
  * @Description:
  *
@@ -40,7 +40,7 @@ type LogConfig struct {
 type LogDetailConfig struct {
 	Type       int    // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO、WARN 级别 2:打印 ERROR、DPANIC、PANIC、FATAL 级别，默认0
 	Level      int    // 日志打印级别 0:DEBUG 1:INFO 2:WARN 3:ERROR 4:DPANIC、5:PANIC、6:FATAL，默认0
-	Format     int    // 输出日志格式 0:logfmt 1:json，默认0
+	Format     int    // 输出日志格式 0:logfmt 1:json，默认1
 	Filename   string // 输出日志文件名称
 	MaxSize    int    // 单个日志文件最多存储量（单位:MB）
 	MaxBackups int    // 日志备份文件最多数量

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-27 18:17:05
+ * @LastEditTime: 2023-03-27 23:21:44
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -11,10 +11,12 @@
 package nlog
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/utils/nfile"
+	"github.com/liusuxian/nova/utils/nslice"
 	"github.com/liusuxian/nova/utils/nstr"
 	"github.com/natefinch/lumberjack"
 	"github.com/pkg/errors"
@@ -37,13 +39,31 @@ type LogConfig struct {
 type LogDetailConfig struct {
 	Type       int    // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO、WARN 级别 2:打印 ERROR、DPANIC、PANIC、FATAL 级别，默认0
 	Level      int    // 日志打印级别 0:DEBUG 1:INFO 2:WARN 3:ERROR 4:DPANIC、5:PANIC、6:FATAL，默认0
-	Format     int    // 输出日志格式 0:logfmt 1:json，默认0
+	Format     int    // 输出日志格式 0:logfmt 1:json，默认1
 	Filename   string // 输出日志文件名称
 	MaxSize    int    // 单个日志文件最多存储量（单位:MB）
 	MaxBackups int    // 日志备份文件最多数量
 	MaxAge     int    // 日志保留时间（单位:天）
 	Compress   bool   // 是否压缩日志
 	Stdout     bool   // 是否输出到控制台
+}
+
+// stdoutWriter 标准输出
+type stdoutWriter struct {
+	format int // 输出日志格式 0:logfmt 1:json，默认1
+}
+
+// fileWriter 文件输出
+type fileWriter struct {
+	lumberjack.Logger
+	format int // 输出日志格式 0:logfmt 1:json，默认1
+}
+
+// nLogger 日志结构
+type nLogger struct {
+	zapLogger *zap.Logger                 // 只能输出结构化日志，但是性能要高于SugaredLogger
+	logConfig LogConfig                   // 日志配置
+	logWriter map[int]zapcore.WriteSyncer // 日志输出对象
 }
 
 const (
@@ -58,23 +78,19 @@ const (
 	FORMAT_JSON   = 1
 )
 
-var (
-	// 只能输出结构化日志，但是性能要高于SugaredLogger
-	logger *zap.Logger
-	// 输出日志文件路径
-	loggerPath string
-	// 日志配置
-	logConfig LogConfig
-)
+// logger 实例
+var logger = &nLogger{
+	logWriter: make(map[int]zapcore.WriteSyncer),
+}
 
 func init() {
 	// 读取配置
 	var err error
-	if err = nconf.StructKey("logger", &logConfig); err != nil {
+	if err = nconf.StructKey("logger", &logger.logConfig); err != nil {
 		panic(errors.Wrapf(err, "Get Logger Config Error"))
 	}
 	// 初始化日志
-	if err = initLogger(logConfig.Path, logConfig.Details); err != nil {
+	if err = initLogger(logger.logConfig.Path, logger.logConfig.Details); err != nil {
 		panic(errors.Wrapf(err, "Init Logger Error"))
 	}
 }
@@ -87,7 +103,7 @@ func initLogger(logPath string, details []LogDetailConfig) (err error) {
 		return
 	}
 	coreSlice := make([]zapcore.Core, 0, detailsLen)
-	for _, conf := range details {
+	for index, conf := range details {
 		// 日志打印级别
 		if conf.Level < 0 || conf.Level > 6 {
 			err = errors.Errorf("Logger Details Config `Level[%d]` Undefined", conf.Level)
@@ -117,6 +133,7 @@ func initLogger(logPath string, details []LogDetailConfig) (err error) {
 		if writeSyncer, err = getWriter(logPath, conf); err != nil {
 			return
 		}
+		logger.logWriter[index] = writeSyncer
 		// 获取编码器
 		var encoder zapcore.Encoder
 		if encoder, err = getEncoder(conf); err != nil {
@@ -128,8 +145,38 @@ func initLogger(logPath string, details []LogDetailConfig) (err error) {
 	}
 	// 新建Logger
 	coreTee := zapcore.NewTee(coreSlice...)
-	logger = zap.New(coreTee, zap.ErrorOutput(zapcore.AddSync(zapcore.Lock(os.Stderr))), zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zapcore.ErrorLevel)) // zap.Addcaller()输出日志打印文件和行数
+	logger.zapLogger = zap.New(
+		coreTee,
+		zap.ErrorOutput(zapcore.Lock(zapcore.AddSync(os.Stderr))),
+		zap.AddCaller(),
+		zap.AddCallerSkip(1),
+		zap.AddStacktrace(zapcore.ErrorLevel),
+	) // zap.Addcaller()输出日志打印文件和行数
 	return
+}
+
+// Write
+func (l *stdoutWriter) Write(p []byte) (int, error) {
+	if l.format == FORMAT_LOGFMT {
+		// 去掉大括号
+		p = bytes.ReplaceAll(p, []byte("{"), []byte(""))
+		p = bytes.ReplaceAll(p, []byte("}"), []byte(""))
+		// 去掉引号
+		p = bytes.ReplaceAll(p, []byte("\""), []byte(""))
+	}
+	return os.Stdout.Write(p)
+}
+
+// Write
+func (l *fileWriter) Write(p []byte) (int, error) {
+	if l.format == FORMAT_LOGFMT {
+		// 去掉大括号
+		p = bytes.ReplaceAll(p, []byte("{"), []byte(""))
+		p = bytes.ReplaceAll(p, []byte("}"), []byte(""))
+		// 去掉引号
+		p = bytes.ReplaceAll(p, []byte("\""), []byte(""))
+	}
+	return l.Logger.Write(p)
 }
 
 // 获取编码器(如何写入日志)
@@ -142,13 +189,11 @@ func getEncoder(conf LogDetailConfig) (encoder zapcore.Encoder, err error) {
 	encoderConfig.StacktraceKey = "stack"
 	encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05.000")
 	encoderConfig.EncodeDuration = zapcore.StringDurationEncoder
+	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 	switch conf.Format {
 	case FORMAT_LOGFMT:
 		encoderConfig.EncodeLevel = func(l zapcore.Level, pae zapcore.PrimitiveArrayEncoder) {
 			pae.AppendString("[" + l.CapitalString() + "]")
-		}
-		encoderConfig.EncodeCaller = func(ec zapcore.EntryCaller, pae zapcore.PrimitiveArrayEncoder) {
-			pae.AppendString(ec.TrimmedPath() + ":")
 		}
 		encoderConfig.ConsoleSeparator = " "
 		encoder = zapcore.NewConsoleEncoder(encoderConfig) // 以logfmt格式写入
@@ -156,7 +201,6 @@ func getEncoder(conf LogDetailConfig) (encoder zapcore.Encoder, err error) {
 	case FORMAT_JSON:
 		encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 		encoderConfig.FunctionKey = "func"
-		encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 		encoder = zapcore.NewJSONEncoder(encoderConfig) // 以json格式写入
 		return
 	default:
@@ -180,7 +224,7 @@ func getWriter(logPath string, conf LogDetailConfig) (writeSyncer zapcore.WriteS
 			}
 		}
 	}
-	loggerPath = logPath
+	logger.logConfig.Path = logPath
 	// 日志文件与日志切割配置
 	filenameList := nstr.Split(conf.Filename, ".")
 	filenameListLen := len(filenameList)
@@ -192,20 +236,42 @@ func getWriter(logPath string, conf LogDetailConfig) (writeSyncer zapcore.WriteS
 	} else {
 		filename = fmt.Sprintf("nova-%s.log", time.Now().Format("2006-01-02"))
 	}
-	lumberJackLogger := &lumberjack.Logger{
-		Filename:   filepath.Join(logPath, filename),
-		MaxSize:    conf.MaxSize,    // 单个日志文件最多存储量，单位(mb)，超过则切割
-		MaxBackups: conf.MaxBackups, // 日志备份文件最多数量，超过就删除最老的日志文件
-		MaxAge:     conf.MaxAge,     // 日志保留时间，单位:天(day)
-		Compress:   conf.Compress,   // 是否压缩日志
+	logFileWriter := &fileWriter{
+		Logger: lumberjack.Logger{
+			Filename:   filepath.Join(logPath, filename),
+			MaxSize:    conf.MaxSize,    // 单个日志文件最多存储量，单位(mb)，超过则切割
+			MaxBackups: conf.MaxBackups, // 日志备份文件最多数量，超过就删除最老的日志文件
+			MaxAge:     conf.MaxAge,     // 日志保留时间，单位:天(day)
+			Compress:   conf.Compress,   // 是否压缩日志
+		},
+		format: conf.Format,
 	}
 	// 日志输出方式
 	if conf.Stdout {
 		// 日志同时输出到控制台和日志文件中
-		writeSyncer = zapcore.NewMultiWriteSyncer(zapcore.AddSync(lumberJackLogger), zapcore.AddSync(zapcore.Lock(os.Stdout)))
+		writeSyncer = zapcore.NewMultiWriteSyncer(
+			zapcore.Lock(zapcore.AddSync(logFileWriter)),
+			zapcore.Lock(zapcore.AddSync(&stdoutWriter{format: conf.Format})),
+		)
 	} else {
 		// 日志只输出到日志文件
-		writeSyncer = zapcore.AddSync(lumberJackLogger)
+		writeSyncer = zapcore.Lock(zapcore.AddSync(logFileWriter))
+	}
+	return
+}
+
+// Write 使用日志输出对象写入数据
+func Write(p []byte, withoutLogType ...int) (err error) {
+	for index, writer := range logger.logWriter {
+		conf := logger.logConfig.Details[index]
+		if !nslice.ContainsInt(withoutLogType, conf.Type) {
+			if _, err = writer.Write(p); err != nil {
+				return
+			}
+			if err = writer.Sync(); err != nil {
+				return
+			}
+		}
 	}
 	return
 }
@@ -247,31 +313,26 @@ func Fatal(ctx context.Context, msg string, fields ...zap.Field) {
 
 // Level
 func Level() zapcore.Level {
-	return logger.Level()
+	return logger.zapLogger.Level()
 }
 
 // LevelEnabled
 func LevelEnabled(lvl zapcore.Level) bool {
-	return logger.Level().Enabled(lvl)
-}
-
-// 获取输出日志文件路径
-func GetLoggerPath() string {
-	return loggerPath
+	return logger.zapLogger.Level().Enabled(lvl)
 }
 
 func withCtxLogger(ctx context.Context, fields ...zap.Field) *zap.Logger {
 	if ctx == nil {
-		return logger.With(fields...)
+		return logger.zapLogger.With(fields...)
 	}
-	ctxKeys := logConfig.CtxKeys
+	ctxKeys := logger.logConfig.CtxKeys
 	ctxKeysLen := len(ctxKeys)
 	if ctxKeysLen == 0 {
-		return logger.With(fields...)
+		return logger.zapLogger.With(fields...)
 	}
 	fieldList := make([]zapcore.Field, 0, ctxKeysLen)
 	for _, key := range ctxKeys {
 		fieldList = append(fieldList, zap.Any(key, ctx.Value(key)))
 	}
-	return logger.With(fieldList...).With(fields...)
+	return logger.zapLogger.With(fieldList...).With(fields...)
 }
