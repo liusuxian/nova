@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 03:23:55
+ * @LastEditTime: 2023-03-27 23:22:38
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -179,7 +179,7 @@ func (s *Server) SetHeartBeat(option *niface.HeartBeatOption, initiate bool) {
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnBoot", zap.String("listening", s.addr), zap.String("ServerName", s.serverConf.Name), zap.Any("options", s.options))
+	nlog.Info(s.ctx, "Server OnBoot", zap.String("listening", s.addr), zap.Reflect("ServerConf", s.serverConf), zap.Reflect("options", s.options))
 	s.eng = eng
 	// 启动 Worker 工作池
 	s.msgHandler.StartWorkerPool()

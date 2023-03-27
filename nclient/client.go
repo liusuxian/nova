@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 19:43:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-27 11:25:34
+ * @LastEditTime: 2023-03-27 23:23:07
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -160,7 +160,7 @@ func (c *Client) SetHeartBeat(option *niface.HeartBeatOption, initiate bool) {
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
-	nlog.Info(c.ctx, "Client OnBoot", zap.String("Network", c.network), zap.String("Addr", c.addr), zap.Any("options", c.options))
+	nlog.Info(c.ctx, "Client OnBoot", zap.String("Network", c.network), zap.String("Addr", c.addr), zap.Reflect("options", c.options))
 	// 连接服务器
 	if _, err := c.client.Dial(c.network, c.addr); err != nil {
 		nlog.Fatal(c.ctx, "Client OnBoot Error", zap.Error(err))
