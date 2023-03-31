@@ -1,8 +1,8 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-02-21 21:08:37
+ * @Date: 2023-03-31 13:54:40
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 12:56:13
+ * @LastEditTime: 2023-03-31 13:56:30
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/message.go
  * @Description:
  *
@@ -32,8 +32,8 @@ func (msg *Message) SetMsgID(msgID uint16) {
 }
 
 // SetDataLen 设置消息体长度
-func (msg *Message) SetDataLen(len int) {
-	msg.DataLen = len
+func (msg *Message) SetDataLen(dataLen int) {
+	msg.DataLen = dataLen
 }
 
 // SetData 设置消息内容
@@ -42,16 +42,16 @@ func (msg *Message) SetData(data []byte) {
 }
 
 // GetMsgID 获取消息 ID
-func (msg *Message) GetMsgID() uint16 {
+func (msg *Message) GetMsgID() (msgID uint16) {
 	return msg.ID
 }
 
 // GetDataLen 获取消息体长度
-func (msg *Message) GetDataLen() int {
+func (msg *Message) GetDataLen() (dataLen int) {
 	return msg.DataLen
 }
 
 // GetData 获取消息内容
-func (msg *Message) GetData() []byte {
+func (msg *Message) GetData() (data []byte) {
 	return msg.Data
 }

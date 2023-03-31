@@ -1,8 +1,8 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-02-22 18:49:26
+ * @Date: 2023-03-31 13:49:39
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-22 17:33:26
+ * @LastEditTime: 2023-03-31 13:53:14
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack.go
  * @Description:
  *
@@ -37,7 +37,7 @@ func newDefaultPack(endian, maxPacketSize int) niface.IDataPack {
 }
 
 // GetHeadLen 获取包头长度
-func (p *defaultPack) GetHeadLen() uint8 {
+func (p *defaultPack) GetHeadLen() (headLen uint8) {
 	return msgIdSize + msgBodySize
 }
 
@@ -72,7 +72,7 @@ func (p *defaultPack) Pack(msg niface.IMessage) (data []byte) {
 }
 
 // UnPack 拆包
-func (p *defaultPack) UnPack(conn gnet.Conn) (data niface.IMessage, err error) {
+func (p *defaultPack) UnPack(conn gnet.Conn) (msg niface.IMessage, err error) {
 	// 读消息头
 	var buf []byte
 	bodyOffset := msgIdSize + msgBodySize
@@ -111,6 +111,6 @@ func (p *defaultPack) UnPack(conn gnet.Conn) (data niface.IMessage, err error) {
 	// 创建 Message 消息包
 	msgID := endianOrder.Uint16(buf[:msgIdSize])
 	msgData := buf[bodyOffset:msgLen]
-	data = NewMsgPackage(msgID, msgData)
+	msg = NewMsgPackage(msgID, msgData)
 	return
 }
