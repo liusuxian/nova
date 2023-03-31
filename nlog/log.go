@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-27 23:21:44
+ * @LastEditTime: 2023-03-31 15:18:39
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -277,37 +277,37 @@ func Write(p []byte, withoutLogType ...int) (err error) {
 }
 
 // Debug
-func Debug(ctx context.Context, msg string, fields ...zap.Field) {
+func Debug(ctx context.Context, msg string, fields ...nField) {
 	withCtxLogger(ctx, fields...).Debug(msg)
 }
 
 // Info
-func Info(ctx context.Context, msg string, fields ...zap.Field) {
+func Info(ctx context.Context, msg string, fields ...nField) {
 	withCtxLogger(ctx, fields...).Info(msg)
 }
 
 // Warn
-func Warn(ctx context.Context, msg string, fields ...zap.Field) {
+func Warn(ctx context.Context, msg string, fields ...nField) {
 	withCtxLogger(ctx, fields...).Warn(msg)
 }
 
 // Error
-func Error(ctx context.Context, msg string, fields ...zap.Field) {
+func Error(ctx context.Context, msg string, fields ...nField) {
 	withCtxLogger(ctx, fields...).Error(msg)
 }
 
 // DPanic
-func DPanic(ctx context.Context, msg string, fields ...zap.Field) {
+func DPanic(ctx context.Context, msg string, fields ...nField) {
 	withCtxLogger(ctx, fields...).DPanic(msg)
 }
 
 // Panic
-func Panic(ctx context.Context, msg string, fields ...zap.Field) {
+func Panic(ctx context.Context, msg string, fields ...nField) {
 	withCtxLogger(ctx, fields...).Panic(msg)
 }
 
 // Fatal
-func Fatal(ctx context.Context, msg string, fields ...zap.Field) {
+func Fatal(ctx context.Context, msg string, fields ...nField) {
 	withCtxLogger(ctx, fields...).Fatal(msg)
 }
 
@@ -321,18 +321,22 @@ func LevelEnabled(lvl zapcore.Level) bool {
 	return logger.zapLogger.Level().Enabled(lvl)
 }
 
-func withCtxLogger(ctx context.Context, fields ...zap.Field) *zap.Logger {
+func withCtxLogger(ctx context.Context, fields ...nField) *zap.Logger {
+	fieldSlice := make([]zapcore.Field, 0, len(fields))
+	for _, f := range fields {
+		fieldSlice = append(fieldSlice, f.field)
+	}
 	if ctx == nil {
-		return logger.zapLogger.With(fields...)
+		return logger.zapLogger.With(fieldSlice...)
 	}
 	ctxKeys := logger.logConfig.CtxKeys
 	ctxKeysLen := len(ctxKeys)
 	if ctxKeysLen == 0 {
-		return logger.zapLogger.With(fields...)
+		return logger.zapLogger.With(fieldSlice...)
 	}
-	fieldList := make([]zapcore.Field, 0, ctxKeysLen)
+	ctxFieldSlice := make([]zapcore.Field, 0, ctxKeysLen)
 	for _, key := range ctxKeys {
-		fieldList = append(fieldList, zap.Any(key, ctx.Value(key)))
+		ctxFieldSlice = append(ctxFieldSlice, zap.Any(key, ctx.Value(key)))
 	}
-	return logger.zapLogger.With(fieldList...).With(fields...)
+	return logger.zapLogger.With(ctxFieldSlice...).With(fieldSlice...)
 }
