@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-30 19:10:16
+ * @LastEditTime: 2023-03-31 20:04:40
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/server.go
  * @Description:
  *
@@ -28,7 +28,8 @@ type IServer interface {
 	GetPacket() (packet IDataPack)                          // 获取当前 Server 绑定的数据协议封包和拆包方式
 	GetMsgHandler() (handler IMsgHandle)                    // 获取当前 Server 绑定的消息处理模块
 	SetOverLoadMsg(option ...*OverLoadMsgOption)            // 设置当前 Server 的服务器人数超载消息
-	SetHeartBeat(initiate bool, option ...*HeartBeatOption) // 设置当前 Server 的心跳检测
+	SetHeartbeat(initiate bool, option ...*HeartBeatOption) // 设置当前 Server 的心跳检测器
+	GetHeartbeat() (checker IHeartBeatChecker)              // 获取当前 Server 的心跳检测器
 }
 
 // 用户自定义的服务器人数超载消息处理方法

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 16:19:47
+ * @LastEditTime: 2023-03-31 20:12:06
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -40,8 +40,7 @@ type Server struct {
 	onConnStop       func(conn niface.IConnection) // 当前 Server 的连接断开时的 Hook 函数
 	packet           niface.IDataPack              // 当前 Server 绑定的数据协议封包方式
 	overLoadMsg      *noverload.OverLoadMsg        // 服务器人数超载消息
-	heartbeat        time.Duration                 // 心跳发送间隔时间
-	heartbeatChecker *nheartbeat.HeartbeatChecker  // 心跳检测器
+	heartbeatChecker niface.IHeartBeatChecker      // 心跳检测器
 }
 
 // ServerConfig 服务器配置
@@ -67,7 +66,6 @@ func NewServer(opts ...Option) niface.IServer {
 		nlog.Fatal(ctx, "New Server Error", nlog.Err(err))
 	}
 	// 初始化 Server 属性
-	heartbeat := time.Duration(serCfg.Heartbeat) * time.Millisecond
 	s := &Server{
 		serverConf: serCfg,
 		addr:       fmt.Sprintf("%s://:%d", serCfg.Network, serCfg.Port),
@@ -75,7 +73,6 @@ func NewServer(opts ...Option) niface.IServer {
 		msgHandler: nmsghandler.NewMsgHandle(serCfg.WorkerPoolSize),
 		connMgr:    nconn.NewConnManager(ctx),
 		packet:     npack.NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
-		heartbeat:  heartbeat,
 	}
 	// 处理服务选项
 	for _, opt := range opts {
@@ -163,9 +160,11 @@ func (s *Server) SetOverLoadMsg(option ...*niface.OverLoadMsgOption) {
 	s.overLoadMsg = overLoadMsg
 }
 
-// SetHeartBeat 设置当前 Server 的心跳检测
-func (s *Server) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
-	checker := nheartbeat.NewHeartbeatCheckerServer(s, initiate)
+// SetHeartbeat 设置当前 Server 的心跳检测器
+func (s *Server) SetHeartbeat(initiate bool, option ...*niface.HeartBeatOption) {
+	// 创建心跳检测器
+	interval := time.Duration(s.serverConf.Heartbeat) * time.Millisecond
+	checker := nheartbeat.NewHeartbeatChecker(interval, initiate)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
@@ -176,6 +175,11 @@ func (s *Server) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) 
 	// 添加心跳检测的路由
 	s.AddRouter(checker.GetMsgID(), checker.GetRouter())
 	s.heartbeatChecker = checker
+}
+
+// GetHeartbeat 获取当前 Server 的心跳检测器
+func (s *Server) GetHeartbeat() (checker niface.IHeartBeatChecker) {
+	return s.heartbeatChecker
 }
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
@@ -204,7 +208,7 @@ func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
 // OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
 func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	nlog.Info(s.ctx, "Server OnOpen", nlog.Int("connID", conn.Fd()), nlog.Int("Connections", s.GetConnections()))
-	// 检测允许的客户端连接最大数量
+	// TODO 检测允许的客户端连接最大数量
 	if s.GetConnections() > s.serverConf.MaxConn {
 		out = s.packet.Pack(npack.NewMsgPackage(s.overLoadMsg.GetMsgID(), s.overLoadMsg.GetMsgData()))
 		// 踢连接
@@ -216,7 +220,7 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	// 启动连接
 	go serverConn.Start()
 	// 发送心跳
-	out = s.packet.Pack(npack.NewMsgPackage(s.heartbeatChecker.GetMsgID(), s.heartbeatChecker.GetMsgData()))
+	out = s.packet.Pack(s.heartbeatChecker.GetMessage())
 	return
 }
 
@@ -230,10 +234,7 @@ func (s *Server) OnShutdown(eng gnet.Engine) {
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
 func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
-	if s.heartbeatChecker != nil {
-		go s.heartbeatChecker.Check()
-	}
-	delay = s.heartbeat
+	delay = time.Duration(1000) * time.Millisecond
 	return
 }
 
