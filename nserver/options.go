@@ -40,9 +40,9 @@ const (
 )
 
 // WithPacket 只要实现 Packet，接口可自由实现数据包解析格式，如果没有则使用默认解析格式
-func WithPacket(pack niface.IDataPack) Option {
+func WithPacket(packet niface.IDataPack) Option {
 	return func(s *Server) {
-		s.SetPacket(pack)
+		s.SetPacket(packet)
 	}
 }
 

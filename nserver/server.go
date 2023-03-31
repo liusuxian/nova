@@ -1,8 +1,8 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-02-18 23:25:38
+ * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-27 23:22:38
+ * @LastEditTime: 2023-03-31 14:29:02
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -103,37 +103,37 @@ func (s *Server) AddRouter(msgID uint16, router niface.IRouter) {
 }
 
 // GetCtx 获取当前 Server 的 Context
-func (s *Server) GetCtx() context.Context {
+func (s *Server) GetCtx() (ctx context.Context) {
 	return s.ctx
 }
 
 // GetConnManager 获取当前 Server 的连接管理
-func (s *Server) GetConnManager() niface.IConnManager {
+func (s *Server) GetConnManager() (connMgr niface.IConnManager) {
 	return s.connMgr
 }
 
 // GetConnections 获取当前 Server 的活跃连接数
-func (s *Server) GetConnections() int {
+func (s *Server) GetConnections() (nums int) {
 	return s.eng.CountConnections()
 }
 
 // SetOnConnStart 设置当前 Server 的连接创建时的 Hook 函数
-func (s *Server) SetOnConnStart(hookFunc func(niface.IConnection)) {
-	s.onConnStart = hookFunc
+func (s *Server) SetOnConnStart(f func(conn niface.IConnection)) {
+	s.onConnStart = f
 }
 
 // SetOnConnStop 设置当前 Server 的连接断开时的 Hook 函数
-func (s *Server) SetOnConnStop(hookFunc func(niface.IConnection)) {
-	s.onConnStop = hookFunc
+func (s *Server) SetOnConnStop(f func(conn niface.IConnection)) {
+	s.onConnStop = f
 }
 
 // GetOnConnStart 获取当前 Server 的连接创建时的 Hook 函数
-func (s *Server) GetOnConnStart() func(niface.IConnection) {
+func (s *Server) GetOnConnStart() (f func(conn niface.IConnection)) {
 	return s.onConnStart
 }
 
 // GetOnConnStop 获取当前 Server 的连接断开时的 Hook 函数
-func (s *Server) GetOnConnStop() func(niface.IConnection) {
+func (s *Server) GetOnConnStop() (f func(conn niface.IConnection)) {
 	return s.onConnStop
 }
 
@@ -143,34 +143,36 @@ func (s *Server) SetPacket(packet niface.IDataPack) {
 }
 
 // GetPacket 获取当前 Server 绑定的数据协议封包和拆包方式
-func (s *Server) GetPacket() niface.IDataPack {
+func (s *Server) GetPacket() (packet niface.IDataPack) {
 	return s.packet
 }
 
 // GetMsgHandler 获取当前 Server 绑定的消息处理模块
-func (s *Server) GetMsgHandler() niface.IMsgHandle {
+func (s *Server) GetMsgHandler() (handler niface.IMsgHandle) {
 	return s.msgHandler
 }
 
 // SetOverLoadMsg 设置当前 Server 的服务器人数超载消息
-func (s *Server) SetOverLoadMsg(option *niface.OverLoadMsgOption) {
+func (s *Server) SetOverLoadMsg(option ...*niface.OverLoadMsgOption) {
 	overLoadMsg := noverload.NewOverLoadMsgServer()
 	// 用户自定义
-	if option != nil {
-		overLoadMsg.SetOverLoadMsgFunc(option.MakeMsg)
-		overLoadMsg.BindRouter(option.MsgID, option.Router)
+	if len(option) > 0 {
+		opt := option[0]
+		overLoadMsg.SetOverLoadMsgFunc(opt.MakeMsg)
+		overLoadMsg.BindRouter(opt.MsgID, opt.Router)
 	}
 	s.overLoadMsg = overLoadMsg
 }
 
 // SetHeartBeat 设置当前 Server 的心跳检测
-func (s *Server) SetHeartBeat(option *niface.HeartBeatOption, initiate bool) {
+func (s *Server) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
 	checker := nheartbeat.NewHeartbeatCheckerServer(s, initiate)
 	// 用户自定义
-	if option != nil {
-		checker.SetHeartBeatMsgFunc(option.MakeMsg)
-		checker.SetOnRemoteNotAlive(option.OnRemoteNotAlive)
-		checker.BindRouter(option.MsgID, option.Router)
+	if len(option) > 0 {
+		opt := option[0]
+		checker.SetHeartBeatMsgFunc(opt.MakeMsg)
+		checker.SetOnRemoteNotAlive(opt.OnRemoteNotAlive)
+		checker.BindRouter(opt.MsgID, opt.Router)
 	}
 	// 添加心跳检测的路由
 	s.AddRouter(checker.GetMsgID(), checker.GetRouter())
