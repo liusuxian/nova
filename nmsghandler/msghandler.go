@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:01:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 14:04:22
+ * @LastEditTime: 2023-03-31 16:22:07
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -17,7 +17,6 @@ import (
 	"github.com/liusuxian/nova/nlog"
 	"github.com/olekukonko/tablewriter"
 	"github.com/panjf2000/ants/v2"
-	"go.uber.org/zap"
 	"reflect"
 	"runtime"
 	"strconv"
@@ -56,7 +55,7 @@ func (mh *MsgHandle) HandleRequest(request niface.IRequest) {
 func (mh *MsgHandle) AddRouter(msgID uint16, router niface.IRouter) {
 	// 判断当前 msgID 绑定的 API 处理方法是否已经存在
 	if _, ok := mh.apis[msgID]; ok {
-		nlog.Fatal(mh.ctx, "AddRouter Repeated Api", zap.Uint16("MsgID", msgID))
+		nlog.Fatal(mh.ctx, "AddRouter Repeated Api", nlog.Uint16("MsgID", msgID))
 	}
 	// 添加 msgID 与 API 的绑定关系
 	mh.apis[msgID] = router
@@ -109,10 +108,10 @@ func (mh *MsgHandle) StartWorkerPool() {
 	if mh.workerPool == nil && mh.workerPoolSize > 0 {
 		workerPool, err := ants.NewPool(mh.workerPoolSize)
 		if err != nil {
-			nlog.Fatal(mh.ctx, "StartWorkerPool Fatal", zap.Error(err))
+			nlog.Fatal(mh.ctx, "StartWorkerPool Fatal", nlog.Err(err))
 		}
 		mh.workerPool = workerPool
-		nlog.Info(mh.ctx, "StartWorkerPool Succeed", zap.Int("WorkerPoolSize", mh.workerPoolSize))
+		nlog.Info(mh.ctx, "StartWorkerPool Succeed", nlog.Int("WorkerPoolSize", mh.workerPoolSize))
 	}
 }
 
@@ -128,7 +127,7 @@ func (mh *MsgHandle) StopWorkerPool() {
 func (mh *MsgHandle) doRequest(request niface.IRequest) {
 	handler, ok := mh.apis[request.GetMsgID()]
 	if !ok {
-		nlog.Error(request.GetCtx(), "HandlerMsg Api Not Found", zap.Uint16("MsgID", request.GetMsgID()))
+		nlog.Error(request.GetCtx(), "HandlerMsg Api Not Found", nlog.Uint16("MsgID", request.GetMsgID()))
 		return
 	}
 	// Request 请求绑定 Router

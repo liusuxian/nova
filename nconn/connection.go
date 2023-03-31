@@ -17,7 +17,6 @@ import (
 	"github.com/liusuxian/nova/npack"
 	"github.com/panjf2000/gnet/v2"
 	"github.com/pkg/errors"
-	"go.uber.org/zap"
 	"net"
 	"sync"
 	"time"
@@ -230,13 +229,13 @@ func (c *Connection) finalizer() {
 	}
 	// 设置当前连接的关闭状态
 	c.isClosed = true
-	nlog.Info(c.ctx, "Connection Stop", zap.Int("ConnID", c.connID))
+	nlog.Info(c.ctx, "Connection Stop", nlog.Int("ConnID", c.connID))
 }
 
 // callOnConnStart 调用连接创建时的 Hook 函数
 func (c *Connection) callOnConnStart() {
 	if c.onConnStart != nil {
-		nlog.Info(c.ctx, "Connection CallOnConnStart...", zap.Int("connID", c.connID))
+		nlog.Info(c.ctx, "Connection CallOnConnStart...", nlog.Int("connID", c.connID))
 		c.onConnStart(c)
 	}
 }
@@ -244,7 +243,7 @@ func (c *Connection) callOnConnStart() {
 // callOnConnStop 调用连接断开时的 Hook 函数
 func (c *Connection) callOnConnStop() {
 	if c.onConnStop != nil {
-		nlog.Info(c.ctx, "Connection CallOnConnStop...", zap.Int("connID", c.connID))
+		nlog.Info(c.ctx, "Connection CallOnConnStop...", nlog.Int("connID", c.connID))
 		c.onConnStop(c)
 	}
 }

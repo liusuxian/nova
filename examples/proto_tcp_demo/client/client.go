@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 03:15:42
+ * @LastEditTime: 2023-03-31 16:29:11
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/client.go
  * @Description:
  *
@@ -16,7 +16,6 @@ import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/overload"
 	"github.com/liusuxian/nova/nclient"
 	"github.com/liusuxian/nova/nlog"
-	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"syscall"
@@ -56,7 +55,7 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 	// 等待信号
 	sig := <-sc
-	nlog.Info(cancelCtx, "Client Interrupt Signal", zap.String("Signal", sig.String()))
+	nlog.Info(cancelCtx, "Client Interrupt Signal", nlog.String("Signal", sig.String()))
 	// 取消任务
 	cancelFunc()
 	// 等待一段时间

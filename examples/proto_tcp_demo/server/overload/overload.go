@@ -14,7 +14,6 @@ import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/proto/pb"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -25,7 +24,7 @@ func SetOverLoadMsg(s niface.IServer) {
 			msg := &pb.OverLoad{}
 			buf, err := proto.Marshal(msg)
 			if err != nil {
-				nlog.Fatal(s.GetCtx(), "Marshal OverLoad Msg Error", zap.Error(err))
+				nlog.Fatal(s.GetCtx(), "Marshal OverLoad Msg Error", nlog.Err(err))
 			}
 			return buf
 		},

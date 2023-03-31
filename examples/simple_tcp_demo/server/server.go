@@ -13,7 +13,6 @@ package main
 import (
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nserver"
-	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"syscall"
@@ -30,9 +29,9 @@ func main() {
 		nserver.WithTicker(true),
 	)
 	// 设置当前 Server 的服务器人数超载消息
-	s.SetOverLoadMsg(nil)
+	s.SetOverLoadMsg()
 	// 设置当前 Server 的心跳检测
-	s.SetHeartBeat(nil, true)
+	s.SetHeartBeat(true)
 	go func() {
 		// 创建一个通道，用于接收信号
 		sc := make(chan os.Signal, 1)
@@ -40,7 +39,7 @@ func main() {
 		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 		// 等待信号
 		sig := <-sc
-		nlog.Info(s.GetCtx(), "Server Interrupt Signal", zap.String("Signal", sig.String()))
+		nlog.Info(s.GetCtx(), "Server Interrupt Signal", nlog.String("Signal", sig.String()))
 		// 停止服务器
 		s.Stop()
 	}()

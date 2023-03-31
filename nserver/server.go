@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 14:29:02
+ * @LastEditTime: 2023-03-31 16:19:47
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -23,7 +23,6 @@ import (
 	"github.com/liusuxian/nova/npack"
 	"github.com/liusuxian/nova/nrequest"
 	"github.com/panjf2000/gnet/v2"
-	"go.uber.org/zap"
 	"time"
 )
 
@@ -65,7 +64,7 @@ func NewServer(opts ...Option) niface.IServer {
 	serCfg := &ServerConfig{}
 	ctx := context.Background()
 	if err := nconf.StructKey("server", serCfg); err != nil {
-		nlog.Fatal(ctx, "New Server Error", zap.Error(err))
+		nlog.Fatal(ctx, "New Server Error", nlog.Err(err))
 	}
 	// 初始化 Server 属性
 	heartbeat := time.Duration(serCfg.Heartbeat) * time.Millisecond
@@ -88,7 +87,7 @@ func NewServer(opts ...Option) niface.IServer {
 // Start 启动 Server
 func (s *Server) Start() {
 	if err := gnet.Run(s, s.addr, gnet.WithOptions(s.options)); err != nil {
-		nlog.Fatal(s.ctx, "Start Server Error", zap.Error(err))
+		nlog.Fatal(s.ctx, "Start Server Error", nlog.Err(err))
 	}
 }
 
@@ -181,7 +180,7 @@ func (s *Server) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) 
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnBoot", zap.String("listening", s.addr), zap.Reflect("ServerConf", s.serverConf), zap.Reflect("options", s.options))
+	nlog.Info(s.ctx, "Server OnBoot", nlog.String("listening", s.addr), nlog.Reflect("ServerConf", s.serverConf), nlog.Reflect("options", s.options))
 	s.eng = eng
 	// 启动 Worker 工作池
 	s.msgHandler.StartWorkerPool()
@@ -192,7 +191,7 @@ func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
 
 // OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
 func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnClose", zap.Int("connID", conn.Fd()), zap.String("RemoteAddr", conn.RemoteAddr().String()), zap.Int("Connections", s.GetConnections()))
+	nlog.Info(s.ctx, "Server OnClose", nlog.Int("connID", conn.Fd()), nlog.String("RemoteAddr", conn.RemoteAddr().String()), nlog.Int("Connections", s.GetConnections()))
 	// 通过 ConnID 获取连接
 	iConn, _ := s.connMgr.GetConn(conn.Fd())
 	// 停止连接
@@ -204,7 +203,7 @@ func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
 
 // OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
 func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnOpen", zap.Int("connID", conn.Fd()), zap.Int("Connections", s.GetConnections()))
+	nlog.Info(s.ctx, "Server OnOpen", nlog.Int("connID", conn.Fd()), nlog.Int("Connections", s.GetConnections()))
 	// 检测允许的客户端连接最大数量
 	if s.GetConnections() > s.serverConf.MaxConn {
 		out = s.packet.Pack(npack.NewMsgPackage(s.overLoadMsg.GetMsgID(), s.overLoadMsg.GetMsgData()))
@@ -246,10 +245,10 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 			break
 		}
 		if err != nil {
-			nlog.Error(s.ctx, "Server OnTraffic Unpack Error", zap.Error(err))
+			nlog.Error(s.ctx, "Server OnTraffic Unpack Error", nlog.Err(err))
 			return gnet.Close
 		}
-		nlog.Debug(s.ctx, "Server OnTraffic", zap.Int("connID", conn.Fd()), zap.Uint16("MsgID", msg.GetMsgID()))
+		nlog.Debug(s.ctx, "Server OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()))
 		iConn, err := s.connMgr.GetConn(conn.Fd())
 		if err != nil {
 			return gnet.Close

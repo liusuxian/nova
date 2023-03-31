@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 21:39:16
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-24 14:18:23
+ * @LastEditTime: 2023-03-31 16:21:22
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/noverload/overload.go
  * @Description:
  *
@@ -14,7 +14,6 @@ import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nrouter"
-	"go.uber.org/zap"
 )
 
 // OverLoadMsg 服务器人数超载消息结构
@@ -32,7 +31,7 @@ type OverLoadMsgDefaultRouter struct {
 
 // Handle 处理服务器人数超载消息
 func (olr *OverLoadMsgDefaultRouter) Handle(request niface.IRequest) {
-	nlog.Debug(request.GetCtx(), "Receive OverLoadMsg", zap.String("From", request.GetConnection().RemoteAddr().String()), zap.Uint16("MsgID", request.GetMsgID()), zap.ByteString("Data", request.GetData()))
+	nlog.Debug(request.GetCtx(), "Receive OverLoadMsg", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("Data", request.GetData()))
 }
 
 // NewOverLoadMsgServer Server 创建服务器人数超载消息

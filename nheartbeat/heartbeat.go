@@ -15,7 +15,6 @@ import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nrouter"
-	"go.uber.org/zap"
 )
 
 // HeartbeatChecker 心跳检测器结构
@@ -38,10 +37,10 @@ type HeartbeatDefaultRouter struct {
 
 // Handle 处理心跳消息
 func (hbr *HeartbeatDefaultRouter) Handle(request niface.IRequest) {
-	nlog.Debug(request.GetCtx(), "Receive Heartbeat", zap.String("From", request.GetConnection().RemoteAddr().String()), zap.Uint16("MsgID", request.GetMsgID()), zap.ByteString("Data", request.GetData()))
+	nlog.Debug(request.GetCtx(), "Receive Heartbeat", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("Data", request.GetData()))
 	if !hbr.initiate {
 		if err := request.GetConnection().SendMsg(request.GetMsgID(), request.GetData(), nil); err != nil {
-			nlog.Error(request.GetCtx(), "Send Heartbeat Error", zap.Uint16("MsgID", request.GetMsgID()), zap.Error(err))
+			nlog.Error(request.GetCtx(), "Send Heartbeat Error", nlog.Uint16("MsgID", request.GetMsgID()), nlog.Err(err))
 		}
 	}
 }
@@ -162,7 +161,7 @@ func (hbc *HeartbeatChecker) sendHeartBeat(conn niface.IConnection) {
 	if hbc.initiate {
 		msg := hbc.makeMsg()
 		if err := conn.SendMsg(hbc.msgID, msg, nil); err != nil {
-			nlog.Error(hbc.ctx, "Send Heartbeat Error", zap.Uint16("MsgID", hbc.msgID), zap.Error(err))
+			nlog.Error(hbc.ctx, "Send Heartbeat Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
 		}
 	}
 }

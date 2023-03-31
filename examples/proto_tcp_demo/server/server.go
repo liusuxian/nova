@@ -15,7 +15,6 @@ import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/overload"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nserver"
-	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"syscall"
@@ -42,7 +41,7 @@ func main() {
 		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 		// 等待信号
 		sig := <-sc
-		nlog.Info(s.GetCtx(), "Server Interrupt Signal", zap.String("Signal", sig.String()))
+		nlog.Info(s.GetCtx(), "Server Interrupt Signal", nlog.String("Signal", sig.String()))
 		// 停止服务器
 		s.Stop()
 	}()

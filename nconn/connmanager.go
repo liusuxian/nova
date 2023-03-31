@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:41:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 13:47:08
+ * @LastEditTime: 2023-03-31 16:23:58
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connmanager.go
  * @Description:
  *
@@ -16,7 +16,6 @@ import (
 	"github.com/liusuxian/nova/nlog"
 	cmap "github.com/orcaman/concurrent-map/v2"
 	"github.com/pkg/errors"
-	"go.uber.org/zap"
 	"strconv"
 )
 
@@ -38,14 +37,14 @@ func NewConnManager(ctx context.Context) *ConnManager {
 func (cm *ConnManager) AddConn(conn niface.IConnection) {
 	key := strconv.FormatInt(int64(conn.GetConnID()), 10)
 	cm.connMap.Set(key, conn)
-	nlog.Debug(cm.ctx, "Connection Add To ConnManager Success", zap.Int("ConnID", conn.GetConnID()), zap.Int("ConnCount", cm.connMap.Count()))
+	nlog.Debug(cm.ctx, "Connection Add To ConnManager Success", nlog.Int("ConnID", conn.GetConnID()), nlog.Int("ConnCount", cm.connMap.Count()))
 }
 
 // RemoveConn 删除连接
 func (cm *ConnManager) RemoveConn(connID int) {
 	key := strconv.FormatInt(int64(connID), 10)
 	cm.connMap.Remove(key)
-	nlog.Debug(cm.ctx, "Connection Remove From ConnManager Success", zap.Int("ConnID", connID), zap.Int("ConnCount", cm.connMap.Count()))
+	nlog.Debug(cm.ctx, "Connection Remove From ConnManager Success", nlog.Int("ConnID", connID), nlog.Int("ConnCount", cm.connMap.Count()))
 }
 
 // GetConn 通过 ConnID 获取连接

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-24 14:45:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-24 14:53:50
+ * @LastEditTime: 2023-03-31 16:28:33
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/overload/overload.go
  * @Description:
  *
@@ -15,7 +15,6 @@ import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nrouter"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -29,10 +28,10 @@ func (olr *OverLoadRouter) Handle(request niface.IRequest) {
 	// 收到服务器人数超载消息
 	reqMsg := &pb.OverLoad{}
 	if err := proto.Unmarshal(request.GetData(), reqMsg); err != nil {
-		nlog.Error(request.GetCtx(), "Unmarshal OverLoad Msg Error", zap.Error(err))
+		nlog.Error(request.GetCtx(), "Unmarshal OverLoad Msg Error", nlog.Err(err))
 		return
 	}
-	nlog.Debug(request.GetCtx(), "Receive OverLoadMsg", zap.String("From", request.GetConnection().RemoteAddr().String()), zap.Uint16("MsgID", request.GetMsgID()), zap.Reflect("ReqMsg", reqMsg))
+	nlog.Debug(request.GetCtx(), "Receive OverLoadMsg", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.Reflect("ReqMsg", reqMsg))
 }
 
 // SetOverLoadMsg 设置当前 Client 的服务器人数超载消息
@@ -42,7 +41,7 @@ func SetOverLoadMsg(c niface.IClient) {
 			msg := &pb.OverLoad{}
 			buf, err := proto.Marshal(msg)
 			if err != nil {
-				nlog.Fatal(c.GetCtx(), "Marshal OverLoad Msg Error", zap.Error(err))
+				nlog.Fatal(c.GetCtx(), "Marshal OverLoad Msg Error", nlog.Err(err))
 			}
 			return buf
 		},
