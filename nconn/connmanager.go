@@ -1,8 +1,8 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-03-08 00:49:32
+ * @Date: 2023-03-31 13:41:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 19:44:59
+ * @LastEditTime: 2023-03-31 13:47:08
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connmanager.go
  * @Description:
  *
@@ -49,15 +49,15 @@ func (cm *ConnManager) RemoveConn(connID int) {
 }
 
 // GetConn 通过 ConnID 获取连接
-func (cm *ConnManager) GetConn(connID int) (niface.IConnection, error) {
+func (cm *ConnManager) GetConn(connID int) (conn niface.IConnection, err error) {
 	key := strconv.FormatInt(int64(connID), 10)
-	if conn, ok := cm.connMap.Get(key); ok {
-		return conn, nil
+	if c, ok := cm.connMap.Get(key); ok {
+		return c, nil
 	}
 	return nil, errors.New("Connection Not Found")
 }
 
 // GetAllConn 获取当前所有连接
-func (cm *ConnManager) GetAllConn() map[string]niface.IConnection {
+func (cm *ConnManager) GetAllConn() (connMap map[string]niface.IConnection) {
 	return cm.connMap.Items()
 }

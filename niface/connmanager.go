@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:30:40
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-16 19:44:05
+ * @LastEditTime: 2023-03-30 18:54:18
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/connmanager.go
  * @Description:
  *
@@ -12,8 +12,8 @@ package niface
 
 // IConnManager 连接管理接口
 type IConnManager interface {
-	AddConn(conn IConnection)                // 添加连接
-	RemoveConn(connID int)                   // 删除连接
-	GetConn(connID int) (IConnection, error) // 通过 ConnID 获取连接
-	GetAllConn() map[string]IConnection      // 获取当前所有连接
+	AddConn(conn IConnection)                         // 添加连接
+	RemoveConn(connID int)                            // 删除连接
+	GetConn(connID int) (conn IConnection, err error) // 通过 ConnID 获取连接
+	GetAllConn() (connMap map[string]IConnection)     // 获取当前所有连接
 }
