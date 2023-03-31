@@ -1,8 +1,8 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-03-14 19:43:01
+ * @Date: 2023-03-31 10:49:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-27 23:23:07
+ * @LastEditTime: 2023-03-31 13:19:19
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -87,32 +87,32 @@ func (c *Client) AddRouter(msgID uint16, router niface.IRouter) {
 }
 
 // GetCtx 获取当前 Client 的 Context
-func (c *Client) GetCtx() context.Context {
+func (c *Client) GetCtx() (ctx context.Context) {
 	return c.ctx
 }
 
 // Conn 当前 Client 的连接信息
-func (c *Client) Conn() niface.IConnection {
+func (c *Client) Conn() (conn niface.IConnection) {
 	return c.conn
 }
 
 // SetOnConnStart 设置当前 Client 的连接创建时的 Hook 函数
-func (c *Client) SetOnConnStart(hookFunc func(niface.IConnection)) {
-	c.onConnStart = hookFunc
+func (c *Client) SetOnConnStart(f func(conn niface.IConnection)) {
+	c.onConnStart = f
 }
 
 // SetOnConnStop 设置当前 Client 的连接断开时的 Hook 函数
-func (c *Client) SetOnConnStop(hookFunc func(niface.IConnection)) {
-	c.onConnStop = hookFunc
+func (c *Client) SetOnConnStop(f func(conn niface.IConnection)) {
+	c.onConnStop = f
 }
 
 // GetOnConnStart 获取当前 Client 的连接创建时的 Hook 函数
-func (c *Client) GetOnConnStart() func(niface.IConnection) {
+func (c *Client) GetOnConnStart() (f func(conn niface.IConnection)) {
 	return c.onConnStart
 }
 
 // GetOnConnStop 获取当前 Client 的连接断开时的 Hook 函数
-func (c *Client) GetOnConnStop() func(niface.IConnection) {
+func (c *Client) GetOnConnStop() (f func(conn niface.IConnection)) {
 	return c.onConnStop
 }
 
@@ -122,22 +122,23 @@ func (c *Client) SetPacket(packet niface.IDataPack) {
 }
 
 // GetPacket 获取当前 Client 绑定的数据协议封包和拆包方式
-func (c *Client) GetPacket() niface.IDataPack {
+func (c *Client) GetPacket() (packet niface.IDataPack) {
 	return c.packet
 }
 
 // GetMsgHandler 获取当前 Client 绑定的消息处理模块
-func (c *Client) GetMsgHandler() niface.IMsgHandle {
+func (c *Client) GetMsgHandler() (handler niface.IMsgHandle) {
 	return c.msgHandler
 }
 
 // SetOverLoadMsg 设置当前 Client 的服务器人数超载消息
-func (c *Client) SetOverLoadMsg(option *niface.OverLoadMsgOption) {
+func (c *Client) SetOverLoadMsg(option ...*niface.OverLoadMsgOption) {
 	overLoadMsg := noverload.NewOverLoadMsgClient()
 	// 用户自定义
-	if option != nil {
-		overLoadMsg.SetOverLoadMsgFunc(option.MakeMsg)
-		overLoadMsg.BindRouter(option.MsgID, option.Router)
+	if len(option) > 0 {
+		opt := option[0]
+		overLoadMsg.SetOverLoadMsgFunc(opt.MakeMsg)
+		overLoadMsg.BindRouter(opt.MsgID, opt.Router)
 	}
 	// 添加服务器人数超载消息的路由
 	c.AddRouter(overLoadMsg.GetMsgID(), overLoadMsg.GetRouter())
@@ -145,13 +146,14 @@ func (c *Client) SetOverLoadMsg(option *niface.OverLoadMsgOption) {
 }
 
 // SetHeartBeat 设置当前 Client 的心跳检测
-func (c *Client) SetHeartBeat(option *niface.HeartBeatOption, initiate bool) {
+func (c *Client) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
 	checker := nheartbeat.NewHeartbeatCheckerClient(c, initiate)
 	// 用户自定义
-	if option != nil {
-		checker.SetHeartBeatMsgFunc(option.MakeMsg)
-		checker.SetOnRemoteNotAlive(option.OnRemoteNotAlive)
-		checker.BindRouter(option.MsgID, option.Router)
+	if len(option) > 0 {
+		opt := option[0]
+		checker.SetHeartBeatMsgFunc(opt.MakeMsg)
+		checker.SetOnRemoteNotAlive(opt.OnRemoteNotAlive)
+		checker.BindRouter(opt.MsgID, opt.Router)
 	}
 	// 添加心跳检测的路由
 	c.AddRouter(checker.GetMsgID(), checker.GetRouter())
