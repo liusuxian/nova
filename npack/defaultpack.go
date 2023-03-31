@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:49:39
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 13:53:14
+ * @LastEditTime: 2023-03-31 20:38:28
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack.go
  * @Description:
  *
@@ -29,7 +29,7 @@ const (
 )
 
 // newDefaultPack 创建默认封包拆包实例
-func newDefaultPack(endian, maxPacketSize int) niface.IDataPack {
+func newDefaultPack(endian, maxPacketSize int) (packet niface.IDataPack) {
 	return &defaultPack{
 		endian:        endian,
 		maxPacketSize: maxPacketSize,

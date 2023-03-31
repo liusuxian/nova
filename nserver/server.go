@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 20:12:06
+ * @LastEditTime: 2023-03-31 20:35:54
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -58,7 +58,7 @@ type ServerConfig struct {
 }
 
 // NewServer 创建 Server
-func NewServer(opts ...Option) niface.IServer {
+func NewServer(opts ...Option) (server niface.IServer) {
 	// 获取服务器配置
 	serCfg := &ServerConfig{}
 	ctx := context.Background()

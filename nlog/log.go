@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 15:18:39
+ * @LastEditTime: 2023-03-31 20:42:22
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -321,7 +321,7 @@ func LevelEnabled(lvl zapcore.Level) bool {
 	return logger.zapLogger.Level().Enabled(lvl)
 }
 
-func withCtxLogger(ctx context.Context, fields ...nField) *zap.Logger {
+func withCtxLogger(ctx context.Context, fields ...nField) (zapLogger *zap.Logger) {
 	fieldSlice := make([]zapcore.Field, 0, len(fields))
 	for _, f := range fields {
 		fieldSlice = append(fieldSlice, f.field)

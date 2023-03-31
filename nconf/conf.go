@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-27 13:19:57
+ * @LastEditTime: 2023-03-31 20:57:06
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -81,157 +81,157 @@ func NewSecureRemoteConfig(provider, endpoint, path, secretkeyring, configType s
 }
 
 // Get 获取 value
-func (c *Config) Get(key string) any {
+func (c *Config) Get(key string) (val any) {
 	return c.v.Get(key)
 }
 
 // GetBool 获取 bool
-func (c *Config) GetBool(key string) bool {
+func (c *Config) GetBool(key string) (val bool) {
 	return c.v.GetBool(key)
 }
 
 // GetDuration 获取 Duration
-func (c *Config) GetDuration(key string) time.Duration {
+func (c *Config) GetDuration(key string) (val time.Duration) {
 	return c.v.GetDuration(key)
 }
 
 // GetFloat32 获取 float32
-func (c *Config) GetFloat32(key string) float32 {
+func (c *Config) GetFloat32(key string) (val float32) {
 	return cast.ToFloat32(c.v.Get(key))
 }
 
 // GetFloat64 获取 float64
-func (c *Config) GetFloat64(key string) float64 {
+func (c *Config) GetFloat64(key string) (val float64) {
 	return c.v.GetFloat64(key)
 }
 
 // GetInt 获取 int
-func (c *Config) GetInt(key string) int {
+func (c *Config) GetInt(key string) (val int) {
 	return c.v.GetInt(key)
 }
 
 // GetInt8 获取 int8
-func (c *Config) GetInt8(key string) int8 {
+func (c *Config) GetInt8(key string) (val int8) {
 	return cast.ToInt8(c.v.Get(key))
 }
 
 // GetInt16 获取 int16
-func (c *Config) GetInt16(key string) int16 {
+func (c *Config) GetInt16(key string) (val int16) {
 	return cast.ToInt16(c.v.Get(key))
 }
 
 // GetInt32 获取 int32
-func (c *Config) GetInt32(key string) int32 {
+func (c *Config) GetInt32(key string) (val int32) {
 	return c.v.GetInt32(key)
 }
 
 // GetInt64 获取 int64
-func (c *Config) GetInt64(key string) int64 {
+func (c *Config) GetInt64(key string) (val int64) {
 	return c.v.GetInt64(key)
 }
 
 // GetAnySlice 获取 []any
-func (c *Config) GetAnySlice(key string) []any {
+func (c *Config) GetAnySlice(key string) (vals []any) {
 	return cast.ToSlice(c.v.Get(key))
 }
 
 // GetBoolSlice 获取 []bool
-func (c *Config) GetBoolSlice(key string) []bool {
+func (c *Config) GetBoolSlice(key string) (vals []bool) {
 	return cast.ToBoolSlice(c.v.Get(key))
 }
 
 // GetStringSlice 获取 []string
-func (c *Config) GetStringSlice(key string) []string {
+func (c *Config) GetStringSlice(key string) (vals []string) {
 	return c.v.GetStringSlice(key)
 }
 
 // GetIntSlice 获取 []int
-func (c *Config) GetIntSlice(key string) []int {
+func (c *Config) GetIntSlice(key string) (vals []int) {
 	return c.v.GetIntSlice(key)
 }
 
 // GetDurationSlice 获取 []time.Duration
-func (c *Config) GetDurationSlice(key string) []time.Duration {
+func (c *Config) GetDurationSlice(key string) (vals []time.Duration) {
 	return cast.ToDurationSlice(c.v.Get(key))
 }
 
 // GetSizeInBytes 获取某个配置项对应的值所占用的内存大小（以字节为单位）
-func (c *Config) GetSizeInBytes(key string) uint {
+func (c *Config) GetSizeInBytes(key string) (val uint) {
 	return c.v.GetSizeInBytes(key)
 }
 
 // GetString 获取 string
-func (c *Config) GetString(key string) string {
+func (c *Config) GetString(key string) (val string) {
 	return c.v.GetString(key)
 }
 
 // GetStringMap 获取 map[string]any
-func (c *Config) GetStringMap(key string) map[string]any {
+func (c *Config) GetStringMap(key string) (val map[string]any) {
 	return c.v.GetStringMap(key)
 }
 
 // GetStringMapBool 获取 map[string]bool
-func (c *Config) GetStringMapBool(key string) map[string]bool {
+func (c *Config) GetStringMapBool(key string) (val map[string]bool) {
 	return cast.ToStringMapBool(c.v.Get(key))
 }
 
 // GetStringMapInt 获取 map[string]int
-func (c *Config) GetStringMapInt(key string) map[string]int {
+func (c *Config) GetStringMapInt(key string) (val map[string]int) {
 	return cast.ToStringMapInt(c.v.Get(key))
 }
 
 // GetStringMapInt64 获取 map[string]int64
-func (c *Config) GetStringMapInt64(key string) map[string]int64 {
+func (c *Config) GetStringMapInt64(key string) (val map[string]int64) {
 	return cast.ToStringMapInt64(c.v.Get(key))
 }
 
 // GetStringMapString 获取 map[string]string
-func (c *Config) GetStringMapString(key string) map[string]string {
+func (c *Config) GetStringMapString(key string) (val map[string]string) {
 	return c.v.GetStringMapString(key)
 }
 
 // GetStringMapStringSlice 获取 map[string][]string
-func (c *Config) GetStringMapStringSlice(key string) map[string][]string {
+func (c *Config) GetStringMapStringSlice(key string) (val map[string][]string) {
 	return c.v.GetStringMapStringSlice(key)
 }
 
 // GetTime 获取 Time
-func (c *Config) GetTime(key string) time.Time {
+func (c *Config) GetTime(key string) (val time.Time) {
 	return c.v.GetTime(key)
 }
 
 // GetUint 获取 uint
-func (c *Config) GetUint(key string) uint {
+func (c *Config) GetUint(key string) (val uint) {
 	return c.v.GetUint(key)
 }
 
 // GetUint8 获取 uint8
-func (c *Config) GetUint8(key string) uint8 {
+func (c *Config) GetUint8(key string) (val uint8) {
 	return cast.ToUint8(c.v.Get(key))
 }
 
 // GetUint16 获取 uint16
-func (c *Config) GetUint16(key string) uint16 {
+func (c *Config) GetUint16(key string) (val uint16) {
 	return c.v.GetUint16(key)
 }
 
 // GetUint32 获取 uint32
-func (c *Config) GetUint32(key string) uint32 {
+func (c *Config) GetUint32(key string) (val uint32) {
 	return c.v.GetUint32(key)
 }
 
 // GetUint64 获取 uint64
-func (c *Config) GetUint64(key string) uint64 {
+func (c *Config) GetUint64(key string) (val uint64) {
 	return c.v.GetUint64(key)
 }
 
 // InConfig 检查给定的键(或别名)是否在配置文件中
-func (c *Config) InConfig(key string) bool {
+func (c *Config) InConfig(key string) (val bool) {
 	return c.v.InConfig(key)
 }
 
 // IsSet 检查是否在任何数据位置设置了键。键不区分大小写
-func (c *Config) IsSet(key string) bool {
+func (c *Config) IsSet(key string) (val bool) {
 	return c.v.IsSet(key)
 }
 
@@ -246,22 +246,22 @@ func (c *Config) SetDefault(key string, value any) {
 }
 
 // Sub 返回一个新的Config实例，表示这个实例的子树，对键不区分大小写
-func (c *Config) Sub(key string) *Config {
+func (c *Config) Sub(key string) (conf *Config) {
 	return &Config{v: c.v.Sub(key)}
 }
 
 // Struct 将配置解析为结构体，确保标签正确设置该结构的字段
-func (c *Config) Struct(rawVal any, opts ...viper.DecoderConfigOption) error {
+func (c *Config) Struct(rawVal any, opts ...viper.DecoderConfigOption) (err error) {
 	return c.v.Unmarshal(rawVal, opts...)
 }
 
 // StructExact 将配置解析为结构体，如果在目标结构体中字段不存在则报错
-func (c *Config) StructExact(rawVal any, opts ...viper.DecoderConfigOption) error {
+func (c *Config) StructExact(rawVal any, opts ...viper.DecoderConfigOption) (err error) {
 	return c.v.UnmarshalExact(rawVal, opts...)
 }
 
 // StructKey 接收一个键并将其解析到结构体中
-func (c *Config) StructKey(key string, rawVal any, opts ...viper.DecoderConfigOption) error {
+func (c *Config) StructKey(key string, rawVal any, opts ...viper.DecoderConfigOption) (err error) {
 	return c.v.UnmarshalKey(key, rawVal, opts...)
 }
 
@@ -271,12 +271,12 @@ func (c *Config) WatchConfig() {
 }
 
 // WatchRemoteConfig 监视远程配置文件的变化
-func (c *Config) WatchRemoteConfig() error {
+func (c *Config) WatchRemoteConfig() (err error) {
 	return c.v.WatchRemoteConfig()
 }
 
 // WatchRemoteConfigOnChannel 取消监视远程配置文件的变化
-func (c *Config) WatchRemoteConfigOnChannel() error {
+func (c *Config) WatchRemoteConfigOnChannel() (err error) {
 	return c.v.WatchRemoteConfigOnChannel()
 }
 
@@ -322,157 +322,157 @@ func init() {
 }
 
 // Get 获取 value
-func Get(key string) any {
+func Get(key string) (val any) {
 	return defaultConfig.v.Get(key)
 }
 
 // GetBool 获取 bool
-func GetBool(key string) bool {
+func GetBool(key string) (val bool) {
 	return defaultConfig.v.GetBool(key)
 }
 
 // GetDuration 获取 Duration
-func GetDuration(key string) time.Duration {
+func GetDuration(key string) (val time.Duration) {
 	return defaultConfig.v.GetDuration(key)
 }
 
 // GetFloat32 获取 float32
-func GetFloat32(key string) float32 {
+func GetFloat32(key string) (val float32) {
 	return cast.ToFloat32(defaultConfig.v.Get(key))
 }
 
 // GetFloat64 获取 float64
-func GetFloat64(key string) float64 {
+func GetFloat64(key string) (val float64) {
 	return defaultConfig.v.GetFloat64(key)
 }
 
 // GetInt 获取 int
-func GetInt(key string) int {
+func GetInt(key string) (val int) {
 	return defaultConfig.v.GetInt(key)
 }
 
 // GetInt8 获取 int8
-func GetInt8(key string) int8 {
+func GetInt8(key string) (val int8) {
 	return cast.ToInt8(defaultConfig.v.Get(key))
 }
 
 // GetInt16 获取 int16
-func GetInt16(key string) int16 {
+func GetInt16(key string) (val int16) {
 	return cast.ToInt16(defaultConfig.v.Get(key))
 }
 
 // GetInt32 获取 int32
-func GetInt32(key string) int32 {
+func GetInt32(key string) (val int32) {
 	return defaultConfig.v.GetInt32(key)
 }
 
 // GetInt64 获取 int64
-func GetInt64(key string) int64 {
+func GetInt64(key string) (val int64) {
 	return defaultConfig.v.GetInt64(key)
 }
 
 // GetAnySlice 获取 []any
-func GetAnySlice(key string) []any {
+func GetAnySlice(key string) (vals []any) {
 	return cast.ToSlice(defaultConfig.v.Get(key))
 }
 
 // GetBoolSlice 获取 []bool
-func GetBoolSlice(key string) []bool {
+func GetBoolSlice(key string) (vals []bool) {
 	return cast.ToBoolSlice(defaultConfig.v.Get(key))
 }
 
 // GetStringSlice 获取 []string
-func GetStringSlice(key string) []string {
+func GetStringSlice(key string) (vals []string) {
 	return defaultConfig.v.GetStringSlice(key)
 }
 
 // GetIntSlice 获取 []int
-func GetIntSlice(key string) []int {
+func GetIntSlice(key string) (vals []int) {
 	return defaultConfig.v.GetIntSlice(key)
 }
 
 // GetDurationSlice 获取 []time.Duration
-func GetDurationSlice(key string) []time.Duration {
+func GetDurationSlice(key string) (vals []time.Duration) {
 	return cast.ToDurationSlice(defaultConfig.v.Get(key))
 }
 
 // GetSizeInBytes 获取某个配置项对应的值所占用的内存大小（以字节为单位）
-func GetSizeInBytes(key string) uint {
+func GetSizeInBytes(key string) (val uint) {
 	return defaultConfig.v.GetSizeInBytes(key)
 }
 
 // GetString 获取 string
-func GetString(key string) string {
+func GetString(key string) (val string) {
 	return defaultConfig.v.GetString(key)
 }
 
 // GetStringMap 获取 map[string]any
-func GetStringMap(key string) map[string]any {
+func GetStringMap(key string) (val map[string]any) {
 	return defaultConfig.v.GetStringMap(key)
 }
 
 // GetStringMapBool 获取 map[string]bool
-func GetStringMapBool(key string) map[string]bool {
+func GetStringMapBool(key string) (val map[string]bool) {
 	return cast.ToStringMapBool(defaultConfig.v.Get(key))
 }
 
 // GetStringMapInt 获取 map[string]int
-func GetStringMapInt(key string) map[string]int {
+func GetStringMapInt(key string) (val map[string]int) {
 	return cast.ToStringMapInt(defaultConfig.v.Get(key))
 }
 
 // GetStringMapInt64 获取 map[string]int64
-func GetStringMapInt64(key string) map[string]int64 {
+func GetStringMapInt64(key string) (val map[string]int64) {
 	return cast.ToStringMapInt64(defaultConfig.v.Get(key))
 }
 
 // GetStringMapString 获取 map[string]string
-func GetStringMapString(key string) map[string]string {
+func GetStringMapString(key string) (val map[string]string) {
 	return defaultConfig.v.GetStringMapString(key)
 }
 
 // GetStringMapStringSlice 获取 map[string][]string
-func GetStringMapStringSlice(key string) map[string][]string {
+func GetStringMapStringSlice(key string) (val map[string][]string) {
 	return defaultConfig.v.GetStringMapStringSlice(key)
 }
 
 // GetTime 获取 Time
-func GetTime(key string) time.Time {
+func GetTime(key string) (val time.Time) {
 	return defaultConfig.v.GetTime(key)
 }
 
 // GetUint 获取 uint
-func GetUint(key string) uint {
+func GetUint(key string) (val uint) {
 	return defaultConfig.v.GetUint(key)
 }
 
 // GetUint8 获取 uint8
-func GetUint8(key string) uint8 {
+func GetUint8(key string) (val uint8) {
 	return cast.ToUint8(defaultConfig.v.Get(key))
 }
 
 // GetUint16 获取 uint16
-func GetUint16(key string) uint16 {
+func GetUint16(key string) (val uint16) {
 	return defaultConfig.v.GetUint16(key)
 }
 
 // GetUint32 获取 uint32
-func GetUint32(key string) uint32 {
+func GetUint32(key string) (val uint32) {
 	return defaultConfig.v.GetUint32(key)
 }
 
 // GetUint64 获取 uint64
-func GetUint64(key string) uint64 {
+func GetUint64(key string) (val uint64) {
 	return defaultConfig.v.GetUint64(key)
 }
 
 // InConfig 检查给定的键(或别名)是否在配置文件中
-func InConfig(key string) bool {
+func InConfig(key string) (val bool) {
 	return defaultConfig.v.InConfig(key)
 }
 
 // IsSet 检查是否在任何数据位置设置了键。键不区分大小写
-func IsSet(key string) bool {
+func IsSet(key string) (val bool) {
 	return defaultConfig.v.IsSet(key)
 }
 
@@ -487,22 +487,22 @@ func SetDefault(key string, value any) {
 }
 
 // Sub 返回一个新的Config实例，表示这个实例的子树，对键不区分大小写
-func Sub(key string) *Config {
+func Sub(key string) (conf *Config) {
 	return &Config{v: defaultConfig.v.Sub(key)}
 }
 
 // Struct 将配置解析为结构体，确保标签正确设置该结构的字段
-func Struct(rawVal any, opts ...viper.DecoderConfigOption) error {
+func Struct(rawVal any, opts ...viper.DecoderConfigOption) (err error) {
 	return defaultConfig.v.Unmarshal(rawVal, opts...)
 }
 
 // StructExact 将配置解析为结构体，如果在目标结构体中字段不存在则报错
-func StructExact(rawVal any, opts ...viper.DecoderConfigOption) error {
+func StructExact(rawVal any, opts ...viper.DecoderConfigOption) (err error) {
 	return defaultConfig.v.UnmarshalExact(rawVal, opts...)
 }
 
 // StructKey 接收一个键并将其解析到结构体中
-func StructKey(key string, rawVal any, opts ...viper.DecoderConfigOption) error {
+func StructKey(key string, rawVal any, opts ...viper.DecoderConfigOption) (err error) {
 	return defaultConfig.v.UnmarshalKey(key, rawVal, opts...)
 }
 

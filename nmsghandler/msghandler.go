@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:01:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 16:22:07
+ * @LastEditTime: 2023-03-31 20:40:40
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -32,7 +32,7 @@ type MsgHandle struct {
 }
 
 // NewMsgHandle 创建消息处理
-func NewMsgHandle(workerPoolSize int) *MsgHandle {
+func NewMsgHandle(workerPoolSize int) (handler *MsgHandle) {
 	return &MsgHandle{
 		ctx:            context.Background(),
 		apis:           make(map[uint16]niface.IRouter),

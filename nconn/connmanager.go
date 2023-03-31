@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:41:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 16:23:58
+ * @LastEditTime: 2023-03-31 20:45:58
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connmanager.go
  * @Description:
  *
@@ -26,7 +26,7 @@ type ConnManager struct {
 }
 
 // NewConnManager 创建一个连接管理
-func NewConnManager(ctx context.Context) *ConnManager {
+func NewConnManager(ctx context.Context) (connMgr *ConnManager) {
 	return &ConnManager{
 		ctx:     ctx,
 		connMap: cmap.New[niface.IConnection](),

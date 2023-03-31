@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 10:49:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 16:26:05
+ * @LastEditTime: 2023-03-31 21:03:32
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -40,11 +40,11 @@ type Client struct {
 	overLoadMsg      *noverload.OverLoadMsg        // 服务器人数超载消息
 	heartbeat        time.Duration                 // 心跳发送间隔时间
 	maxHeartbeat     time.Duration                 // 最长心跳检测间隔时间
-	heartbeatChecker *nheartbeat.HeartbeatChecker  // 心跳检测器
+	heartbeatChecker niface.IHeartBeatChecker      // 心跳检测器
 }
 
 // NewClient 创建 Client
-func NewClient(network, addr string, opts ...Option) niface.IClient {
+func NewClient(network, addr string, opts ...Option) (client niface.IClient) {
 	// 初始化 Client 属性
 	ctx := context.Background()
 	c := &Client{
@@ -59,11 +59,11 @@ func NewClient(network, addr string, opts ...Option) niface.IClient {
 		opt(c)
 	}
 	// 创建 Client
-	client, err := gnet.NewClient(c, gnet.WithOptions(c.options))
+	cli, err := gnet.NewClient(c, gnet.WithOptions(c.options))
 	if err != nil {
 		nlog.Fatal(ctx, "New Client Error", nlog.Err(err))
 	}
-	c.client = client
+	c.client = cli
 	return c
 }
 
@@ -146,7 +146,7 @@ func (c *Client) SetOverLoadMsg(option ...*niface.OverLoadMsgOption) {
 
 // SetHeartBeat 设置当前 Client 的心跳检测
 func (c *Client) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
-	checker := nheartbeat.NewHeartbeatCheckerClient(c, initiate)
+	checker := nheartbeat.NewHeartbeatChecker(c.heartbeat, initiate)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
@@ -157,6 +157,11 @@ func (c *Client) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) 
 	// 添加心跳检测的路由
 	c.AddRouter(checker.GetMsgID(), checker.GetRouter())
 	c.heartbeatChecker = checker
+}
+
+// GetHeartbeat 获取当前 Client 的心跳检测器
+func (c *Client) GetHeartbeat() (checker niface.IHeartBeatChecker) {
+	return c.heartbeatChecker
 }
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
@@ -197,10 +202,7 @@ func (c *Client) OnShutdown(eng gnet.Engine) {
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
 func (c *Client) OnTick() (delay time.Duration, action gnet.Action) {
-	if c.heartbeatChecker != nil {
-		go c.heartbeatChecker.Check()
-	}
-	delay = c.heartbeat
+	delay = time.Duration(1000) * time.Millisecond
 	return
 }
 
