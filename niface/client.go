@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 13:38:19
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 20:27:49
+ * @LastEditTime: 2023-03-31 21:15:31
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/client.go
  * @Description:
  *
@@ -28,5 +28,5 @@ type IClient interface {
 	GetMsgHandler() (handler IMsgHandle)                    // 获取当前 Client 绑定的消息处理模块
 	SetOverLoadMsg(option ...*OverLoadMsgOption)            // 设置当前 Client 的服务器人数超载消息
 	SetHeartBeat(initiate bool, option ...*HeartBeatOption) // 设置当前 Client 的心跳检测
-	GetHeartbeat() (checker IHeartBeatChecker)              // 获取当前 Client 的心跳检测器
+	GetHeartBeat() (checker IHeartBeatChecker)              // 获取当前 Client 的心跳检测器
 }

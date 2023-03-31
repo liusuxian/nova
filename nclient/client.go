@@ -159,8 +159,8 @@ func (c *Client) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) 
 	c.heartbeatChecker = checker
 }
 
-// GetHeartbeat 获取当前 Client 的心跳检测器
-func (c *Client) GetHeartbeat() (checker niface.IHeartBeatChecker) {
+// GetHeartBeat 获取当前 Client 的心跳检测器
+func (c *Client) GetHeartBeat() (checker niface.IHeartBeatChecker) {
 	return c.heartbeatChecker
 }
 

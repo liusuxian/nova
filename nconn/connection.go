@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:23:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 21:09:21
+ * @LastEditTime: 2023-03-31 21:19:57
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -61,7 +61,7 @@ func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Dura
 		maxHeartbeat:   maxHeartbeat,
 	}
 	// 从当前 Server 克隆心跳检测器
-	heartbeatChecker := server.GetHeartbeat().Clone()
+	heartbeatChecker := server.GetHeartBeat().Clone()
 	// 绑定连接
 	heartbeatChecker.BindConn(c)
 	// 将新创建的 Connection 添加到连接管理中
@@ -86,7 +86,7 @@ func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Dura
 		maxHeartbeat:   maxHeartbeat,
 	}
 	// 从当前 Client 克隆心跳检测器
-	heartbeatChecker := client.GetHeartbeat().Clone()
+	heartbeatChecker := client.GetHeartBeat().Clone()
 	// 绑定连接
 	heartbeatChecker.BindConn(c)
 	return c
@@ -106,11 +106,8 @@ func (c *Connection) Start() {
 		c.UpdateActivity()
 	}
 
-	select {
-	case <-c.cancelCtx.Done():
-		c.finalizer()
-		return
-	}
+	<-c.cancelCtx.Done()
+	c.finalizer()
 }
 
 // Stop 停止连接
@@ -216,7 +213,7 @@ func (c *Connection) IsAlive() (isAlive bool) {
 		return false
 	}
 	// 检查连接最后一次活动时间，如果超过心跳间隔，则认为连接已经死亡
-	return time.Now().Sub(c.lastActivityTime) < c.maxHeartbeat
+	return time.Since(c.lastActivityTime) < c.maxHeartbeat
 }
 
 // UpdateActivity 更新连接活动时间

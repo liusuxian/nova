@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 20:35:54
+ * @LastEditTime: 2023-03-31 21:16:01
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -160,8 +160,8 @@ func (s *Server) SetOverLoadMsg(option ...*niface.OverLoadMsgOption) {
 	s.overLoadMsg = overLoadMsg
 }
 
-// SetHeartbeat 设置当前 Server 的心跳检测器
-func (s *Server) SetHeartbeat(initiate bool, option ...*niface.HeartBeatOption) {
+// SetHeartBeat 设置当前 Server 的心跳检测器
+func (s *Server) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
 	// 创建心跳检测器
 	interval := time.Duration(s.serverConf.Heartbeat) * time.Millisecond
 	checker := nheartbeat.NewHeartbeatChecker(interval, initiate)
@@ -177,8 +177,8 @@ func (s *Server) SetHeartbeat(initiate bool, option ...*niface.HeartBeatOption) 
 	s.heartbeatChecker = checker
 }
 
-// GetHeartbeat 获取当前 Server 的心跳检测器
-func (s *Server) GetHeartbeat() (checker niface.IHeartBeatChecker) {
+// GetHeartBeat 获取当前 Server 的心跳检测器
+func (s *Server) GetHeartBeat() (checker niface.IHeartBeatChecker) {
 	return s.heartbeatChecker
 }
 
