@@ -1,8 +1,8 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-02-19 01:00:23
+ * @Date: 2023-03-31 13:23:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 20:17:53
+ * @LastEditTime: 2023-03-31 13:37:06
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -105,32 +105,32 @@ func (c *Connection) Stop() {
 }
 
 // GetCancelCtx 返回 Cancel Context，用于用户自定义的 Goroutine 获取连接退出状态
-func (c *Connection) GetCancelCtx() context.Context {
+func (c *Connection) GetCancelCtx() (ctx context.Context) {
 	return c.cancelCtx
 }
 
 // GetConnection 从当前连接获取原始的 gnet.Conn
-func (c *Connection) GetConnection() gnet.Conn {
+func (c *Connection) GetConnection() (conn gnet.Conn) {
 	return c.conn
 }
 
 // GetConnID 获取当前 ConnID
-func (c *Connection) GetConnID() int {
+func (c *Connection) GetConnID() (connID int) {
 	return c.connID
 }
 
 // RemoteAddr 获取当前连接远程地址信息
-func (c *Connection) RemoteAddr() net.Addr {
+func (c *Connection) RemoteAddr() (addr net.Addr) {
 	return c.conn.RemoteAddr()
 }
 
 // LocalAddr 获取当前连接本地地址信息
-func (c *Connection) LocalAddr() net.Addr {
+func (c *Connection) LocalAddr() (addr net.Addr) {
 	return c.conn.LocalAddr()
 }
 
 // SendMsg 将 Message 数据发送给远程的对端
-func (c *Connection) SendMsg(msgID uint16, data []byte, callback gnet.AsyncCallback) (err error) {
+func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCallback) (err error) {
 	// 判断当前连接的关闭状态
 	if c.isClosed {
 		err = errors.New("Connection Closed When Send Msg")
@@ -140,7 +140,11 @@ func (c *Connection) SendMsg(msgID uint16, data []byte, callback gnet.AsyncCallb
 	buf := c.packet.Pack(npack.NewMsgPackage(msgID, data))
 	// 异步发送给客户端
 	go func() {
-		c.sendMsgErrChan <- c.conn.AsyncWrite(buf, callback)
+		if len(callback) > 0 {
+			c.sendMsgErrChan <- c.conn.AsyncWrite(buf, callback[0])
+		} else {
+			c.sendMsgErrChan <- c.conn.AsyncWrite(buf, nil)
+		}
 	}()
 	// 接收错误
 	select {
@@ -193,7 +197,7 @@ func (c *Connection) RemoveProperty(key string) {
 }
 
 // IsAlive 判断当前连接是否存活
-func (c *Connection) IsAlive() bool {
+func (c *Connection) IsAlive() (isAlive bool) {
 	if c.isClosed {
 		return false
 	}
