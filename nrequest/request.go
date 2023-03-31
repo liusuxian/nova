@@ -1,8 +1,8 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-02-22 20:23:33
+ * @Date: 2023-03-31 14:06:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-23 13:38:27
+ * @LastEditTime: 2023-03-31 14:16:41
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrequest/request.go
  * @Description:
  *
@@ -49,15 +49,20 @@ func NewRequest(conn niface.IConnection, msg niface.IMessage) (req *Request) {
 }
 
 // RequestFromCtx 从上下文中检索并返回 Request 对象
-func RequestFromCtx(ctx context.Context) *Request {
+func RequestFromCtx(ctx context.Context) (request *Request) {
 	if v := ctx.Value(ctxKeyForRequest); v != nil {
 		return v.(*Request)
 	}
 	return nil
 }
 
-// Context 是函数 GetCtx 的别名
-func (r *Request) Context() context.Context {
+// SetCtx 设置请求的 Context
+func (r *Request) SetCtx(ctx context.Context) {
+	r.ctx = ctx
+}
+
+// GetCtx 获取请求的 Context
+func (r *Request) GetCtx() (ctx context.Context) {
 	if r.ctx == nil {
 		r.ctx = context.Background()
 	}
@@ -68,47 +73,37 @@ func (r *Request) Context() context.Context {
 	return r.ctx
 }
 
-// SetCtx 设置请求的 Context
-func (r *Request) SetCtx(ctx context.Context) {
-	r.ctx = ctx
-}
-
-// GetCtx 获取请求的 Context
-func (r *Request) GetCtx() context.Context {
-	return r.Context()
-}
-
 // SetCtxVal 将键值对作为自定义参数设置到请求的 Context 中
 func (r *Request) SetCtxVal(key string, value any) {
-	r.ctx = context.WithValue(r.Context(), key, value)
+	r.ctx = context.WithValue(r.GetCtx(), key, value)
 }
 
 // GetCtxVal 检索并返回给定键名的值，可选参数 def 指定如果请求的 Context 中不存在给定的 key 时的默认值
-func (r *Request) GetCtxVal(key string, def ...any) any {
-	val := r.Context().Value(key)
-	if val == nil && len(def) > 0 {
-		val = def[0]
+func (r *Request) GetCtxVal(key string, def ...any) (value any) {
+	value = r.GetCtx().Value(key)
+	if value == nil && len(def) > 0 {
+		value = def[0]
 	}
-	return val
+	return
 }
 
 // GetConnection 获取请求连接信息
-func (r *Request) GetConnection() niface.IConnection {
+func (r *Request) GetConnection() (conn niface.IConnection) {
 	return r.conn
 }
 
 // GetMsgID 获取请求的消息 ID
-func (r *Request) GetMsgID() uint16 {
+func (r *Request) GetMsgID() (msgID uint16) {
 	return r.msg.GetMsgID()
 }
 
 // GetData 获取请求消息的数据
-func (r *Request) GetData() []byte {
+func (r *Request) GetData() (data []byte) {
 	return r.msg.GetData()
 }
 
 // GetMessage 获取请求消息的原始数据
-func (r *Request) GetMessage() niface.IMessage {
+func (r *Request) GetMessage() (msg niface.IMessage) {
 	return r.msg
 }
 
