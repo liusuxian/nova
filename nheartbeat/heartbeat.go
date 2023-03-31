@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 17:44:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 20:01:08
+ * @LastEditTime: 2023-03-31 21:54:46
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nheartbeat/heartbeat.go
  * @Description:
  *
@@ -42,7 +42,7 @@ type HeartbeatDefaultRouter struct {
 func (hbr *HeartbeatDefaultRouter) Handle(request niface.IRequest) {
 	nlog.Debug(request.GetCtx(), "Receive Heartbeat", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("Data", request.GetData()))
 	// 回复心跳消息
-	hbr.heartbeatChecker.replyHeartBeatMsg()
+	hbr.heartbeatChecker.replyHeartBeatMsg(request.GetConnection())
 }
 
 // NewHeartbeatChecker 创建心跳检测器
@@ -152,25 +152,25 @@ func (hbc *HeartbeatChecker) check() {
 	if !hbc.conn.IsAlive() {
 		hbc.onRemoteNotAlive(hbc.conn)
 	} else {
-		hbc.sendHeartBeatMsg()
+		hbc.sendHeartBeatMsg(hbc.conn)
 	}
 }
 
 // sendHeartBeatMsg 发送心跳消息
-func (hbc *HeartbeatChecker) sendHeartBeatMsg() {
+func (hbc *HeartbeatChecker) sendHeartBeatMsg(conn niface.IConnection) {
 	if hbc.initiate {
 		msg := hbc.makeMsg()
-		if err := hbc.conn.SendMsg(hbc.msgID, msg); err != nil {
+		if err := conn.SendMsg(hbc.msgID, msg); err != nil {
 			nlog.Error(hbc.ctx, "Send HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
 		}
 	}
 }
 
 // replyHeartBeatMsg 回复心跳消息
-func (hbc *HeartbeatChecker) replyHeartBeatMsg() {
+func (hbc *HeartbeatChecker) replyHeartBeatMsg(conn niface.IConnection) {
 	if !hbc.initiate {
 		msg := hbc.makeMsg()
-		if err := hbc.conn.SendMsg(hbc.msgID, msg); err != nil {
+		if err := conn.SendMsg(hbc.msgID, msg); err != nil {
 			nlog.Error(hbc.ctx, "Reply HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
 		}
 	}
