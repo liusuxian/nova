@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:23:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 13:37:06
+ * @LastEditTime: 2023-03-31 21:09:21
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -38,14 +38,15 @@ type Connection struct {
 	onConnStart      func(conn niface.IConnection) // 当前连接创建时的 Hook 函数
 	onConnStop       func(conn niface.IConnection) // 当前连接断开时的 Hook 函数
 	packet           niface.IDataPack              // 数据协议封包和拆包方式
-	maxHeartbeat     time.Duration                 // 最长心跳检测间隔时间
 	lastActivityTime time.Time                     // 最后一次活动时间
+	maxHeartbeat     time.Duration                 // 最长心跳检测间隔时间
+	heartbeatChecker niface.IHeartBeatChecker      // 心跳检测器
 }
 
 // NewServerConn 创建一个 Server 服务端特性的连接
-func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Duration) *Connection {
+func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Duration) (c *Connection) {
 	// 初始化 Connection 属性
-	c := &Connection{
+	c = &Connection{
 		conn:           conn,
 		connID:         conn.Fd(),
 		msgHandler:     server.GetMsgHandler(),
@@ -59,15 +60,19 @@ func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Dura
 		packet:         server.GetPacket(),
 		maxHeartbeat:   maxHeartbeat,
 	}
+	// 从当前 Server 克隆心跳检测器
+	heartbeatChecker := server.GetHeartbeat().Clone()
+	// 绑定连接
+	heartbeatChecker.BindConn(c)
 	// 将新创建的 Connection 添加到连接管理中
 	server.GetConnManager().AddConn(c)
-	return c
+	return
 }
 
 // NewClientConn 创建一个 Client 客户端特性的连接
-func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Duration) *Connection {
+func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Duration) (c *Connection) {
 	// 初始化 Connection 属性
-	c := &Connection{
+	c = &Connection{
 		conn:           conn,
 		connID:         conn.Fd(),
 		msgHandler:     client.GetMsgHandler(),
@@ -80,16 +85,26 @@ func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Dura
 		packet:         client.GetPacket(),
 		maxHeartbeat:   maxHeartbeat,
 	}
+	// 从当前 Client 克隆心跳检测器
+	heartbeatChecker := client.GetHeartbeat().Clone()
+	// 绑定连接
+	heartbeatChecker.BindConn(c)
 	return c
 }
 
 // Start 启动连接
 func (c *Connection) Start() {
 	c.cancelCtx, c.cancelFunc = context.WithCancel(context.Background())
-	// 更新连接活动时间
-	c.UpdateActivity()
 	// 调用连接创建时的 Hook 函数
 	c.callOnConnStart()
+
+	// 启动心跳检测
+	if c.heartbeatChecker != nil {
+		// 启动心跳检测
+		c.heartbeatChecker.Start()
+		// 更新连接活动时间
+		c.UpdateActivity()
+	}
 
 	select {
 	case <-c.cancelCtx.Done():
@@ -209,6 +224,11 @@ func (c *Connection) UpdateActivity() {
 	c.lastActivityTime = time.Now()
 }
 
+// SetHeartBeat 设置心跳检测器
+func (c *Connection) SetHeartBeat(checker niface.IHeartBeatChecker) {
+	c.heartbeatChecker = checker
+}
+
 // finalizer 清理器
 func (c *Connection) finalizer() {
 	// 调用连接断开时的 Hook 函数
@@ -216,6 +236,10 @@ func (c *Connection) finalizer() {
 	// 如果当前连接已经关闭
 	if c.isClosed {
 		return
+	}
+	// 关闭链接绑定的心跳检测器
+	if c.heartbeatChecker != nil {
+		c.heartbeatChecker.Stop()
 	}
 	// 关闭 Socket 连接
 	_ = c.conn.Close()
