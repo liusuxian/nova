@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 20:17:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-30 18:53:42
+ * @LastEditTime: 2023-04-01 22:47:20
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/connection.go
  * @Description:
  *
@@ -25,10 +25,12 @@ type IConnection interface {
 	GetConnID() (connID int)                                                       // 获取当前 ConnID
 	RemoteAddr() (addr net.Addr)                                                   // 获取当前连接远程地址信息
 	LocalAddr() (addr net.Addr)                                                    // 获取当前连接本地地址信息
+	Send(data []byte, callback ...gnet.AsyncCallback) (err error)                  // 将数据发送给远程的对端
 	SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCallback) (err error) // 将 Message 数据发送给远程的对端
 	SetProperty(key string, value any)                                             // 设置当前连接属性
 	GetProperty(key string) (value any, err error)                                 // 获取当前连接属性
 	RemoveProperty(key string)                                                     // 移除当前连接属性
 	IsAlive() (isAlive bool)                                                       // 判断当前连接是否存活
 	UpdateActivity()                                                               // 更新连接活动时间
+	SetHeartBeat(checker IHeartBeatChecker)                                        // 设置心跳检测器
 }

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:23:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 17:10:12
+ * @LastEditTime: 2023-04-01 22:50:35
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -144,6 +144,37 @@ func (c *Connection) LocalAddr() (addr net.Addr) {
 	return c.conn.LocalAddr()
 }
 
+// Send 将数据发送给远程的对端
+func (c *Connection) Send(data []byte, callback ...gnet.AsyncCallback) (err error) {
+	// 判断当前连接的关闭状态
+	if c.isClosed {
+		err = errors.New("Connection Closed When Send Data")
+		return
+	}
+	// 异步发送给客户端
+	go func() {
+		if len(callback) > 0 {
+			c.sendMsgErrChan <- c.conn.AsyncWrite(data, callback[0])
+		} else {
+			c.sendMsgErrChan <- c.conn.AsyncWrite(data, nil)
+		}
+	}()
+	// 接收错误
+	select {
+	case err = <-c.sendMsgErrChan:
+		if err != nil {
+			err = errors.Wrap(err, "Connection Send Data Error")
+			return
+		}
+	case <-c.cancelCtx.Done():
+		err = errors.New("Connection Stop When Send Data")
+		return
+	}
+	// 更新连接活动时间
+	c.UpdateActivity()
+	return
+}
+
 // SendMsg 将 Message 数据发送给远程的对端
 func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCallback) (err error) {
 	// 判断当前连接的关闭状态
@@ -172,7 +203,7 @@ func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCa
 		err = errors.New("Connection Stop When Send Msg")
 		return
 	}
-	// 发送给客户端成功, 更新连接活动时间
+	// 更新连接活动时间
 	c.UpdateActivity()
 	return
 }

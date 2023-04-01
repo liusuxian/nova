@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 17:18:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 16:29:55
+ * @LastEditTime: 2023-04-01 22:59:19
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/heartbeat/heartbeat.go
  * @Description:
  *
@@ -41,14 +41,14 @@ func (hbr *HeartBeatRouter) Handle(request niface.IRequest) {
 			nlog.Error(request.GetCtx(), "Marshal Heartbeat Msg Error", nlog.Err(err))
 			return
 		}
-		if err := request.GetConnection().SendMsg(request.GetMsgID(), resMsg, nil); err != nil {
+		if err := request.GetConnection().SendMsg(request.GetMsgID(), resMsg); err != nil {
 			nlog.Error(request.GetCtx(), "Send Heartbeat Error", nlog.Err(err))
 			return
 		}
 	}
 }
 
-// SetHeartBeat 设置当前 Server 的心跳检测
+// SetHeartBeat 设置当前 Server 的心跳检测器
 func SetHeartBeat(s niface.IServer, initiate bool) {
 	s.SetHeartBeat(initiate, &niface.HeartBeatOption{
 		MakeMsg: func() []byte {

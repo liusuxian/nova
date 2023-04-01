@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 03:16:30
+ * @LastEditTime: 2023-04-01 22:59:35
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/server.go
  * @Description:
  *
@@ -12,7 +12,7 @@ package main
 
 import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/heartbeat"
-	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/overload"
+	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/serveroverload"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nserver"
 	"os"
@@ -28,11 +28,10 @@ func main() {
 		nserver.WithReuseAddr(true),
 		nserver.WithReusePort(true),
 		nserver.WithLockOSThread(true),
-		nserver.WithTicker(true),
 	)
-	// 设置当前 Server 的服务器人数超载消息
-	overload.SetOverLoadMsg(s)
-	// 设置当前 Server 的心跳检测
+	// 设置当前 Server 的服务器人数超载检测器
+	serveroverload.SetServerOverload(s)
+	// 设置当前 Server 的心跳检测器
 	heartbeat.SetHeartBeat(s, true)
 	go func() {
 		// 创建一个通道，用于接收信号
@@ -48,7 +47,5 @@ func main() {
 	// 启动服务器
 	s.Start()
 	// 等待一段时间
-	select {
-	case <-time.After(1 * time.Second):
-	}
+	<-time.After(1 * time.Second)
 }

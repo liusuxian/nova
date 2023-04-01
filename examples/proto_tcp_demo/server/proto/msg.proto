@@ -5,7 +5,7 @@ option go_package = "./;pb";
 option csharp_namespace = "Pb"; // 给 C# 提供的选项
 
 // 服务器人数超载
-message OverLoad {}
+message ServerOverload {}
 
 // 心跳
 message Heartbeat {
