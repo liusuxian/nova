@@ -52,7 +52,7 @@ func NewClient(network, addr string, opts ...Option) (client niface.IClient) {
 		addr:       addr,
 		ctx:        ctx,
 		msgHandler: nmsghandler.NewMsgHandle(0),
-		packet:     npack.NewPack(npack.DefaultPacketMethod, npack.LittleEndian, 4096),
+		packet:     npack.NewPack(npack.DefaultPacketMethod, npack.LittleEndian, npack.DefaultMaxPacketSize),
 	}
 	// 处理服务选项
 	for _, opt := range opts {

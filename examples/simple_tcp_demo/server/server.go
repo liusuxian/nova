@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 18:10:57
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-26 03:16:25
+ * @LastEditTime: 2023-04-01 22:22:15
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/server/server.go
  * @Description:
  *
@@ -26,11 +26,10 @@ func main() {
 		nserver.WithReuseAddr(true),
 		nserver.WithReusePort(true),
 		nserver.WithLockOSThread(true),
-		nserver.WithTicker(true),
 	)
-	// 设置当前 Server 的服务器人数超载消息
-	s.SetOverLoadMsg()
-	// 设置当前 Server 的心跳检测
+	// 设置当前 Server 的服务器人数超载检测器
+	s.SetServerOverload()
+	// 设置当前 Server 的心跳检测器
 	s.SetHeartBeat(true)
 	go func() {
 		// 创建一个通道，用于接收信号
@@ -46,7 +45,5 @@ func main() {
 	// 启动服务器
 	s.Start()
 	// 等待一段时间
-	select {
-	case <-time.After(1 * time.Second):
-	}
+	<-time.After(1 * time.Second)
 }

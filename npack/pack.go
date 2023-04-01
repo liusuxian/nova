@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 15:42:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-21 16:00:58
+ * @LastEditTime: 2023-04-01 22:30:31
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/pack.go
  * @Description:
  *
@@ -24,6 +24,10 @@ const (
 	BigEndian    = 2 // 字节存储次序，大端
 )
 
+const (
+	DefaultMaxPacketSize = 4096 // 默认数据包的最大值
+)
+
 // 自定义错误，不完整的包
 var ErrIncompletePacket = errors.New("incomplete packet")
 
@@ -32,7 +36,7 @@ func NewPack(packetMethod, endian, maxPacketSize int) (dataPack niface.IDataPack
 	switch packetMethod {
 	case DefaultPacketMethod:
 		// 默认封包拆包方式
-		// 消息ID(4字节)-消息体长度(4字节)-消息内容
+		// 消息ID(2字节)-消息体长度(4字节)-消息内容
 		dataPack = newDefaultPack(endian, maxPacketSize)
 	default:
 		// 未知的封包拆包方式，则使用默认封包拆包方式

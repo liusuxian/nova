@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 20:34:11
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 16:31:17
+ * @LastEditTime: 2023-04-01 22:23:54
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/client/client.go
  * @Description:
  *
@@ -34,17 +34,15 @@ func main() {
 				nclient.WithHeartbeat(time.Duration(3000)*time.Millisecond),
 				nclient.WithMaxHeartbeat(time.Duration(5000)*time.Millisecond),
 			)
-			// 设置当前 Client 的服务器人数超载消息
-			c.SetOverLoadMsg()
-			// 设置当前 Client 的心跳检测
+			// 设置当前 Client 的服务器人数超载检测器
+			c.SetServerOverload()
+			// 设置当前 Client 的心跳检测器
 			c.SetHeartBeat(false)
 			// 启动 Client
 			c.Start()
-			select {
-			case <-ctx.Done():
-				c.Stop()
-				return
-			}
+			// 停止 Client
+			<-ctx.Done()
+			c.Stop()
 		}(cancelCtx)
 	}
 	// 创建一个通道，用于接收信号
@@ -57,7 +55,5 @@ func main() {
 	// 取消任务
 	cancelFunc()
 	// 等待一段时间
-	select {
-	case <-time.After(1 * time.Second):
-	}
+	<-time.After(1 * time.Second)
 }
