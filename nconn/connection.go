@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:23:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 21:19:57
+ * @LastEditTime: 2023-04-01 17:10:12
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -61,9 +61,11 @@ func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Dura
 		maxHeartbeat:   maxHeartbeat,
 	}
 	// 从当前 Server 克隆心跳检测器
-	heartbeatChecker := server.GetHeartBeat().Clone()
-	// 绑定连接
-	heartbeatChecker.BindConn(c)
+	heartbeatChecker := server.GetHeartBeat()
+	if heartbeatChecker != nil {
+		// 绑定连接
+		heartbeatChecker.Clone().BindConn(c)
+	}
 	// 将新创建的 Connection 添加到连接管理中
 	server.GetConnManager().AddConn(c)
 	return
@@ -86,9 +88,11 @@ func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Dura
 		maxHeartbeat:   maxHeartbeat,
 	}
 	// 从当前 Client 克隆心跳检测器
-	heartbeatChecker := client.GetHeartBeat().Clone()
-	// 绑定连接
-	heartbeatChecker.BindConn(c)
+	heartbeatChecker := client.GetHeartBeat()
+	if heartbeatChecker != nil {
+		// 绑定连接
+		heartbeatChecker.Clone().BindConn(c)
+	}
 	return c
 }
 
