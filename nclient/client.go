@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 10:49:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 21:03:32
+ * @LastEditTime: 2023-04-01 22:17:46
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -17,9 +17,9 @@ import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nmsghandler"
-	"github.com/liusuxian/nova/noverload"
 	"github.com/liusuxian/nova/npack"
 	"github.com/liusuxian/nova/nrequest"
+	"github.com/liusuxian/nova/nserveroverload"
 	"github.com/panjf2000/gnet/v2"
 	"time"
 )
@@ -27,20 +27,20 @@ import (
 // Client 客户端结构
 type Client struct {
 	gnet.BuiltinEventEngine
-	client           *gnet.Client                  // gnet 客户端
-	options          gnet.Options                  // 客户端 gnet 启动选项
-	network          string                        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
-	addr             string                        // 服务器地址
-	ctx              context.Context               // 当前 Client 的 Context
-	conn             niface.IConnection            // Client 连接
-	msgHandler       niface.IMsgHandle             // 当前 Client 绑定的消息处理模块
-	onConnStart      func(conn niface.IConnection) // 当前 Client 的连接创建时的 Hook 函数
-	onConnStop       func(conn niface.IConnection) // 当前 Client 的连接断开时的 Hook 函数
-	packet           niface.IDataPack              // 当前 Client 绑定的数据协议封包方式
-	overLoadMsg      *noverload.OverLoadMsg        // 服务器人数超载消息
-	heartbeat        time.Duration                 // 心跳发送间隔时间
-	maxHeartbeat     time.Duration                 // 最长心跳检测间隔时间
-	heartbeatChecker niface.IHeartBeatChecker      // 心跳检测器
+	client                *gnet.Client                  // gnet 客户端
+	options               gnet.Options                  // 客户端 gnet 启动选项
+	network               string                        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
+	addr                  string                        // 服务器地址
+	ctx                   context.Context               // 当前 Client 的 Context
+	conn                  niface.IConnection            // Client 连接
+	msgHandler            niface.IMsgHandle             // 当前 Client 绑定的消息处理模块
+	onConnStart           func(conn niface.IConnection) // 当前 Client 的连接创建时的 Hook 函数
+	onConnStop            func(conn niface.IConnection) // 当前 Client 的连接断开时的 Hook 函数
+	packet                niface.IDataPack              // 当前 Client 绑定的数据协议封包方式
+	serverOverloadChecker niface.IServerOverloadChecker // 服务器人数超载检测器
+	heartbeat             time.Duration                 // 心跳发送间隔时间
+	maxHeartbeat          time.Duration                 // 最长心跳检测间隔时间
+	heartbeatChecker      niface.IHeartBeatChecker      // 心跳检测器
 }
 
 // NewClient 创建 Client
@@ -130,21 +130,21 @@ func (c *Client) GetMsgHandler() (handler niface.IMsgHandle) {
 	return c.msgHandler
 }
 
-// SetOverLoadMsg 设置当前 Client 的服务器人数超载消息
-func (c *Client) SetOverLoadMsg(option ...*niface.OverLoadMsgOption) {
-	overLoadMsg := noverload.NewOverLoadMsgClient()
+// SetServerOverload 设置当前 Client 的服务器人数超载检测器
+func (c *Client) SetServerOverload(option ...*niface.ServerOverloadOption) {
+	checker := nserveroverload.NewServerOverloadChecker(true)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
-		overLoadMsg.SetOverLoadMsgFunc(opt.MakeMsg)
-		overLoadMsg.BindRouter(opt.MsgID, opt.Router)
+		checker.SetServerOverloadMsgFunc(opt.MakeMsg)
+		checker.BindRouter(opt.MsgID, opt.Router)
 	}
 	// 添加服务器人数超载消息的路由
-	c.AddRouter(overLoadMsg.GetMsgID(), overLoadMsg.GetRouter())
-	c.overLoadMsg = overLoadMsg
+	c.AddRouter(checker.GetMsgID(), checker.GetRouter())
+	c.serverOverloadChecker = checker
 }
 
-// SetHeartBeat 设置当前 Client 的心跳检测
+// SetHeartBeat 设置当前 Client 的心跳检测器
 func (c *Client) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
 	checker := nheartbeat.NewHeartbeatChecker(c.heartbeat, initiate)
 	// 用户自定义
@@ -197,7 +197,6 @@ func (c *Client) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 // OnShutdown 在引擎被关闭时触发，它在所有事件循环和连接关闭后立即调用。
 func (c *Client) OnShutdown(eng gnet.Engine) {
 	nlog.Info(c.ctx, "Client OnShutdown")
-	return
 }
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。

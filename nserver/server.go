@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 21:16:01
+ * @LastEditTime: 2023-04-01 22:12:33
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -19,9 +19,9 @@ import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nmsghandler"
-	"github.com/liusuxian/nova/noverload"
 	"github.com/liusuxian/nova/npack"
 	"github.com/liusuxian/nova/nrequest"
+	"github.com/liusuxian/nova/nserveroverload"
 	"github.com/panjf2000/gnet/v2"
 	"time"
 )
@@ -29,18 +29,18 @@ import (
 // Server 服务器结构
 type Server struct {
 	gnet.BuiltinEventEngine
-	eng              gnet.Engine
-	options          gnet.Options                  // 服务器 gnet 启动选项
-	serverConf       *ServerConfig                 // 服务器配置
-	addr             string                        // 服务器绑定的地址
-	ctx              context.Context               // 当前 Server 的 Context
-	msgHandler       niface.IMsgHandle             // 当前 Server 绑定的消息处理模块
-	connMgr          niface.IConnManager           // 当前 Server 的连接管理模块
-	onConnStart      func(conn niface.IConnection) // 当前 Server 的连接创建时的 Hook 函数
-	onConnStop       func(conn niface.IConnection) // 当前 Server 的连接断开时的 Hook 函数
-	packet           niface.IDataPack              // 当前 Server 绑定的数据协议封包方式
-	overLoadMsg      *noverload.OverLoadMsg        // 服务器人数超载消息
-	heartbeatChecker niface.IHeartBeatChecker      // 心跳检测器
+	eng                   gnet.Engine
+	options               gnet.Options                  // 服务器 gnet 启动选项
+	serverConf            ServerConfig                  // 服务器配置
+	addr                  string                        // 服务器绑定的地址
+	ctx                   context.Context               // 当前 Server 的 Context
+	msgHandler            niface.IMsgHandle             // 当前 Server 绑定的消息处理模块
+	connMgr               niface.IConnManager           // 当前 Server 的连接管理模块
+	onConnStart           func(conn niface.IConnection) // 当前 Server 的连接创建时的 Hook 函数
+	onConnStop            func(conn niface.IConnection) // 当前 Server 的连接断开时的 Hook 函数
+	packet                niface.IDataPack              // 当前 Server 绑定的数据协议封包方式
+	serverOverloadChecker niface.IServerOverloadChecker // 服务器人数超载检测器
+	heartbeatChecker      niface.IHeartBeatChecker      // 心跳检测器
 }
 
 // ServerConfig 服务器配置
@@ -60,9 +60,9 @@ type ServerConfig struct {
 // NewServer 创建 Server
 func NewServer(opts ...Option) (server niface.IServer) {
 	// 获取服务器配置
-	serCfg := &ServerConfig{}
+	serCfg := ServerConfig{}
 	ctx := context.Background()
-	if err := nconf.StructKey("server", serCfg); err != nil {
+	if err := nconf.StructKey("server", &serCfg); err != nil {
 		nlog.Fatal(ctx, "New Server Error", nlog.Err(err))
 	}
 	// 初始化 Server 属性
@@ -148,16 +148,16 @@ func (s *Server) GetMsgHandler() (handler niface.IMsgHandle) {
 	return s.msgHandler
 }
 
-// SetOverLoadMsg 设置当前 Server 的服务器人数超载消息
-func (s *Server) SetOverLoadMsg(option ...*niface.OverLoadMsgOption) {
-	overLoadMsg := noverload.NewOverLoadMsgServer()
+// SetServerOverload 设置当前 Server 的服务器人数超载检测器
+func (s *Server) SetServerOverload(option ...*niface.ServerOverloadOption) {
+	checker := nserveroverload.NewServerOverloadChecker(false)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
-		overLoadMsg.SetOverLoadMsgFunc(opt.MakeMsg)
-		overLoadMsg.BindRouter(opt.MsgID, opt.Router)
+		checker.SetServerOverloadMsgFunc(opt.MakeMsg)
+		checker.BindRouter(opt.MsgID, opt.Router)
 	}
-	s.overLoadMsg = overLoadMsg
+	s.serverOverloadChecker = checker
 }
 
 // SetHeartBeat 设置当前 Server 的心跳检测器
@@ -208,12 +208,14 @@ func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
 // OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
 func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	nlog.Info(s.ctx, "Server OnOpen", nlog.Int("connID", conn.Fd()), nlog.Int("Connections", s.GetConnections()))
-	// TODO 检测允许的客户端连接最大数量
-	if s.GetConnections() > s.serverConf.MaxConn {
-		out = s.packet.Pack(npack.NewMsgPackage(s.overLoadMsg.GetMsgID(), s.overLoadMsg.GetMsgData()))
-		// 踢连接
-		go s.doKickConn(conn)
-		return
+	// 服务器人数超载检测
+	if s.serverOverloadChecker != nil {
+		if s.serverOverloadChecker.Check(s, s.serverConf.MaxConn) {
+			out = s.packet.Pack(s.serverOverloadChecker.GetMessage())
+			// 踢连接
+			go s.doKickConn(conn)
+			return
+		}
 	}
 	// 创建一个 Server 服务端特性的连接
 	serverConn := nconn.NewServerConn(s, conn, time.Duration(s.serverConf.MaxHeartbeat)*time.Millisecond)
@@ -229,7 +231,6 @@ func (s *Server) OnShutdown(eng gnet.Engine) {
 	nlog.Info(s.ctx, "Server OnShutdown")
 	// 停止 Worker 工作池
 	s.msgHandler.StopWorkerPool()
-	return
 }
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
@@ -266,9 +267,6 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 
 // doKickConn 踢连接
 func (s *Server) doKickConn(conn gnet.Conn) {
-	select {
-	case <-time.After(10 * time.Millisecond):
-		_ = conn.Close()
-		return
-	}
+	<-time.After(10 * time.Millisecond)
+	_ = conn.Close()
 }
