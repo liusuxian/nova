@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 17:44:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 21:54:46
+ * @LastEditTime: 2023-04-01 17:21:16
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nheartbeat/heartbeat.go
  * @Description:
  *
@@ -96,6 +96,7 @@ func (hbc *HeartbeatChecker) BindRouter(msgID uint16, router niface.IRouter) {
 // BindConn 绑定连接
 func (hbc *HeartbeatChecker) BindConn(conn niface.IConnection) {
 	hbc.conn = conn
+	// 设置心跳检测器
 	conn.SetHeartBeat(hbc)
 }
 
@@ -159,8 +160,7 @@ func (hbc *HeartbeatChecker) check() {
 // sendHeartBeatMsg 发送心跳消息
 func (hbc *HeartbeatChecker) sendHeartBeatMsg(conn niface.IConnection) {
 	if hbc.initiate {
-		msg := hbc.makeMsg()
-		if err := conn.SendMsg(hbc.msgID, msg); err != nil {
+		if err := conn.SendMsg(hbc.msgID, hbc.makeMsg()); err != nil {
 			nlog.Error(hbc.ctx, "Send HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
 		}
 	}
@@ -169,8 +169,7 @@ func (hbc *HeartbeatChecker) sendHeartBeatMsg(conn niface.IConnection) {
 // replyHeartBeatMsg 回复心跳消息
 func (hbc *HeartbeatChecker) replyHeartBeatMsg(conn niface.IConnection) {
 	if !hbc.initiate {
-		msg := hbc.makeMsg()
-		if err := conn.SendMsg(hbc.msgID, msg); err != nil {
+		if err := conn.SendMsg(hbc.msgID, hbc.makeMsg()); err != nil {
 			nlog.Error(hbc.ctx, "Reply HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
 		}
 	}
