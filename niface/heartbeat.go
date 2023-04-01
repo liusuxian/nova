@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-30 18:27:46
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 19:55:36
+ * @LastEditTime: 2023-04-01 17:39:21
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/heartbeat.go
  * @Description:
  *
@@ -30,7 +30,7 @@ type HeartBeatMsgFunc func() []byte
 // 用户自定义的远程连接不存活时的处理方法
 type OnRemoteNotAlive func(IConnection)
 
-// HeartBeatOption 心跳检测
+// HeartBeatOption 心跳检测选项
 type HeartBeatOption struct {
 	MakeMsg          HeartBeatMsgFunc // 用户自定义的心跳检测消息处理方法
 	OnRemoteNotAlive OnRemoteNotAlive // 用户自定义的远程连接不存活时的处理方法
