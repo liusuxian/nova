@@ -12,12 +12,13 @@ package nlog_test
 
 import (
 	"context"
+	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"testing"
 )
 
 func TestLog(t *testing.T) {
-	ctx := context.WithValue(context.Background(), "ctxKey", "ctxValue")
+	ctx := context.WithValue(context.Background(), niface.CtxKey("ctxKey"), "ctxValue")
 	nlog.Debug(ctx, "I am Debug", nlog.Int("Int", 1))
 	nlog.Info(ctx, "I am Info", nlog.Any("Array", []int{1, 2, 3}))
 	nlog.Warn(ctx, "I am Warn")

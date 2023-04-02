@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:49:39
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 20:38:28
+ * @LastEditTime: 2023-04-03 00:59:11
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack.go
  * @Description:
  *
@@ -110,7 +110,8 @@ func (p *defaultPack) UnPack(conn gnet.Conn) (msg niface.IMessage, err error) {
 	_, _ = conn.Discard(msgLen)
 	// 创建 Message 消息包
 	msgID := endianOrder.Uint16(buf[:msgIdSize])
-	msgData := buf[bodyOffset:msgLen]
+	msgData := make([]byte, msgBodyLen)
+	copy(msgData, buf[bodyOffset:msgLen])
 	msg = NewMsgPackage(msgID, msgData)
 	return
 }
