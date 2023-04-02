@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:06:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 14:16:41
+ * @LastEditTime: 2023-04-02 20:49:51
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrequest/request.go
  * @Description:
  *
@@ -34,7 +34,7 @@ const (
 	HANDLE_OVER                          // HandleOver 处理完成
 )
 const (
-	ctxKeyForRequest = "NovaRequestObject" // 请求的 Request 对象
+	ctxKeyForRequest niface.CtxKey = "NovaRequestObject" // 请求的 Request 对象
 )
 
 // NewRequest 创建请求
@@ -74,12 +74,12 @@ func (r *Request) GetCtx() (ctx context.Context) {
 }
 
 // SetCtxVal 将键值对作为自定义参数设置到请求的 Context 中
-func (r *Request) SetCtxVal(key string, value any) {
+func (r *Request) SetCtxVal(key niface.CtxKey, value any) {
 	r.ctx = context.WithValue(r.GetCtx(), key, value)
 }
 
 // GetCtxVal 检索并返回给定键名的值，可选参数 def 指定如果请求的 Context 中不存在给定的 key 时的默认值
-func (r *Request) GetCtxVal(key string, def ...any) (value any) {
+func (r *Request) GetCtxVal(key niface.CtxKey, def ...any) (value any) {
 	value = r.GetCtx().Value(key)
 	if value == nil && len(def) > 0 {
 		value = def[0]
@@ -128,6 +128,7 @@ func (r *Request) Call() {
 		}
 		r.next()
 	}
+	r.step = PRE_HANDLE
 }
 
 // Abort 终止处理函数的运行，但调用此方法的函数会执行完毕
@@ -147,7 +148,7 @@ func (r *Request) Goto(step niface.HandleStep) {
 
 // 是否需要转进到下一个处理器开始执行
 func (r *Request) next() {
-	if r.needNext == false {
+	if !r.needNext {
 		r.needNext = true
 		return
 	}
