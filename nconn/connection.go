@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:23:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 22:50:35
+ * @LastEditTime: 2023-04-02 22:34:16
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -30,15 +30,15 @@ type Connection struct {
 	ctx              context.Context               // 当前连接的 Context
 	cancelCtx        context.Context               // 当前连接的 Cancel Context
 	cancelFunc       context.CancelFunc            // 当前连接的 Cancel Func
-	sendMsgErrChan   chan error                    // 将 Message 数据发送给远程的对端时报错
 	property         map[string]any                // 连接属性
-	propertyLock     sync.Mutex                    // 连接属性的并发锁
+	propertyLock     *sync.Mutex                   // 连接属性的互斥锁
 	isClosed         bool                          // 当前连接的关闭状态
 	connManager      niface.IConnManager           // 当前连接属于哪个 Connection Manager
 	onConnStart      func(conn niface.IConnection) // 当前连接创建时的 Hook 函数
 	onConnStop       func(conn niface.IConnection) // 当前连接断开时的 Hook 函数
 	packet           niface.IDataPack              // 数据协议封包和拆包方式
 	lastActivityTime time.Time                     // 最后一次活动时间
+	lastActivityLock *sync.Mutex                   // 最后一次活动时间的互斥锁
 	maxHeartbeat     time.Duration                 // 最长心跳检测间隔时间
 	heartbeatChecker niface.IHeartBeatChecker      // 心跳检测器
 }
@@ -47,18 +47,19 @@ type Connection struct {
 func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Duration) (c *Connection) {
 	// 初始化 Connection 属性
 	c = &Connection{
-		conn:           conn,
-		connID:         conn.Fd(),
-		msgHandler:     server.GetMsgHandler(),
-		ctx:            context.Background(),
-		sendMsgErrChan: make(chan error, 1),
-		property:       nil,
-		isClosed:       false,
-		connManager:    server.GetConnManager(),
-		onConnStart:    server.GetOnConnStart(),
-		onConnStop:     server.GetOnConnStop(),
-		packet:         server.GetPacket(),
-		maxHeartbeat:   maxHeartbeat,
+		conn:             conn,
+		connID:           conn.Fd(),
+		msgHandler:       server.GetMsgHandler(),
+		ctx:              context.Background(),
+		property:         nil,
+		propertyLock:     new(sync.Mutex),
+		isClosed:         false,
+		connManager:      server.GetConnManager(),
+		onConnStart:      server.GetOnConnStart(),
+		onConnStop:       server.GetOnConnStop(),
+		packet:           server.GetPacket(),
+		lastActivityLock: new(sync.Mutex),
+		maxHeartbeat:     maxHeartbeat,
 	}
 	// 从当前 Server 克隆心跳检测器
 	heartbeatChecker := server.GetHeartBeat()
@@ -75,17 +76,18 @@ func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Dura
 func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Duration) (c *Connection) {
 	// 初始化 Connection 属性
 	c = &Connection{
-		conn:           conn,
-		connID:         conn.Fd(),
-		msgHandler:     client.GetMsgHandler(),
-		ctx:            context.Background(),
-		sendMsgErrChan: make(chan error, 1),
-		property:       nil,
-		isClosed:       false,
-		onConnStart:    client.GetOnConnStart(),
-		onConnStop:     client.GetOnConnStop(),
-		packet:         client.GetPacket(),
-		maxHeartbeat:   maxHeartbeat,
+		conn:             conn,
+		connID:           conn.Fd(),
+		msgHandler:       client.GetMsgHandler(),
+		ctx:              context.Background(),
+		property:         nil,
+		propertyLock:     new(sync.Mutex),
+		isClosed:         false,
+		onConnStart:      client.GetOnConnStart(),
+		onConnStop:       client.GetOnConnStop(),
+		packet:           client.GetPacket(),
+		lastActivityLock: new(sync.Mutex),
+		maxHeartbeat:     maxHeartbeat,
 	}
 	// 从当前 Client 克隆心跳检测器
 	heartbeatChecker := client.GetHeartBeat()
@@ -152,26 +154,11 @@ func (c *Connection) Send(data []byte, callback ...gnet.AsyncCallback) (err erro
 		return
 	}
 	// 异步发送给客户端
-	go func() {
-		if len(callback) > 0 {
-			c.sendMsgErrChan <- c.conn.AsyncWrite(data, callback[0])
-		} else {
-			c.sendMsgErrChan <- c.conn.AsyncWrite(data, nil)
-		}
-	}()
-	// 接收错误
-	select {
-	case err = <-c.sendMsgErrChan:
-		if err != nil {
-			err = errors.Wrap(err, "Connection Send Data Error")
-			return
-		}
-	case <-c.cancelCtx.Done():
-		err = errors.New("Connection Stop When Send Data")
-		return
+	if len(callback) > 0 {
+		err = c.conn.AsyncWrite(data, callback[0])
+	} else {
+		err = c.conn.AsyncWrite(data, nil)
 	}
-	// 更新连接活动时间
-	c.UpdateActivity()
 	return
 }
 
@@ -185,26 +172,11 @@ func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCa
 	// 封包
 	buf := c.packet.Pack(npack.NewMsgPackage(msgID, data))
 	// 异步发送给客户端
-	go func() {
-		if len(callback) > 0 {
-			c.sendMsgErrChan <- c.conn.AsyncWrite(buf, callback[0])
-		} else {
-			c.sendMsgErrChan <- c.conn.AsyncWrite(buf, nil)
-		}
-	}()
-	// 接收错误
-	select {
-	case err = <-c.sendMsgErrChan:
-		if err != nil {
-			err = errors.Wrap(err, "Connection Send Msg Error")
-			return
-		}
-	case <-c.cancelCtx.Done():
-		err = errors.New("Connection Stop When Send Msg")
-		return
+	if len(callback) > 0 {
+		err = c.conn.AsyncWrite(buf, callback[0])
+	} else {
+		err = c.conn.AsyncWrite(buf, nil)
 	}
-	// 更新连接活动时间
-	c.UpdateActivity()
 	return
 }
 
@@ -216,7 +188,6 @@ func (c *Connection) SetProperty(key string, value any) {
 	if c.property == nil {
 		c.property = make(map[string]any)
 	}
-
 	c.property[key] = value
 }
 
@@ -226,11 +197,10 @@ func (c *Connection) GetProperty(key string) (value any, err error) {
 	defer c.propertyLock.Unlock()
 
 	var ok bool
-	if value, ok = c.property[key]; ok {
+	if value, ok = c.property[key]; !ok {
+		err = errors.New("Connection No Property Found")
 		return
 	}
-
-	err = errors.New("Connection No Property Found")
 	return
 }
 
@@ -248,11 +218,17 @@ func (c *Connection) IsAlive() (isAlive bool) {
 		return false
 	}
 	// 检查连接最后一次活动时间，如果超过心跳间隔，则认为连接已经死亡
-	return time.Since(c.lastActivityTime) < c.maxHeartbeat
+	c.lastActivityLock.Lock()
+	t := c.lastActivityTime
+	c.lastActivityLock.Unlock()
+	return time.Since(t) < c.maxHeartbeat
 }
 
 // UpdateActivity 更新连接活动时间
 func (c *Connection) UpdateActivity() {
+	c.lastActivityLock.Lock()
+	defer c.lastActivityLock.Unlock()
+
 	c.lastActivityTime = time.Now()
 }
 
@@ -278,10 +254,6 @@ func (c *Connection) finalizer() {
 	// 将当前连接从连接管理器中删除
 	if c.connManager != nil {
 		c.connManager.RemoveConn(c.connID)
-	}
-	// 关闭当前连接全部管道
-	if c.sendMsgErrChan != nil {
-		close(c.sendMsgErrChan)
 	}
 	// 设置当前连接的关闭状态
 	c.isClosed = true
