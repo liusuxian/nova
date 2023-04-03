@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 21:35:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-02 20:48:11
+ * @LastEditTime: 2023-04-03 11:38:54
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/request.go
  * @Description:
  *
@@ -11,6 +11,9 @@
 package niface
 
 import "context"
+
+// Context 键
+type CtxKey string
 
 // HandleStep 处理阶段
 type HandleStep uint8
@@ -30,6 +33,3 @@ type IRequest interface {
 	Abort()                                       // 终止处理函数的运行，但调用此方法的函数会执行完毕
 	Goto(step HandleStep)                         // 指定接下来的 Handle 去执行哪个 Handler 函数（慎用！！！，会导致循环调用）
 }
-
-// Context 键
-type CtxKey string

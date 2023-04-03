@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:06:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-02 20:49:51
+ * @LastEditTime: 2023-04-03 11:38:10
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrequest/request.go
  * @Description:
  *
@@ -23,7 +23,7 @@ type Request struct {
 	msg      niface.IMessage    // 客户端请求的数据
 	router   niface.IRouter     // 请求处理的函数
 	step     niface.HandleStep  // 用来控制路由函数的执行
-	stepLock *sync.RWMutex      // 用来控制路由函数执行的并发读写锁
+	stepLock *sync.RWMutex      // 用来控制路由函数的执行的读写锁
 	needNext bool               // 是否需要转进到下一个处理器开始执行
 }
 
