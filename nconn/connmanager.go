@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:41:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 20:45:58
+ * @LastEditTime: 2023-04-03 16:42:39
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connmanager.go
  * @Description:
  *
@@ -11,7 +11,6 @@
 package nconn
 
 import (
-	"context"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	cmap "github.com/orcaman/concurrent-map/v2"
@@ -21,14 +20,12 @@ import (
 
 // ConnManager 连接管理结构
 type ConnManager struct {
-	ctx     context.Context                                // 当前 Server 的根 Context
 	connMap cmap.ConcurrentMap[string, niface.IConnection] // 存放 Connection 的并发安全 Map
 }
 
 // NewConnManager 创建一个连接管理
-func NewConnManager(ctx context.Context) (connMgr *ConnManager) {
+func NewConnManager() (connMgr *ConnManager) {
 	return &ConnManager{
-		ctx:     ctx,
 		connMap: cmap.New[niface.IConnection](),
 	}
 }
@@ -37,14 +34,14 @@ func NewConnManager(ctx context.Context) (connMgr *ConnManager) {
 func (cm *ConnManager) AddConn(conn niface.IConnection) {
 	key := strconv.FormatInt(int64(conn.GetConnID()), 10)
 	cm.connMap.Set(key, conn)
-	nlog.Debug(cm.ctx, "Connection Add To ConnManager Success", nlog.Int("ConnID", conn.GetConnID()), nlog.Int("ConnCount", cm.connMap.Count()))
+	nlog.Debug("Connection Add To ConnManager", nlog.Int("ConnID", conn.GetConnID()), nlog.Int("ConnCount", cm.connMap.Count()))
 }
 
 // RemoveConn 删除连接
 func (cm *ConnManager) RemoveConn(connID int) {
 	key := strconv.FormatInt(int64(connID), 10)
 	cm.connMap.Remove(key)
-	nlog.Debug(cm.ctx, "Connection Remove From ConnManager Success", nlog.Int("ConnID", connID), nlog.Int("ConnCount", cm.connMap.Count()))
+	nlog.Debug("Connection Remove From ConnManager", nlog.Int("ConnID", connID), nlog.Int("ConnCount", cm.connMap.Count()))
 }
 
 // GetConn 通过 ConnID 获取连接
