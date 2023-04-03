@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 10:49:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 22:17:46
+ * @LastEditTime: 2023-04-03 15:55:57
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -11,7 +11,6 @@
 package nclient
 
 import (
-	"context"
 	"github.com/liusuxian/nova/nconn"
 	"github.com/liusuxian/nova/nheartbeat"
 	"github.com/liusuxian/nova/niface"
@@ -31,7 +30,6 @@ type Client struct {
 	options               gnet.Options                  // 客户端 gnet 启动选项
 	network               string                        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
 	addr                  string                        // 服务器地址
-	ctx                   context.Context               // 当前 Client 的 Context
 	conn                  niface.IConnection            // Client 连接
 	msgHandler            niface.IMsgHandle             // 当前 Client 绑定的消息处理模块
 	onConnStart           func(conn niface.IConnection) // 当前 Client 的连接创建时的 Hook 函数
@@ -46,11 +44,9 @@ type Client struct {
 // NewClient 创建 Client
 func NewClient(network, addr string, opts ...Option) (client niface.IClient) {
 	// 初始化 Client 属性
-	ctx := context.Background()
 	c := &Client{
 		network:    network,
 		addr:       addr,
-		ctx:        ctx,
 		msgHandler: nmsghandler.NewMsgHandle(0),
 		packet:     npack.NewPack(npack.DefaultPacketMethod, npack.LittleEndian, npack.DefaultMaxPacketSize),
 	}
@@ -61,7 +57,7 @@ func NewClient(network, addr string, opts ...Option) (client niface.IClient) {
 	// 创建 Client
 	cli, err := gnet.NewClient(c, gnet.WithOptions(c.options))
 	if err != nil {
-		nlog.Fatal(ctx, "New Client Error", nlog.Err(err))
+		nlog.Fatal("New Client Error", nlog.Err(err))
 	}
 	c.client = cli
 	return c
@@ -71,7 +67,7 @@ func NewClient(network, addr string, opts ...Option) (client niface.IClient) {
 func (c *Client) Start() {
 	// 启动 Client
 	if err := c.client.Start(); err != nil {
-		nlog.Fatal(c.ctx, "Start Client Error", nlog.Err(err))
+		nlog.Fatal("Start Client Error", nlog.Err(err))
 	}
 }
 
@@ -83,11 +79,6 @@ func (c *Client) Stop() {
 // AddRouter 给当前 Client 添加路由
 func (c *Client) AddRouter(msgID uint16, router niface.IRouter) {
 	c.msgHandler.AddRouter(msgID, router)
-}
-
-// GetCtx 获取当前 Client 的 Context
-func (c *Client) GetCtx() (ctx context.Context) {
-	return c.ctx
 }
 
 // Conn 当前 Client 的连接信息
@@ -166,10 +157,10 @@ func (c *Client) GetHeartBeat() (checker niface.IHeartBeatChecker) {
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
-	nlog.Info(c.ctx, "Client OnBoot", nlog.String("Network", c.network), nlog.String("Addr", c.addr), nlog.Reflect("options", c.options))
+	nlog.Info("Client OnBoot", nlog.String("Network", c.network), nlog.String("Addr", c.addr), nlog.Reflect("options", c.options))
 	// 连接服务器
 	if _, err := c.client.Dial(c.network, c.addr); err != nil {
-		nlog.Fatal(c.ctx, "Client OnBoot Error", nlog.Err(err))
+		nlog.Fatal("Client OnBoot Error", nlog.Err(err))
 	}
 	// 打印所有路由
 	c.msgHandler.PrintRouters()
@@ -178,7 +169,7 @@ func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
 
 // OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
 func (c *Client) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
-	nlog.Info(c.ctx, "Client OnClose", nlog.Int("connID", conn.Fd()), nlog.String("RemoteAddr", conn.RemoteAddr().String()))
+	nlog.Info("Client OnClose", nlog.Int("connID", conn.Fd()), nlog.String("RemoteAddr", conn.RemoteAddr().String()))
 	// 停止连接
 	c.conn.Stop()
 	return
@@ -186,7 +177,7 @@ func (c *Client) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
 
 // OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
 func (c *Client) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
-	nlog.Info(c.ctx, "Client OnOpen", nlog.Int("connID", conn.Fd()))
+	nlog.Info("Client OnOpen", nlog.Int("connID", conn.Fd()))
 	// 创建一个 Client 客户端特性的连接
 	c.conn = nconn.NewClientConn(c, conn, c.maxHeartbeat)
 	// 启动连接
@@ -196,7 +187,7 @@ func (c *Client) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 
 // OnShutdown 在引擎被关闭时触发，它在所有事件循环和连接关闭后立即调用。
 func (c *Client) OnShutdown(eng gnet.Engine) {
-	nlog.Info(c.ctx, "Client OnShutdown")
+	nlog.Info("Client OnShutdown")
 }
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
@@ -213,10 +204,10 @@ func (c *Client) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 			break
 		}
 		if err != nil {
-			nlog.Error(c.ctx, "Client OnTraffic Unpack Error", nlog.Err(err))
+			nlog.Error("Client OnTraffic Unpack Error", nlog.Err(err))
 			return
 		}
-		nlog.Debug(c.ctx, "Client OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()))
+		nlog.Debug("Client OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()))
 		// 更新连接活动时间
 		c.conn.UpdateActivity()
 		// 得到当前客户端请求的 Request 数据
