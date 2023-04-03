@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 20:42:22
+ * @LastEditTime: 2023-04-03 15:51:27
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -12,7 +12,6 @@ package nlog
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/utils/nfile"
@@ -30,7 +29,6 @@ import (
 
 // LogConfig 日志配置
 type LogConfig struct {
-	CtxKeys []string          // 自定义 Context 上下文变量名称，自动打印 Context 的变量到日志中。默认为空
 	Path    string            // 输出日志文件路径
 	Details []LogDetailConfig // 日志详细配置
 }
@@ -277,38 +275,38 @@ func Write(p []byte, withoutLogType ...int) (err error) {
 }
 
 // Debug
-func Debug(ctx context.Context, msg string, fields ...nField) {
-	withCtxLogger(ctx, fields...).Debug(msg)
+func Debug(msg string, nFields ...nField) {
+	logger.zapLogger.Debug(msg, getFields(nFields...)...)
 }
 
 // Info
-func Info(ctx context.Context, msg string, fields ...nField) {
-	withCtxLogger(ctx, fields...).Info(msg)
+func Info(msg string, nFields ...nField) {
+	logger.zapLogger.Info(msg, getFields(nFields...)...)
 }
 
 // Warn
-func Warn(ctx context.Context, msg string, fields ...nField) {
-	withCtxLogger(ctx, fields...).Warn(msg)
+func Warn(msg string, nFields ...nField) {
+	logger.zapLogger.Warn(msg, getFields(nFields...)...)
 }
 
 // Error
-func Error(ctx context.Context, msg string, fields ...nField) {
-	withCtxLogger(ctx, fields...).Error(msg)
+func Error(msg string, nFields ...nField) {
+	logger.zapLogger.Error(msg, getFields(nFields...)...)
 }
 
 // DPanic
-func DPanic(ctx context.Context, msg string, fields ...nField) {
-	withCtxLogger(ctx, fields...).DPanic(msg)
+func DPanic(msg string, nFields ...nField) {
+	logger.zapLogger.DPanic(msg, getFields(nFields...)...)
 }
 
 // Panic
-func Panic(ctx context.Context, msg string, fields ...nField) {
-	withCtxLogger(ctx, fields...).Panic(msg)
+func Panic(msg string, nFields ...nField) {
+	logger.zapLogger.Panic(msg, getFields(nFields...)...)
 }
 
 // Fatal
-func Fatal(ctx context.Context, msg string, fields ...nField) {
-	withCtxLogger(ctx, fields...).Fatal(msg)
+func Fatal(msg string, nFields ...nField) {
+	logger.zapLogger.Fatal(msg, getFields(nFields...)...)
 }
 
 // Level
@@ -321,22 +319,11 @@ func LevelEnabled(lvl zapcore.Level) bool {
 	return logger.zapLogger.Level().Enabled(lvl)
 }
 
-func withCtxLogger(ctx context.Context, fields ...nField) (zapLogger *zap.Logger) {
-	fieldSlice := make([]zapcore.Field, 0, len(fields))
-	for _, f := range fields {
-		fieldSlice = append(fieldSlice, f.field)
+// getFields 获取 zapcore.Field 列表
+func getFields(nFields ...nField) (zFields []zapcore.Field) {
+	zFields = make([]zapcore.Field, 0, len(nFields))
+	for _, f := range nFields {
+		zFields = append(zFields, f.field)
 	}
-	if ctx == nil {
-		return logger.zapLogger.With(fieldSlice...)
-	}
-	ctxKeys := logger.logConfig.CtxKeys
-	ctxKeysLen := len(ctxKeys)
-	if ctxKeysLen == 0 {
-		return logger.zapLogger.With(fieldSlice...)
-	}
-	ctxFieldSlice := make([]zapcore.Field, 0, ctxKeysLen)
-	for _, key := range ctxKeys {
-		ctxFieldSlice = append(ctxFieldSlice, zap.Any(key, ctx.Value(key)))
-	}
-	return logger.zapLogger.With(ctxFieldSlice...).With(fieldSlice...)
+	return
 }
