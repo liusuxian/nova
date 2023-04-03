@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-21 22:15:16
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 16:10:26
+ * @LastEditTime: 2023-04-03 12:12:44
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log_test.go
  * @Description:
  *
@@ -12,13 +12,15 @@ package nlog_test
 
 import (
 	"context"
-	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"testing"
 )
 
+// Context 键
+type CtxKey string
+
 func TestLog(t *testing.T) {
-	ctx := context.WithValue(context.Background(), niface.CtxKey("ctxKey"), "ctxValue")
+	ctx := context.WithValue(context.Background(), CtxKey("ctxKey"), "ctxValue")
 	nlog.Debug(ctx, "I am Debug", nlog.Int("Int", 1))
 	nlog.Info(ctx, "I am Info", nlog.Any("Array", []int{1, 2, 3}))
 	nlog.Warn(ctx, "I am Warn")

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:06:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 11:38:10
+ * @LastEditTime: 2023-04-03 12:10:17
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrequest/request.go
  * @Description:
  *
@@ -11,14 +11,12 @@
 package nrequest
 
 import (
-	"context"
 	"github.com/liusuxian/nova/niface"
 	"sync"
 )
 
 // Request 请求结构
 type Request struct {
-	ctx      context.Context    // 请求的 Context
 	conn     niface.IConnection // 已经和客户端建立好的连接
 	msg      niface.IMessage    // 客户端请求的数据
 	router   niface.IRouter     // 请求处理的函数
@@ -33,9 +31,6 @@ const (
 	POST_HANDLE                          // PostHandle 后置处理
 	HANDLE_OVER                          // HandleOver 处理完成
 )
-const (
-	ctxKeyForRequest niface.CtxKey = "NovaRequestObject" // 请求的 Request 对象
-)
 
 // NewRequest 创建请求
 func NewRequest(conn niface.IConnection, msg niface.IMessage) (req *Request) {
@@ -45,45 +40,6 @@ func NewRequest(conn niface.IConnection, msg niface.IMessage) (req *Request) {
 	req.step = PRE_HANDLE
 	req.stepLock = new(sync.RWMutex)
 	req.needNext = true
-	return
-}
-
-// RequestFromCtx 从上下文中检索并返回 Request 对象
-func RequestFromCtx(ctx context.Context) (request *Request) {
-	if v := ctx.Value(ctxKeyForRequest); v != nil {
-		return v.(*Request)
-	}
-	return nil
-}
-
-// SetCtx 设置请求的 Context
-func (r *Request) SetCtx(ctx context.Context) {
-	r.ctx = ctx
-}
-
-// GetCtx 获取请求的 Context
-func (r *Request) GetCtx() (ctx context.Context) {
-	if r.ctx == nil {
-		r.ctx = context.Background()
-	}
-	// 将 Request 对象注入到上下文中
-	if RequestFromCtx(r.ctx) == nil {
-		r.ctx = context.WithValue(r.ctx, ctxKeyForRequest, r)
-	}
-	return r.ctx
-}
-
-// SetCtxVal 将键值对作为自定义参数设置到请求的 Context 中
-func (r *Request) SetCtxVal(key niface.CtxKey, value any) {
-	r.ctx = context.WithValue(r.GetCtx(), key, value)
-}
-
-// GetCtxVal 检索并返回给定键名的值，可选参数 def 指定如果请求的 Context 中不存在给定的 key 时的默认值
-func (r *Request) GetCtxVal(key niface.CtxKey, def ...any) (value any) {
-	value = r.GetCtx().Value(key)
-	if value == nil && len(def) > 0 {
-		value = def[0]
-	}
 	return
 }
 
@@ -100,11 +56,6 @@ func (r *Request) GetMsgID() (msgID uint16) {
 // GetData 获取请求消息的数据
 func (r *Request) GetData() (data []byte) {
 	return r.msg.GetData()
-}
-
-// GetMessage 获取请求消息的原始数据
-func (r *Request) GetMessage() (msg niface.IMessage) {
-	return r.msg
 }
 
 // BindRouter 绑定这次请求由哪个路由处理
