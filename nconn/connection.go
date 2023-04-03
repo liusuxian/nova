@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:23:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-02 22:34:16
+ * @LastEditTime: 2023-04-03 16:02:34
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -27,7 +27,6 @@ type Connection struct {
 	conn             gnet.Conn                     // 当前连接的 Socket 套接字
 	connID           int                           // 当前连接的 ID，也可以称作为 SessionID，ID 全局唯一
 	msgHandler       niface.IMsgHandle             // 消息管理和对应处理方法的消息管理模块
-	ctx              context.Context               // 当前连接的 Context
 	cancelCtx        context.Context               // 当前连接的 Cancel Context
 	cancelFunc       context.CancelFunc            // 当前连接的 Cancel Func
 	property         map[string]any                // 连接属性
@@ -50,7 +49,6 @@ func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Dura
 		conn:             conn,
 		connID:           conn.Fd(),
 		msgHandler:       server.GetMsgHandler(),
-		ctx:              context.Background(),
 		property:         nil,
 		propertyLock:     new(sync.Mutex),
 		isClosed:         false,
@@ -79,7 +77,6 @@ func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Dura
 		conn:             conn,
 		connID:           conn.Fd(),
 		msgHandler:       client.GetMsgHandler(),
-		ctx:              context.Background(),
 		property:         nil,
 		propertyLock:     new(sync.Mutex),
 		isClosed:         false,
@@ -100,6 +97,8 @@ func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Dura
 
 // Start 启动连接
 func (c *Connection) Start() {
+	nlog.Info("Connection Start", nlog.Int("ConnID", c.connID))
+
 	c.cancelCtx, c.cancelFunc = context.WithCancel(context.Background())
 	// 调用连接创建时的 Hook 函数
 	c.callOnConnStart()
@@ -113,6 +112,7 @@ func (c *Connection) Start() {
 	}
 
 	<-c.cancelCtx.Done()
+	// 清理
 	c.finalizer()
 }
 
@@ -257,13 +257,13 @@ func (c *Connection) finalizer() {
 	}
 	// 设置当前连接的关闭状态
 	c.isClosed = true
-	nlog.Info(c.ctx, "Connection Stop", nlog.Int("ConnID", c.connID))
+	nlog.Info("Connection Stop", nlog.Int("ConnID", c.connID))
 }
 
 // callOnConnStart 调用连接创建时的 Hook 函数
 func (c *Connection) callOnConnStart() {
 	if c.onConnStart != nil {
-		nlog.Info(c.ctx, "Connection CallOnConnStart...", nlog.Int("connID", c.connID))
+		nlog.Info("Connection CallOnConnStart...", nlog.Int("connID", c.connID))
 		c.onConnStart(c)
 	}
 }
@@ -271,7 +271,7 @@ func (c *Connection) callOnConnStart() {
 // callOnConnStop 调用连接断开时的 Hook 函数
 func (c *Connection) callOnConnStop() {
 	if c.onConnStop != nil {
-		nlog.Info(c.ctx, "Connection CallOnConnStop...", nlog.Int("connID", c.connID))
+		nlog.Info("Connection CallOnConnStop...", nlog.Int("connID", c.connID))
 		c.onConnStop(c)
 	}
 }
