@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 18:54:09
+ * @LastEditTime: 2023-04-03 21:32:49
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -174,6 +174,11 @@ func (s *Server) GetHeartBeat() (checker niface.IHeartBeatChecker) {
 	return s.heartbeatChecker
 }
 
+// AddInterceptor 添加拦截器
+func (s *Server) AddInterceptor(interceptor niface.IInterceptor) {
+	s.msgHandler.AddInterceptor(interceptor)
+}
+
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	nlog.Info("Server OnBoot", nlog.String("listening", s.addr), nlog.Reflect("ServerConf", s.serverConf), nlog.Reflect("options", s.options))
@@ -252,7 +257,7 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		// 得到当前客户端请求的 Request 数据
 		request := nrequest.NewRequest(iConn, msg)
 		// 处理请求消息
-		s.msgHandler.HandleRequest(request)
+		s.msgHandler.Execute(request)
 	}
 	return
 }

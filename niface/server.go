@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 18:51:28
+ * @LastEditTime: 2023-04-03 21:32:13
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/server.go
  * @Description:
  *
@@ -27,4 +27,5 @@ type IServer interface {
 	SetServerOverload(option ...*ServerOverloadOption)      // 设置当前 Server 的服务器人数超载检测器
 	SetHeartBeat(initiate bool, option ...*HeartBeatOption) // 设置当前 Server 的心跳检测器
 	GetHeartBeat() (checker IHeartBeatChecker)              // 获取当前 Server 的心跳检测器
+	AddInterceptor(interceptor IInterceptor)                // 添加拦截器
 }

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:01:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 18:12:40
+ * @LastEditTime: 2023-04-03 21:29:58
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -13,6 +13,7 @@ package nmsghandler
 import (
 	"bytes"
 	"github.com/liusuxian/nova/niface"
+	"github.com/liusuxian/nova/ninterceptor"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/olekukonko/tablewriter"
 	"github.com/panjf2000/ants/v2"
@@ -27,25 +28,18 @@ type MsgHandle struct {
 	apis           map[uint16]niface.IRouter // 存放每个 MsgID 所对应的处理方法
 	workerPool     *ants.Pool                // Worker 工作池
 	workerPoolSize int                       // Worker 池的最大 Worker 数量
+	builder        niface.IBuilder           // 责任链构造器
 }
 
 // NewMsgHandle 创建消息处理
 func NewMsgHandle(workerPoolSize int) (handler *MsgHandle) {
-	return &MsgHandle{
+	handler = &MsgHandle{
 		apis:           make(map[uint16]niface.IRouter),
 		workerPoolSize: workerPoolSize,
+		builder:        ninterceptor.NewBuilder(),
 	}
-}
-
-// HandleRequest 处理请求消息
-func (mh *MsgHandle) HandleRequest(request niface.IRequest) {
-	if mh.workerPool != nil {
-		mh.workerPool.Submit(func() {
-			mh.doRequest(request)
-		})
-	} else {
-		go mh.doRequest(request)
-	}
+	handler.builder.Tail(handler)
+	return
 }
 
 // AddRouter 为消息添加具体的处理逻辑
@@ -120,8 +114,38 @@ func (mh *MsgHandle) StopWorkerPool() {
 	}
 }
 
-// doRequest 处理请求
-func (mh *MsgHandle) doRequest(request niface.IRequest) {
+// AddInterceptor 添加拦截器
+func (mh *MsgHandle) AddInterceptor(interceptor niface.IInterceptor) {
+	if mh.builder != nil {
+		mh.builder.AddInterceptor(interceptor)
+	}
+}
+
+// Execute 执行当前请求
+func (mh *MsgHandle) Execute(request niface.IRequest) {
+	mh.builder.Execute(request)
+}
+
+// Intercept 拦截
+func (mh *MsgHandle) Intercept(chain niface.IChain) (resp niface.IcResp) {
+	request := chain.Request()
+	if request != nil {
+		switch iRequest := request.(type) {
+		case niface.IRequest:
+			if mh.workerPool != nil {
+				mh.workerPool.Submit(func() {
+					mh.handlerRequest(iRequest)
+				})
+			} else {
+				go mh.handlerRequest(iRequest)
+			}
+		}
+	}
+	return chain.Proceed(chain.Request())
+}
+
+// handlerRequest 处理请求
+func (mh *MsgHandle) handlerRequest(request niface.IRequest) {
 	handler, ok := mh.apis[request.GetMsgID()]
 	if !ok {
 		nlog.Error("HandlerMsg Api Not Found", nlog.Uint16("MsgID", request.GetMsgID()))

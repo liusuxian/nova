@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 10:49:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 15:55:57
+ * @LastEditTime: 2023-04-03 21:33:55
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -155,6 +155,11 @@ func (c *Client) GetHeartBeat() (checker niface.IHeartBeatChecker) {
 	return c.heartbeatChecker
 }
 
+// AddInterceptor 添加拦截器
+func (c *Client) AddInterceptor(interceptor niface.IInterceptor) {
+	c.msgHandler.AddInterceptor(interceptor)
+}
+
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	nlog.Info("Client OnBoot", nlog.String("Network", c.network), nlog.String("Addr", c.addr), nlog.Reflect("options", c.options))
@@ -213,7 +218,7 @@ func (c *Client) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		// 得到当前客户端请求的 Request 数据
 		request := nrequest.NewRequest(c.conn, msg)
 		// 处理请求消息
-		c.msgHandler.HandleRequest(request)
+		c.msgHandler.Execute(request)
 	}
 	return
 }
