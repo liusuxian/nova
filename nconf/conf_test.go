@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-27 23:21:25
+ * @LastEditTime: 2023-04-03 15:38:40
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf_test.go
  * @Description:
  *
@@ -31,7 +31,6 @@ type ServerConfig struct {
 
 // LogConfig 日志配置
 type LogConfig struct {
-	CtxKeys []string          // 自定义 Context 上下文变量名称，自动打印 Context 的变量到日志中。默认为空
 	Path    string            // 输出日志文件路径
 	Details []LogDetailConfig // 日志详细配置
 }

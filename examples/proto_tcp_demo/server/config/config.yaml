@@ -13,7 +13,6 @@ server:
 
 # 日志配置
 logger:
-  ctxKeys: [] # 自定义 Context 上下文变量名称，自动打印 Context 的变量到日志中。默认为空
   path: "logs" # 输出日志文件路径
   details:
     - type: 1 # 日志类型 0:打印所有级别 1:打印 DEBUG、INFO、WARN 级别 2:打印 ERROR、DPANIC、PANIC、FATAL 级别，默认0

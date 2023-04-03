@@ -308,7 +308,6 @@ func init() {
 	SetDefault("server.packetMethod", 1)     // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
 	SetDefault("server.endian", 1)           // 字节存储次序，1: 小端 2: 大端，默认 1
 	// 日志配置
-	SetDefault("logger.ctxKeys", []string{})      // 自定义 Context 上下文变量名称，自动打印 Context 的变量到日志中。默认为空
 	SetDefault("logger.path", "logs")             // 输出日志文件路径
 	SetDefault("logger.details.type", 0)          // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO、WARN 级别 2:打印 ERROR、DPANIC、PANIC、FATAL 级别，默认0
 	SetDefault("logger.details.level", 0)         // 日志打印级别 0:DEBUG 1:INFO 2:WARN 3:ERROR 4:DPANIC、5:PANIC、6:FATAL，默认0
