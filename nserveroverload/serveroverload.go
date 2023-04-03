@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-01 17:52:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 21:49:49
+ * @LastEditTime: 2023-04-03 18:54:30
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserveroverload/serveroverload.go
  * @Description:
  *
@@ -32,7 +32,7 @@ type ServerOverloadDefaultRouter struct {
 
 // Handle 处理服务器人数超载消息
 func (sor *ServerOverloadDefaultRouter) Handle(request niface.IRequest) {
-	nlog.Debug(request.GetCtx(), "Receive Server Overload Msg", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("Data", request.GetData()))
+	nlog.Debug("Receive Server Overload Msg", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("Data", request.GetData()))
 }
 
 // NewServerOverloadChecker 创建服务器人数超载检测器

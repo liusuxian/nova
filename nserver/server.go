@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 22:12:33
+ * @LastEditTime: 2023-04-03 18:54:09
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -33,7 +33,6 @@ type Server struct {
 	options               gnet.Options                  // 服务器 gnet 启动选项
 	serverConf            ServerConfig                  // 服务器配置
 	addr                  string                        // 服务器绑定的地址
-	ctx                   context.Context               // 当前 Server 的 Context
 	msgHandler            niface.IMsgHandle             // 当前 Server 绑定的消息处理模块
 	connMgr               niface.IConnManager           // 当前 Server 的连接管理模块
 	onConnStart           func(conn niface.IConnection) // 当前 Server 的连接创建时的 Hook 函数
@@ -61,17 +60,15 @@ type ServerConfig struct {
 func NewServer(opts ...Option) (server niface.IServer) {
 	// 获取服务器配置
 	serCfg := ServerConfig{}
-	ctx := context.Background()
 	if err := nconf.StructKey("server", &serCfg); err != nil {
-		nlog.Fatal(ctx, "New Server Error", nlog.Err(err))
+		nlog.Fatal("New Server Error", nlog.Err(err))
 	}
 	// 初始化 Server 属性
 	s := &Server{
 		serverConf: serCfg,
 		addr:       fmt.Sprintf("%s://:%d", serCfg.Network, serCfg.Port),
-		ctx:        ctx,
 		msgHandler: nmsghandler.NewMsgHandle(serCfg.WorkerPoolSize),
-		connMgr:    nconn.NewConnManager(ctx),
+		connMgr:    nconn.NewConnManager(),
 		packet:     npack.NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
 	}
 	// 处理服务选项
@@ -84,23 +81,18 @@ func NewServer(opts ...Option) (server niface.IServer) {
 // Start 启动 Server
 func (s *Server) Start() {
 	if err := gnet.Run(s, s.addr, gnet.WithOptions(s.options)); err != nil {
-		nlog.Fatal(s.ctx, "Start Server Error", nlog.Err(err))
+		nlog.Fatal("Start Server Error", nlog.Err(err))
 	}
 }
 
 // Stop 停止 Server
 func (s *Server) Stop() {
-	s.eng.Stop(s.ctx)
+	s.eng.Stop(context.Background())
 }
 
 // AddRouter 给当前 Server 添加路由
 func (s *Server) AddRouter(msgID uint16, router niface.IRouter) {
 	s.msgHandler.AddRouter(msgID, router)
-}
-
-// GetCtx 获取当前 Server 的 Context
-func (s *Server) GetCtx() (ctx context.Context) {
-	return s.ctx
 }
 
 // GetConnManager 获取当前 Server 的连接管理
@@ -184,7 +176,7 @@ func (s *Server) GetHeartBeat() (checker niface.IHeartBeatChecker) {
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnBoot", nlog.String("listening", s.addr), nlog.Reflect("ServerConf", s.serverConf), nlog.Reflect("options", s.options))
+	nlog.Info("Server OnBoot", nlog.String("listening", s.addr), nlog.Reflect("ServerConf", s.serverConf), nlog.Reflect("options", s.options))
 	s.eng = eng
 	// 启动 Worker 工作池
 	s.msgHandler.StartWorkerPool()
@@ -195,7 +187,7 @@ func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
 
 // OnClose 在连接关闭时触发。参数 err 是最后已知的连接错误。
 func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnClose", nlog.Int("connID", conn.Fd()), nlog.String("RemoteAddr", conn.RemoteAddr().String()), nlog.Int("Connections", s.GetConnections()))
+	nlog.Info("Server OnClose", nlog.Int("connID", conn.Fd()), nlog.String("RemoteAddr", conn.RemoteAddr().String()), nlog.Int("Connections", s.GetConnections()))
 	// 通过 ConnID 获取连接
 	iConn, _ := s.connMgr.GetConn(conn.Fd())
 	// 停止连接
@@ -207,7 +199,7 @@ func (s *Server) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
 
 // OnOpen 在新连接打开时触发。参数 out 是将要发送回对等方的返回值。
 func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
-	nlog.Info(s.ctx, "Server OnOpen", nlog.Int("connID", conn.Fd()), nlog.Int("Connections", s.GetConnections()))
+	nlog.Info("Server OnOpen", nlog.Int("connID", conn.Fd()), nlog.Int("Connections", s.GetConnections()))
 	// 服务器人数超载检测
 	if s.serverOverloadChecker != nil {
 		if s.serverOverloadChecker.Check(s, s.serverConf.MaxConn) {
@@ -228,7 +220,7 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 
 // OnShutdown 在引擎被关闭时触发，它在所有事件循环和连接关闭后立即调用。
 func (s *Server) OnShutdown(eng gnet.Engine) {
-	nlog.Info(s.ctx, "Server OnShutdown")
+	nlog.Info("Server OnShutdown")
 	// 停止 Worker 工作池
 	s.msgHandler.StopWorkerPool()
 }
@@ -247,10 +239,10 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 			break
 		}
 		if err != nil {
-			nlog.Error(s.ctx, "Server OnTraffic Unpack Error", nlog.Err(err))
+			nlog.Error("Server OnTraffic Unpack Error", nlog.Err(err))
 			return gnet.Close
 		}
-		nlog.Debug(s.ctx, "Server OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()))
+		nlog.Debug("Server OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()))
 		iConn, err := s.connMgr.GetConn(conn.Fd())
 		if err != nil {
 			return gnet.Close

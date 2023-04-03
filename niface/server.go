@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 17:49:25
+ * @LastEditTime: 2023-04-03 18:51:28
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/server.go
  * @Description:
  *
@@ -10,14 +10,11 @@
  */
 package niface
 
-import "context"
-
 // IServer 服务器接口
 type IServer interface {
 	Start()                                                 // 启动 Server
 	Stop()                                                  // 停止 Server
 	AddRouter(msgID uint16, router IRouter)                 // 给当前 Server 添加路由
-	GetCtx() (ctx context.Context)                          // 获取当前 Server 的 Context
 	GetConnManager() (connMgr IConnManager)                 // 获取当前 Server 的连接管理
 	GetConnections() (nums int)                             // 获取当前 Server 的活跃连接数
 	SetOnConnStart(f func(conn IConnection))                // 设置当前 Server 的连接创建时的 Hook 函数

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:01:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 20:40:40
+ * @LastEditTime: 2023-04-03 18:12:40
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -12,7 +12,6 @@ package nmsghandler
 
 import (
 	"bytes"
-	"context"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/olekukonko/tablewriter"
@@ -25,7 +24,6 @@ import (
 
 // MsgHandle 消息处理回调结构
 type MsgHandle struct {
-	ctx            context.Context           // 消息处理的 Context
 	apis           map[uint16]niface.IRouter // 存放每个 MsgID 所对应的处理方法
 	workerPool     *ants.Pool                // Worker 工作池
 	workerPoolSize int                       // Worker 池的最大 Worker 数量
@@ -34,7 +32,6 @@ type MsgHandle struct {
 // NewMsgHandle 创建消息处理
 func NewMsgHandle(workerPoolSize int) (handler *MsgHandle) {
 	return &MsgHandle{
-		ctx:            context.Background(),
 		apis:           make(map[uint16]niface.IRouter),
 		workerPoolSize: workerPoolSize,
 	}
@@ -55,7 +52,7 @@ func (mh *MsgHandle) HandleRequest(request niface.IRequest) {
 func (mh *MsgHandle) AddRouter(msgID uint16, router niface.IRouter) {
 	// 判断当前 msgID 绑定的 API 处理方法是否已经存在
 	if _, ok := mh.apis[msgID]; ok {
-		nlog.Fatal(mh.ctx, "AddRouter Repeated Api", nlog.Uint16("MsgID", msgID))
+		nlog.Fatal("AddRouter Repeated Api", nlog.Uint16("MsgID", msgID))
 	}
 	// 添加 msgID 与 API 的绑定关系
 	mh.apis[msgID] = router
@@ -108,10 +105,10 @@ func (mh *MsgHandle) StartWorkerPool() {
 	if mh.workerPool == nil && mh.workerPoolSize > 0 {
 		workerPool, err := ants.NewPool(mh.workerPoolSize)
 		if err != nil {
-			nlog.Fatal(mh.ctx, "StartWorkerPool Fatal", nlog.Err(err))
+			nlog.Fatal("StartWorkerPool Fatal", nlog.Err(err))
 		}
 		mh.workerPool = workerPool
-		nlog.Info(mh.ctx, "StartWorkerPool Succeed", nlog.Int("WorkerPoolSize", mh.workerPoolSize))
+		nlog.Info("StartWorkerPool Succeed", nlog.Int("WorkerPoolSize", mh.workerPoolSize))
 	}
 }
 
@@ -119,7 +116,7 @@ func (mh *MsgHandle) StartWorkerPool() {
 func (mh *MsgHandle) StopWorkerPool() {
 	if mh.workerPool != nil {
 		mh.workerPool.Release()
-		nlog.Info(mh.ctx, "StopWorkerPool Succeed")
+		nlog.Info("StopWorkerPool Succeed")
 	}
 }
 
@@ -127,7 +124,7 @@ func (mh *MsgHandle) StopWorkerPool() {
 func (mh *MsgHandle) doRequest(request niface.IRequest) {
 	handler, ok := mh.apis[request.GetMsgID()]
 	if !ok {
-		nlog.Error(request.GetCtx(), "HandlerMsg Api Not Found", nlog.Uint16("MsgID", request.GetMsgID()))
+		nlog.Error("HandlerMsg Api Not Found", nlog.Uint16("MsgID", request.GetMsgID()))
 		return
 	}
 	// Request 请求绑定 Router

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 17:44:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 17:21:16
+ * @LastEditTime: 2023-04-03 18:07:33
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nheartbeat/heartbeat.go
  * @Description:
  *
@@ -11,7 +11,6 @@
 package nheartbeat
 
 import (
-	"context"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/npack"
@@ -21,7 +20,6 @@ import (
 
 // HeartbeatChecker 心跳检测器结构
 type HeartbeatChecker struct {
-	ctx              context.Context         // 心跳检测器的 Context
 	interval         time.Duration           // 心跳检测时间间隔
 	quitChan         chan bool               // 退出信号
 	makeMsg          niface.HeartBeatMsgFunc // 用户自定义的心跳检测消息处理方法
@@ -40,7 +38,7 @@ type HeartbeatDefaultRouter struct {
 
 // Handle 处理心跳消息
 func (hbr *HeartbeatDefaultRouter) Handle(request niface.IRequest) {
-	nlog.Debug(request.GetCtx(), "Receive Heartbeat", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("Data", request.GetData()))
+	nlog.Debug("Receive Heartbeat", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("Data", request.GetData()))
 	// 回复心跳消息
 	hbr.heartbeatChecker.replyHeartBeatMsg(request.GetConnection())
 }
@@ -48,7 +46,6 @@ func (hbr *HeartbeatDefaultRouter) Handle(request niface.IRequest) {
 // NewHeartbeatChecker 创建心跳检测器
 func NewHeartbeatChecker(interval time.Duration, initiate bool) (checker niface.IHeartBeatChecker) {
 	heartbeat := &HeartbeatChecker{
-		ctx:              context.Background(),
 		interval:         interval,
 		quitChan:         make(chan bool),
 		makeMsg:          makeMsgDefaultFunc,
@@ -103,7 +100,6 @@ func (hbc *HeartbeatChecker) BindConn(conn niface.IConnection) {
 // Clone 克隆心跳检测器
 func (hbc *HeartbeatChecker) Clone() (checker niface.IHeartBeatChecker) {
 	heartbeat := &HeartbeatChecker{
-		ctx:              context.Background(),
 		interval:         hbc.interval,
 		quitChan:         make(chan bool),
 		makeMsg:          hbc.makeMsg,
@@ -161,7 +157,7 @@ func (hbc *HeartbeatChecker) check() {
 func (hbc *HeartbeatChecker) sendHeartBeatMsg(conn niface.IConnection) {
 	if hbc.initiate {
 		if err := conn.SendMsg(hbc.msgID, hbc.makeMsg()); err != nil {
-			nlog.Error(hbc.ctx, "Send HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
+			nlog.Error("Send HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
 		}
 	}
 }
@@ -170,7 +166,7 @@ func (hbc *HeartbeatChecker) sendHeartBeatMsg(conn niface.IConnection) {
 func (hbc *HeartbeatChecker) replyHeartBeatMsg(conn niface.IConnection) {
 	if !hbc.initiate {
 		if err := conn.SendMsg(hbc.msgID, hbc.makeMsg()); err != nil {
-			nlog.Error(hbc.ctx, "Reply HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
+			nlog.Error("Reply HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
 		}
 	}
 }
