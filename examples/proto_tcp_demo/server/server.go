@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 19:56:38
+ * @LastEditTime: 2023-04-03 21:42:24
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/server.go
  * @Description:
  *
@@ -12,6 +12,7 @@ package main
 
 import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/heartbeat"
+	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/interceptor"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/serveroverload"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nserver"
@@ -33,6 +34,8 @@ func main() {
 	serveroverload.SetServerOverload(s)
 	// 设置当前 Server 的心跳检测器
 	heartbeat.SetHeartBeat(s, true)
+	// 添加自定义拦截器
+	s.AddInterceptor(&interceptor.Interceptor{})
 	go func() {
 		// 创建一个通道，用于接收信号
 		sc := make(chan os.Signal, 1)
