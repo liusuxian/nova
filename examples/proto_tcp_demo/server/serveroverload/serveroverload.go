@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-01 23:08:17
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 23:09:23
+ * @LastEditTime: 2023-04-03 19:56:23
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/serveroverload/serveroverload.go
  * @Description:
  *
@@ -23,7 +23,7 @@ func SetServerOverload(s niface.IServer) {
 		MakeMsg: func() []byte {
 			buf, err := proto.Marshal(&pb.ServerOverload{})
 			if err != nil {
-				nlog.Fatal(s.GetCtx(), "Marshal ServerOverload Msg Error", nlog.Err(err))
+				nlog.Fatal("Marshal ServerOverload Msg Error", nlog.Err(err))
 			}
 			return buf
 		},

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 23:18:34
+ * @LastEditTime: 2023-04-03 19:56:55
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/client.go
  * @Description:
  *
@@ -52,7 +52,7 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 	// 等待信号
 	sig := <-sc
-	nlog.Info(cancelCtx, "Client Interrupt Signal", nlog.String("Signal", sig.String()))
+	nlog.Info("Client Interrupt Signal", nlog.String("Signal", sig.String()))
 	// 取消任务
 	cancelFunc()
 	// 等待一段时间

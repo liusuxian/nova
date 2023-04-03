@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 22:59:35
+ * @LastEditTime: 2023-04-03 19:56:38
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/server.go
  * @Description:
  *
@@ -40,7 +40,7 @@ func main() {
 		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 		// 等待信号
 		sig := <-sc
-		nlog.Info(s.GetCtx(), "Server Interrupt Signal", nlog.String("Signal", sig.String()))
+		nlog.Info("Server Interrupt Signal", nlog.String("Signal", sig.String()))
 		// 停止服务器
 		s.Stop()
 	}()

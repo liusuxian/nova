@@ -38,7 +38,7 @@ func main() {
 		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
 		// 等待信号
 		sig := <-sc
-		nlog.Info(s.GetCtx(), "Server Interrupt Signal", nlog.String("Signal", sig.String()))
+		nlog.Info("Server Interrupt Signal", nlog.String("Signal", sig.String()))
 		// 停止服务器
 		s.Stop()
 	}()
