@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 15:51:27
+ * @LastEditTime: 2023-04-04 10:47:39
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -64,16 +64,22 @@ type nLogger struct {
 	logWriter map[int]zapcore.WriteSyncer // 日志输出对象
 }
 
+// 默认输出日志文件路径
 const (
-	// 默认输出日志文件路径
-	defaultPath = "logs"
-	// 日志类型
-	LOGTYPE_ALL   = 0 // 打印所有级别
-	LOGTYPE_INFO  = 1 // 打印 DEBUG、INFO、WARN 级别
-	LOGTYPE_ERROR = 2 // 打印 ERROR、DPANIC、PANIC、FATAL 级别
-	// 输出日志格式
-	FORMAT_LOGFMT = 0
-	FORMAT_JSON   = 1
+	defaultPath string = "logs"
+)
+
+// 日志类型
+const (
+	LOGTYPE_ALL   int = iota // 打印所有级别
+	LOGTYPE_INFO             // 打印 DEBUG、INFO、WARN 级别
+	LOGTYPE_ERROR            // 打印 ERROR、DPANIC、PANIC、FATAL 级别
+)
+
+// 输出日志格式
+const (
+	FORMAT_LOGFMT int = iota
+	FORMAT_JSON
 )
 
 // logger 实例

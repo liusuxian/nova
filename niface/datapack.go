@@ -14,7 +14,7 @@ import "github.com/panjf2000/gnet/v2"
 
 // IDataPack 包接口
 type IDataPack interface {
-	GetHeadLen() (headLen uint8)                     // 获取包头长度
+	GetHeadLen() (headLen int)                       // 获取包头长度
 	Pack(msg IMessage) (data []byte)                 // 封包
 	UnPack(conn gnet.Conn) (msg IMessage, err error) // 拆包
 }

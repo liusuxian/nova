@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 15:42:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-01 22:30:31
+ * @LastEditTime: 2023-04-04 10:43:14
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/pack.go
  * @Description:
  *
@@ -16,16 +16,11 @@ import (
 )
 
 const (
-	DefaultPacketMethod = 1 // 默认封包拆包方式
+	DefaultPacketMethod int = 1 // 默认封包拆包方式
 )
-
 const (
-	LittleEndian = 1 // 字节存储次序，小端
-	BigEndian    = 2 // 字节存储次序，大端
-)
-
-const (
-	DefaultMaxPacketSize = 4096 // 默认数据包的最大值
+	LittleEndian int = iota + 1 // 字节存储次序，小端
+	BigEndian                   // 字节存储次序，大端
 )
 
 // 自定义错误，不完整的包

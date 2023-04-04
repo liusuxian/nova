@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 10:49:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 21:33:55
+ * @LastEditTime: 2023-04-04 11:21:20
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -34,6 +34,9 @@ type Client struct {
 	msgHandler            niface.IMsgHandle             // 当前 Client 绑定的消息处理模块
 	onConnStart           func(conn niface.IConnection) // 当前 Client 的连接创建时的 Hook 函数
 	onConnStop            func(conn niface.IConnection) // 当前 Client 的连接断开时的 Hook 函数
+	packetMethod          int                           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容
+	endian                int                           // 字节存储次序，1: 小端 2: 大端
+	maxPacketSize         int                           // 数据包的最大值（单位:字节）
 	packet                niface.IDataPack              // 当前 Client 绑定的数据协议封包方式
 	serverOverloadChecker niface.IServerOverloadChecker // 服务器人数超载检测器
 	heartbeat             time.Duration                 // 心跳发送间隔时间
@@ -45,15 +48,19 @@ type Client struct {
 func NewClient(network, addr string, opts ...Option) (client niface.IClient) {
 	// 初始化 Client 属性
 	c := &Client{
-		network:    network,
-		addr:       addr,
-		msgHandler: nmsghandler.NewMsgHandle(0),
-		packet:     npack.NewPack(npack.DefaultPacketMethod, npack.LittleEndian, npack.DefaultMaxPacketSize),
+		network:       network,
+		addr:          addr,
+		msgHandler:    nmsghandler.NewMsgHandle(0),
+		packetMethod:  npack.DefaultPacketMethod,
+		endian:        npack.LittleEndian,
+		maxPacketSize: 4096,
 	}
 	// 处理服务选项
 	for _, opt := range opts {
 		opt(c)
 	}
+	// 处理数据协议封包方式
+	c.packet = npack.NewPack(c.packetMethod, c.endian, c.maxPacketSize)
 	// 创建 Client
 	cli, err := gnet.NewClient(c, gnet.WithOptions(c.options))
 	if err != nil {

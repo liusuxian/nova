@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:49:39
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 00:59:11
+ * @LastEditTime: 2023-04-04 10:51:19
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack.go
  * @Description:
  *
@@ -24,8 +24,8 @@ type defaultPack struct {
 }
 
 const (
-	msgIdSize   = 2 // 消息ID长度 uint16(2字节)
-	msgBodySize = 4 // 消息体长度 uint32(4字节)
+	msgIdSize   int = 2 // 消息ID长度 uint16(2字节)
+	msgBodySize int = 4 // 消息体长度 uint32(4字节)
 )
 
 // newDefaultPack 创建默认封包拆包实例
@@ -37,7 +37,7 @@ func newDefaultPack(endian, maxPacketSize int) (packet niface.IDataPack) {
 }
 
 // GetHeadLen 获取包头长度
-func (p *defaultPack) GetHeadLen() (headLen uint8) {
+func (p *defaultPack) GetHeadLen() (headLen int) {
 	return msgIdSize + msgBodySize
 }
 

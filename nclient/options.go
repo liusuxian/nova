@@ -24,17 +24,38 @@ func WithPacket(packet niface.IDataPack) (opt Option) {
 	}
 }
 
-// WithHeartbeat 设置心跳发送间隔时间
+// WithHeartbeat 设置心跳发送间隔时间（单位:毫秒，一定要小于 maxHeartbeat 配置）
 func WithHeartbeat(heartbeat time.Duration) (opt Option) {
 	return func(c *Client) {
 		c.heartbeat = heartbeat
 	}
 }
 
-// WithMaxHeartbeat 设置最长心跳检测间隔时间
+// WithMaxHeartbeat 设置最长心跳检测间隔时间（单位:毫秒，一定要大于 heartbeat 配置）
 func WithMaxHeartbeat(maxHeartbeat time.Duration) (opt Option) {
 	return func(c *Client) {
 		c.maxHeartbeat = maxHeartbeat
+	}
+}
+
+// WithPacketMethod 设置封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容
+func WithPacketMethod(packetMethod int) (opt Option) {
+	return func(c *Client) {
+		c.packetMethod = packetMethod
+	}
+}
+
+// WithEndian 设置字节存储次序，1: 小端 2: 大端
+func WithEndian(endian int) (opt Option) {
+	return func(c *Client) {
+		c.endian = endian
+	}
+}
+
+// WithMaxPacketSize 设置数据包的最大值（单位:字节）
+func WithMaxPacketSize(maxPacketSize int) (opt Option) {
+	return func(c *Client) {
+		c.maxPacketSize = maxPacketSize
 	}
 }
 
