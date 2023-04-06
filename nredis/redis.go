@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-04 12:04:41
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-06 19:26:34
+ * @LastEditTime: 2023-04-06 20:03:37
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nredis/redis.go
  * @Description:
  *
@@ -75,39 +75,38 @@ func NewClient(opt *Options) (client niface.IRedisClient) {
 }
 
 // Do 执行 redis 命令
-func (rc *RedisClient) Do(ctx context.Context, cmd *niface.RedisCmd) (result *niface.RedisResult) {
+func (rc *RedisClient) Do(ctx context.Context, cmd string, args ...any) (value any, err error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	// 处理 redis 命令参数
-	result = &niface.RedisResult{}
-	for k, v := range cmd.Args {
+	for k, v := range args {
 		reflectInfo := reflection.OriginTypeAndKind(v)
 		switch reflectInfo.OriginKind {
 		case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
 			// 忽略切片类型为 []byte 的情况
 			if _, ok := v.([]byte); !ok {
-				if cmd.Args[k], result.Err = json.Marshal(v); result.Err != nil {
+				if args[k], err = json.Marshal(v); err != nil {
 					return
 				}
 			}
 		}
 	}
 	// 执行 redis 命令
-	args := make([]any, 0, len(cmd.Args)+1)
-	args = append(args, cmd.Cmd)
-	args = append(args, cmd.Args...)
-	result.Val, result.Err = rc.redis.Do(ctx, args...).Result()
-	if result.Err == redis.Nil {
-		result.Err = nil
+	cmdArgs := make([]any, 0, len(args)+1)
+	cmdArgs = append(cmdArgs, cmd)
+	cmdArgs = append(cmdArgs, args...)
+	value, err = rc.redis.Do(ctx, cmdArgs...).Result()
+	if err == redis.Nil {
+		err = nil
 	}
 	return
 }
 
 // Pipeline 执行 redis 管道命令
-func (rc *RedisClient) Pipeline(ctx context.Context, cmds []*niface.RedisCmd) (results []*niface.RedisResult, err error) {
-	if len(cmds) == 0 {
-		err = errors.New("Pipeline Cmds Is Empty")
+func (rc *RedisClient) Pipeline(ctx context.Context, cmdArgsList ...[]any) (results []*niface.PipelineResult, err error) {
+	if len(cmdArgsList) == 0 {
+		err = errors.New("Pipeline CmdArgsList Is Empty")
 		return
 	}
 	if ctx == nil {
@@ -116,24 +115,23 @@ func (rc *RedisClient) Pipeline(ctx context.Context, cmds []*niface.RedisCmd) (r
 	// 执行 redis 管道命令
 	p := rc.redis.Pipeline()
 	// 处理redis命令参数
-	for _, cmd := range cmds {
-		for k, v := range cmd.Args {
-			reflectInfo := reflection.OriginTypeAndKind(v)
-			switch reflectInfo.OriginKind {
-			case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
-				// 忽略切片类型为 []byte 的情况
-				if _, ok := v.([]byte); !ok {
-					if cmd.Args[k], err = json.Marshal(v); err != nil {
-						return
+	for _, cmdArgs := range cmdArgsList {
+		for k, v := range cmdArgs {
+			if k > 0 {
+				reflectInfo := reflection.OriginTypeAndKind(v)
+				switch reflectInfo.OriginKind {
+				case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
+					// 忽略切片类型为 []byte 的情况
+					if _, ok := v.([]byte); !ok {
+						if cmdArgs[k], err = json.Marshal(v); err != nil {
+							return
+						}
 					}
 				}
 			}
 		}
 		// 执行 redis 命令
-		args := make([]any, 0, len(cmd.Args)+1)
-		args = append(args, cmd.Cmd)
-		args = append(args, cmd.Args...)
-		p.Do(ctx, args...)
+		p.Do(ctx, cmdArgs...)
 	}
 	var resList []redis.Cmder
 	resList, err = p.Exec(ctx)
@@ -144,9 +142,9 @@ func (rc *RedisClient) Pipeline(ctx context.Context, cmds []*niface.RedisCmd) (r
 		return
 	}
 	// 处理返回结果
-	results = make([]*niface.RedisResult, 0, len(resList))
+	results = make([]*niface.PipelineResult, 0, len(resList))
 	for _, v := range resList {
-		results = append(results, &niface.RedisResult{
+		results = append(results, &niface.PipelineResult{
 			Val: v.(*redis.Cmd).Val(),
 			Err: v.Err(),
 		})
