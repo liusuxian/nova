@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-07 15:55:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-07 16:16:21
+ * @LastEditTime: 2023-04-07 17:26:22
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nbinary/binary_le.go
  * @Description:
  *
@@ -14,6 +14,11 @@ import (
 	"encoding/binary"
 	"math"
 )
+
+// LeDecodeToInt64
+func LeDecodeToInt64(b []byte) int64 {
+	return int64(binary.LittleEndian.Uint64(LeFillUpSize(b, 8)))
+}
 
 // LeDecodeToUint64
 func LeDecodeToUint64(b []byte) (val uint64) {
