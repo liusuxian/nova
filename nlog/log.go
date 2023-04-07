@@ -268,7 +268,7 @@ func getWriter(logPath string, conf LogDetailConfig) (writeSyncer zapcore.WriteS
 func Write(p []byte, withoutLogType ...int) (err error) {
 	for index, writer := range logger.logWriter {
 		conf := logger.logConfig.Details[index]
-		if !nslice.ContainsInt(withoutLogType, conf.Type) {
+		if !nslice.IsContains(withoutLogType, conf.Type) {
 			if _, err = writer.Write(p); err != nil {
 				return
 			}
