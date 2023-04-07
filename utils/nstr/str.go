@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 12:17:05
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-02 02:53:41
+ * @LastEditTime: 2023-04-07 13:42:20
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nstr/str.go
  * @Description:
  *
@@ -52,7 +52,7 @@ func TrimAll(str string, characterMask ...string) (newStr string) {
 func Split(str, sep string) (list []string) {
 	str = TrimAll(str)
 	if str == "" {
-		return
+		return []string{}
 	}
 	list = strings.Split(str, sep)
 	return
