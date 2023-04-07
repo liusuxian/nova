@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-04 17:16:37
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-04 17:19:51
+ * @LastEditTime: 2023-04-07 14:20:16
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/internal/reflection/reflection.go
  * @Description:
  *
@@ -21,7 +21,7 @@ type OriginValueAndKindOutput struct {
 }
 
 // OriginValueAndKind 检索并返回原始的反射值和数据类型
-func OriginValueAndKind(value interface{}) (out OriginValueAndKindOutput) {
+func OriginValueAndKind(value any) (out OriginValueAndKindOutput) {
 	if v, ok := value.(reflect.Value); ok {
 		out.InputValue = v
 	} else {
@@ -46,7 +46,7 @@ type OriginTypeAndKindOutput struct {
 }
 
 // OriginTypeAndKind 检索并返回原始的反射类型和数据类型
-func OriginTypeAndKind(value interface{}) (out OriginTypeAndKindOutput) {
+func OriginTypeAndKind(value any) (out OriginTypeAndKindOutput) {
 	if value == nil {
 		return
 	}
