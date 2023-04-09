@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-07 12:48:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 21:57:20
+ * @LastEditTime: 2023-04-09 22:30:06
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv.go
  * @Description:
  *
@@ -56,24 +56,24 @@ func ToBytes(val any) (bs []byte) {
 		originValueAndKind := reflection.OriginValueAndKind(val)
 		switch originValueAndKind.OriginKind {
 		case reflect.Map:
-			bytes, err := json.Marshal(val)
+			byteList, err := json.Marshal(val)
 			if err != nil {
 				fmt.Printf("ToBytes Error: %+v\n", err)
 			}
-			return bytes
+			return byteList
 		case reflect.Array, reflect.Slice:
-			var ok = true
-			var bytes = make([]byte, originValueAndKind.OriginValue.Len())
-			for i := range bytes {
+			ok := true
+			byteList := make([]byte, originValueAndKind.OriginValue.Len())
+			for i := range byteList {
 				int32Value := ToInt32(originValueAndKind.OriginValue.Index(i).Interface())
 				if int32Value < 0 || int32Value > math.MaxUint8 {
 					ok = false
 					break
 				}
-				bytes[i] = byte(int32Value)
+				byteList[i] = byte(int32Value)
 			}
 			if ok {
-				return bytes
+				return byteList
 			}
 		}
 		return leEncode(val)
@@ -154,8 +154,8 @@ func ToString(val any) (cVal string) {
 			return f.Error()
 		}
 		// 反射检查
-		var rv = reflect.ValueOf(value)
-		var kind = rv.Kind()
+		rv := reflect.ValueOf(value)
+		kind := rv.Kind()
 		switch kind {
 		case reflect.Chan,
 			reflect.Map,

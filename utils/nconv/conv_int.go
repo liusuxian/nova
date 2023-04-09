@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-07 17:18:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 21:35:04
+ * @LastEditTime: 2023-04-09 22:30:47
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_int.go
  * @Description:
  *
@@ -101,8 +101,8 @@ func ToInt64(val any) (cVal int64) {
 		if f, ok := value.(iInt64); ok {
 			return f.Int64()
 		}
-		var s = ToString(value)
-		var isMinus = false
+		s := ToString(value)
+		isMinus := false
 		if len(s) > 0 {
 			if s[0] == '-' {
 				isMinus = true
