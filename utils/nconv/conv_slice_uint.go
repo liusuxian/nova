@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-09 23:19:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 23:54:56
+ * @LastEditTime: 2023-04-10 00:13:09
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_slice_uint.go
  * @Description:
  *
@@ -13,7 +13,7 @@ package nconv
 import (
 	"github.com/liusuxian/nova/internal/json"
 	"github.com/liusuxian/nova/internal/reflection"
-	"github.com/liusuxian/nova/utils/nstr"
+	"github.com/liusuxian/nova/internal/utils"
 	"reflect"
 	"strings"
 )
@@ -29,7 +29,7 @@ func ToUints(val any) (s []uint) {
 		if value == "" {
 			return []uint{}
 		}
-		if nstr.IsNumeric(value) {
+		if utils.IsNumeric(value) {
 			return []uint{ToUint(value)}
 		}
 	case []string:
@@ -155,7 +155,7 @@ func ToUint8s(val any) (s []uint8) {
 		if value == "" {
 			return []uint8{}
 		}
-		if nstr.IsNumeric(value) {
+		if utils.IsNumeric(value) {
 			return []uint8{ToUint8(value)}
 		}
 	case []string:
@@ -281,7 +281,7 @@ func ToUint16s(val any) (s []uint16) {
 		if value == "" {
 			return []uint16{}
 		}
-		if nstr.IsNumeric(value) {
+		if utils.IsNumeric(value) {
 			return []uint16{ToUint16(value)}
 		}
 	case []string:
@@ -407,7 +407,7 @@ func ToUint32s(val any) (s []uint32) {
 		if value == "" {
 			return []uint32{}
 		}
-		if nstr.IsNumeric(value) {
+		if utils.IsNumeric(value) {
 			return []uint32{ToUint32(value)}
 		}
 	case []string:
@@ -533,7 +533,7 @@ func ToUint64s(val any) (s []uint64) {
 		if value == "" {
 			return []uint64{}
 		}
-		if nstr.IsNumeric(value) {
+		if utils.IsNumeric(value) {
 			return []uint64{ToUint64(value)}
 		}
 	case []string:

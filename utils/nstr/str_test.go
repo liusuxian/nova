@@ -37,15 +37,3 @@ func TestSplit(t *testing.T) {
 	assert.Equal([]string{}, nstr.Split(" ", "."))
 	assert.Equal([]string{}, nstr.Split("   ", "."))
 }
-
-func TestIsNumeric(t *testing.T) {
-	assert := assert.New(t)
-	assert.True(nstr.IsNumeric("-123456"))
-	assert.True(nstr.IsNumeric("123456"))
-	assert.True(nstr.IsNumeric("-123.456"))
-	assert.True(nstr.IsNumeric("123.456"))
-	assert.False(nstr.IsNumeric("-123.456.789"))
-	assert.False(nstr.IsNumeric("123.456.789"))
-	assert.False(nstr.IsNumeric("-123-456"))
-	assert.False(nstr.IsNumeric("123-456"))
-}
