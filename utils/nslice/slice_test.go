@@ -1,8 +1,8 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-03-27 22:47:22
+ * @Date: 2023-03-27 22:38:10
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-07 11:32:34
+ * @LastEditTime: 2023-04-10 00:21:01
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nslice/slice_test.go
  * @Description:
  *
@@ -16,7 +16,7 @@ import (
 	"testing"
 )
 
-func TestSlice(t *testing.T) {
+func TestIsContains(t *testing.T) {
 	assert := assert.New(t)
 	assert.False(nslice.IsContains([]int{}, 0))
 	assert.True(nslice.IsContains([]int{0, 1, 2}, 0))
