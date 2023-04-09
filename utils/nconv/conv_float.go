@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-07 16:09:39
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-07 17:10:22
+ * @LastEditTime: 2023-04-09 21:17:33
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_float.go
  * @Description:
  *
@@ -11,8 +11,9 @@
 package nconv
 
 import (
+	"encoding/binary"
 	"fmt"
-	"github.com/liusuxian/nova/utils/nbinary"
+	"math"
 	"strconv"
 )
 
@@ -27,7 +28,7 @@ func ToFloat32(val any) (cVal float32) {
 	case float64:
 		return float32(value)
 	case []byte:
-		return nbinary.DecodeToFloat32(value)
+		return math.Float32frombits(binary.LittleEndian.Uint32(leFillUpSize(value, 4)))
 	default:
 		if f, ok := value.(iFloat32); ok {
 			return f.Float32()
@@ -51,7 +52,7 @@ func ToFloat64(val any) (cVal float64) {
 	case float64:
 		return value
 	case []byte:
-		return nbinary.DecodeToFloat64(value)
+		return math.Float64frombits(binary.LittleEndian.Uint64(leFillUpSize(value, 8)))
 	default:
 		if f, ok := value.(iFloat64); ok {
 			return f.Float64()

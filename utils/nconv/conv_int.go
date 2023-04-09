@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-07 17:18:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-07 17:27:00
+ * @LastEditTime: 2023-04-09 21:19:48
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_int.go
  * @Description:
  *
@@ -11,7 +11,7 @@
 package nconv
 
 import (
-	"github.com/liusuxian/nova/utils/nbinary"
+	"encoding/binary"
 	"math"
 	"strconv"
 )
@@ -96,7 +96,7 @@ func ToInt64(val any) (cVal int64) {
 		}
 		return 0
 	case []byte:
-		return nbinary.DecodeToInt64(value)
+		return int64(binary.LittleEndian.Uint64(leFillUpSize(value, 8)))
 	default:
 		if f, ok := value.(iInt64); ok {
 			return f.Int64()
