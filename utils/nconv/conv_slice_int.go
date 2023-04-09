@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-09 22:47:12
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 23:06:38
+ * @LastEditTime: 2023-04-09 23:17:41
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_slice_int.go
  * @Description:
  *
@@ -137,6 +137,252 @@ func ToInts(val any) (s []int) {
 			return []int{}
 		}
 		return []int{ToInt(val)}
+	}
+}
+
+// ToInt8s
+func ToInt8s(val any) (s []int8) {
+	if val == nil {
+		return nil
+	}
+	switch value := val.(type) {
+	case []string:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []int:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []int8:
+		s = value
+	case []int16:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []int32:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []int64:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []uint:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []uint8:
+		if json.Valid(value) {
+			_ = json.UnmarshalUseNumber(value, &s)
+		} else {
+			s = make([]int8, len(value))
+			for k, v := range value {
+				s[k] = ToInt8(v)
+			}
+		}
+	case []uint16:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []uint32:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []uint64:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []bool:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			if v {
+				s[k] = 1
+			} else {
+				s[k] = 0
+			}
+		}
+	case []float32:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []float64:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case []any:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	case [][]byte:
+		s = make([]int8, len(value))
+		for k, v := range value {
+			s[k] = ToInt8(v)
+		}
+	}
+	if s != nil {
+		return
+	}
+	if v, ok := val.(iInts); ok {
+		return ToInt8s(v.Ints())
+	}
+	if v, ok := val.(iInterfaces); ok {
+		return ToInt8s(v.Interfaces())
+	}
+	// 检查给定的 val 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
+	if checkJsonAndUnmarshalUseNumber(val, &s) {
+		return
+	}
+	// 传入的参数不是常见的类型，则会使用反射进行转换
+	originValueAndKind := reflection.OriginValueAndKind(val)
+	switch originValueAndKind.OriginKind {
+	case reflect.Slice, reflect.Array:
+		length := originValueAndKind.OriginValue.Len()
+		s = make([]int8, length)
+		for i := 0; i < length; i++ {
+			s[i] = ToInt8(originValueAndKind.OriginValue.Index(i).Interface())
+		}
+		return
+	default:
+		if originValueAndKind.OriginValue.IsZero() {
+			return []int8{}
+		}
+		return []int8{ToInt8(val)}
+	}
+}
+
+// ToInt16s
+func ToInt16s(val any) (s []int16) {
+	if val == nil {
+		return nil
+	}
+	switch value := val.(type) {
+	case []string:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []int:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []int8:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []int16:
+		s = value
+	case []int32:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []int64:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []uint:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []uint8:
+		if json.Valid(value) {
+			_ = json.UnmarshalUseNumber(value, &s)
+		} else {
+			s = make([]int16, len(value))
+			for k, v := range value {
+				s[k] = ToInt16(v)
+			}
+		}
+	case []uint16:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []uint32:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []uint64:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []bool:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			if v {
+				s[k] = 1
+			} else {
+				s[k] = 0
+			}
+		}
+	case []float32:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []float64:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case []any:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	case [][]byte:
+		s = make([]int16, len(value))
+		for k, v := range value {
+			s[k] = ToInt16(v)
+		}
+	}
+	if s != nil {
+		return
+	}
+	if v, ok := val.(iInts); ok {
+		return ToInt16s(v.Ints())
+	}
+	if v, ok := val.(iInterfaces); ok {
+		return ToInt16s(v.Interfaces())
+	}
+	// 检查给定的 val 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
+	if checkJsonAndUnmarshalUseNumber(val, &s) {
+		return
+	}
+	// 传入的参数不是常见的类型，则会使用反射进行转换
+	originValueAndKind := reflection.OriginValueAndKind(val)
+	switch originValueAndKind.OriginKind {
+	case reflect.Slice, reflect.Array:
+		length := originValueAndKind.OriginValue.Len()
+		s = make([]int16, length)
+		for i := 0; i < length; i++ {
+			s[i] = ToInt16(originValueAndKind.OriginValue.Index(i).Interface())
+		}
+		return
+	default:
+		if originValueAndKind.OriginValue.IsZero() {
+			return []int16{}
+		}
+		return []int16{ToInt16(val)}
 	}
 }
 
