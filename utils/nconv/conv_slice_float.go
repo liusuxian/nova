@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-09 22:16:19
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 22:45:59
+ * @LastEditTime: 2023-04-09 23:01:53
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_slice_float.go
  * @Description:
  *
@@ -17,7 +17,7 @@ import (
 )
 
 // ToFloat32s
-func ToFloat32s(val any) (fs []float32) {
+func ToFloat32s(val any) (s []float32) {
 	if val == nil {
 		return nil
 	}
@@ -28,83 +28,83 @@ func ToFloat32s(val any) (fs []float32) {
 		}
 		return []float32{ToFloat32(value)}
 	case []string:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []int:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []int8:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []int16:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []int32:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []int64:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []uint:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []uint8:
 		if json.Valid(value) {
-			_ = json.UnmarshalUseNumber(value, &fs)
+			_ = json.UnmarshalUseNumber(value, &s)
 		} else {
-			fs = make([]float32, len(value))
+			s = make([]float32, len(value))
 			for k, v := range value {
-				fs[k] = ToFloat32(v)
+				s[k] = ToFloat32(v)
 			}
 		}
 	case []uint16:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []uint32:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []uint64:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []bool:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []float32:
-		fs = value
+		s = value
 	case []float64:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	case []any:
-		fs = make([]float32, len(value))
+		s = make([]float32, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat32(v)
+			s[k] = ToFloat32(v)
 		}
 	}
-	if fs != nil {
+	if s != nil {
 		return
 	}
 	if v, ok := val.(iFloats); ok {
@@ -114,7 +114,7 @@ func ToFloat32s(val any) (fs []float32) {
 		return ToFloat32s(v.Interfaces())
 	}
 	// 检查给定的 val 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
-	if checkJsonAndUnmarshalUseNumber(val, &fs) {
+	if checkJsonAndUnmarshalUseNumber(val, &s) {
 		return
 	}
 	// 传入的参数不是常见的类型，则会使用反射进行转换
@@ -122,9 +122,9 @@ func ToFloat32s(val any) (fs []float32) {
 	switch originValueAndKind.OriginKind {
 	case reflect.Slice, reflect.Array:
 		length := originValueAndKind.OriginValue.Len()
-		fs = make([]float32, length)
+		s = make([]float32, length)
 		for i := 0; i < length; i++ {
-			fs[i] = ToFloat32(originValueAndKind.OriginValue.Index(i).Interface())
+			s[i] = ToFloat32(originValueAndKind.OriginValue.Index(i).Interface())
 		}
 		return
 	default:
@@ -136,7 +136,7 @@ func ToFloat32s(val any) (fs []float32) {
 }
 
 // ToFloat64s
-func ToFloat64s(val any) (fs []float64) {
+func ToFloat64s(val any) (s []float64) {
 	if val == nil {
 		return nil
 	}
@@ -147,83 +147,83 @@ func ToFloat64s(val any) (fs []float64) {
 		}
 		return []float64{ToFloat64(value)}
 	case []string:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []int:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []int8:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []int16:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []int32:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []int64:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []uint:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []uint8:
 		if json.Valid(value) {
-			_ = json.UnmarshalUseNumber(value, &fs)
+			_ = json.UnmarshalUseNumber(value, &s)
 		} else {
-			fs = make([]float64, len(value))
+			s = make([]float64, len(value))
 			for k, v := range value {
-				fs[k] = ToFloat64(v)
+				s[k] = ToFloat64(v)
 			}
 		}
 	case []uint16:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []uint32:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []uint64:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []bool:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []float32:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	case []float64:
-		fs = value
+		s = value
 	case []any:
-		fs = make([]float64, len(value))
+		s = make([]float64, len(value))
 		for k, v := range value {
-			fs[k] = ToFloat64(v)
+			s[k] = ToFloat64(v)
 		}
 	}
-	if fs != nil {
+	if s != nil {
 		return
 	}
 	if v, ok := val.(iFloats); ok {
@@ -233,7 +233,7 @@ func ToFloat64s(val any) (fs []float64) {
 		return ToFloat64s(v.Interfaces())
 	}
 	// 检查给定的 val 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
-	if checkJsonAndUnmarshalUseNumber(val, &fs) {
+	if checkJsonAndUnmarshalUseNumber(val, &s) {
 		return
 	}
 	// 传入的参数不是常见的类型，则会使用反射进行转换
@@ -241,9 +241,9 @@ func ToFloat64s(val any) (fs []float64) {
 	switch originValueAndKind.OriginKind {
 	case reflect.Slice, reflect.Array:
 		length := originValueAndKind.OriginValue.Len()
-		fs = make([]float64, length)
+		s = make([]float64, length)
 		for i := 0; i < length; i++ {
-			fs[i] = ToFloat64(originValueAndKind.OriginValue.Index(i).Interface())
+			s[i] = ToFloat64(originValueAndKind.OriginValue.Index(i).Interface())
 		}
 		return
 	default:
