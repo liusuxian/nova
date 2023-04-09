@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-09 22:47:12
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 23:17:41
+ * @LastEditTime: 2023-04-09 23:20:10
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_slice_int.go
  * @Description:
  *
@@ -590,7 +590,7 @@ func ToInt64s(val any) (s []int64) {
 		for k, v := range value {
 			s[k] = ToInt64(v)
 		}
-	case []interface{}:
+	case []any:
 		s = make([]int64, len(value))
 		for k, v := range value {
 			s[k] = ToInt64(v)
