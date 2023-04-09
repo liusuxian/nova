@@ -120,7 +120,6 @@ func ToSlice(val any) (s []any) {
 		}
 		return
 	default:
-		s = []any{val}
-		return
+		return []any{val}
 	}
 }
