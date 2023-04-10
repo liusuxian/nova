@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 20:57:06
+ * @LastEditTime: 2023-04-10 21:26:26
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -12,6 +12,7 @@ package nconf
 
 import (
 	"github.com/fsnotify/fsnotify"
+	"github.com/liusuxian/nova/utils/nconv"
 	"github.com/liusuxian/nova/utils/nfile"
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
@@ -97,7 +98,7 @@ func (c *Config) GetDuration(key string) (val time.Duration) {
 
 // GetFloat32 获取 float32
 func (c *Config) GetFloat32(key string) (val float32) {
-	return cast.ToFloat32(c.v.Get(key))
+	return nconv.ToFloat32(c.v.Get(key))
 }
 
 // GetFloat64 获取 float64
@@ -112,12 +113,12 @@ func (c *Config) GetInt(key string) (val int) {
 
 // GetInt8 获取 int8
 func (c *Config) GetInt8(key string) (val int8) {
-	return cast.ToInt8(c.v.Get(key))
+	return nconv.ToInt8(c.v.Get(key))
 }
 
 // GetInt16 获取 int16
 func (c *Config) GetInt16(key string) (val int16) {
-	return cast.ToInt16(c.v.Get(key))
+	return nconv.ToInt16(c.v.Get(key))
 }
 
 // GetInt32 获取 int32
@@ -132,7 +133,7 @@ func (c *Config) GetInt64(key string) (val int64) {
 
 // GetAnySlice 获取 []any
 func (c *Config) GetAnySlice(key string) (vals []any) {
-	return cast.ToSlice(c.v.Get(key))
+	return nconv.ToSlice(c.v.Get(key))
 }
 
 // GetBoolSlice 获取 []bool
@@ -207,7 +208,7 @@ func (c *Config) GetUint(key string) (val uint) {
 
 // GetUint8 获取 uint8
 func (c *Config) GetUint8(key string) (val uint8) {
-	return cast.ToUint8(c.v.Get(key))
+	return nconv.ToUint8(c.v.Get(key))
 }
 
 // GetUint16 获取 uint16
@@ -337,7 +338,7 @@ func GetDuration(key string) (val time.Duration) {
 
 // GetFloat32 获取 float32
 func GetFloat32(key string) (val float32) {
-	return cast.ToFloat32(defaultConfig.v.Get(key))
+	return nconv.ToFloat32(defaultConfig.v.Get(key))
 }
 
 // GetFloat64 获取 float64
@@ -352,12 +353,12 @@ func GetInt(key string) (val int) {
 
 // GetInt8 获取 int8
 func GetInt8(key string) (val int8) {
-	return cast.ToInt8(defaultConfig.v.Get(key))
+	return nconv.ToInt8(defaultConfig.v.Get(key))
 }
 
 // GetInt16 获取 int16
 func GetInt16(key string) (val int16) {
-	return cast.ToInt16(defaultConfig.v.Get(key))
+	return nconv.ToInt16(defaultConfig.v.Get(key))
 }
 
 // GetInt32 获取 int32
@@ -372,7 +373,7 @@ func GetInt64(key string) (val int64) {
 
 // GetAnySlice 获取 []any
 func GetAnySlice(key string) (vals []any) {
-	return cast.ToSlice(defaultConfig.v.Get(key))
+	return nconv.ToSlice(defaultConfig.v.Get(key))
 }
 
 // GetBoolSlice 获取 []bool
@@ -447,7 +448,7 @@ func GetUint(key string) (val uint) {
 
 // GetUint8 获取 uint8
 func GetUint8(key string) (val uint8) {
-	return cast.ToUint8(defaultConfig.v.Get(key))
+	return nconv.ToUint8(defaultConfig.v.Get(key))
 }
 
 // GetUint16 获取 uint16
