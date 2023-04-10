@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-27 22:38:10
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 11:01:14
+ * @LastEditTime: 2023-04-10 13:55:08
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nslice/slice_test.go
  * @Description:
  *
@@ -42,15 +42,20 @@ func TestIsContains(t *testing.T) {
 	assert.False(nslice.IsContains([]string{"hello", "jack", "hello", "world", "tom", "hay", "tom"}, "hell"))
 	assert.True(nslice.IsContains([]string{"hello", "jack", "hello", "world", "tom", "hay", "tom"}, "hay"))
 
-	assert.False(nslice.IsContains([]string{"我", "是", "中", "国", "人"}, "hello"))
-	assert.False(nslice.IsContains([]string{"我", "是", "中", "国", "人"}, "哈"))
-	assert.True(nslice.IsContains([]string{"我", "是", "中", "国", "人"}, "中"))
+	assert.False(nslice.IsContains([]string{"hello", "我", "是", "中", "国", "人"}, "Hello"))
+	assert.False(nslice.IsContains([]string{"hello", "我", "是", "中", "国", "人"}, "哈"))
+	assert.True(nslice.IsContains([]string{"hello", "我", "是", "中", "国", "人"}, "中"))
 
-	assert.False(nslice.IsContains([]rune("我是中国人"), []rune("hello")[0]))
-	assert.False(nslice.IsContains([]rune("我是中国人"), []rune("哈罗")[0]))
-	assert.True(nslice.IsContains([]rune("我是中国人"), []rune("中国")[0]))
-	assert.True(nslice.IsContains([]rune("hello我是中国人"), []rune("hello")[0]))
+	assert.False(nslice.IsContains([]rune("hello我是中国人"), 'H'))
+	assert.False(nslice.IsContains([]rune("hello我是中国人"), '哈'))
+	assert.True(nslice.IsContains([]rune("hello我是中国人"), '中'))
+	assert.True(nslice.IsContains([]rune("hello我是中国人"), 'h'))
 
 	assert.False(nslice.IsContains([]byte{4, 3, 1, 5, 6, 9, 8, 2, 1, 7}, 0))
 	assert.True(nslice.IsContains([]byte{4, 3, 1, 5, 6, 9, 8, 2, 1, 7}, 2))
+
+	assert.False(nslice.IsContains([]byte("Hello World"), 'h'))
+	assert.False(nslice.IsContains([]byte("Hello World"), 'w'))
+	assert.True(nslice.IsContains([]byte("Hello World"), 'H'))
+	assert.True(nslice.IsContains([]byte("Hello World"), 'W'))
 }
