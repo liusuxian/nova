@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-10 15:15:07
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 20:07:14
+ * @LastEditTime: 2023-04-10 20:43:35
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_map.go
  * @Description:
  *
@@ -27,22 +27,16 @@ type doMapConvertInput struct {
 }
 
 // ToMap 将 any 转换为 map[string]any 类型
-//
-//	如果参数`value`不是`map/struct/*struct`类型，则转换失败并返回`nil`
 func ToMap(value any, tags ...string) (mVal map[string]any) {
 	return mapConvert(value, false, tags...)
 }
 
 // ToMapDeep 递归地对 value 进行 ToMap 函数操作
-//
-//	如果`value`的属性也是一个`struct/*struct`，它会对该属性调用`ToMap`函数，将其转换为`map[string]any`类型的变量
 func ToMapDeep(value any, tags ...string) (mVal map[string]any) {
 	return mapConvert(value, true, tags...)
 }
 
 // mapConvert 实现了 map 类型的转换
-//
-//	如果`value`是`string/[]byte`类型，它会自动检查并将其转换为`map`
 func mapConvert(value any, recursive bool, tags ...string) (mVal map[string]any) {
 	if value == nil {
 		return nil
@@ -204,7 +198,7 @@ func mapConvert(value any, recursive bool, tags ...string) (mVal map[string]any)
 
 // ToMapStrStr 将 value 转换为 map[string]string 类型
 //
-//	注意，在进行此`map`类型转换时可能会发生数据复制
+//	注意，这种`map`类型的转换可能会进行数据复制
 func ToMapStrStr(value any, tags ...string) (mVal map[string]string) {
 	if r, ok := value.(map[string]string); ok {
 		return r
