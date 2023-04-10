@@ -2,13 +2,28 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-09 23:59:28
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 00:11:05
+ * @LastEditTime: 2023-04-10 17:53:17
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/internal/utils/utils_str.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
 package utils
+
+// IsLetterUpper 检查给定的字节 b 是否为大写字母
+func IsLetterUpper(b byte) (isLetterUpper bool) {
+	return b >= byte('A') && b <= byte('Z')
+}
+
+// IsLetterUpper 检查给定的字节 b 是否为小写字母
+func IsLetterLower(b byte) (isLetterLower bool) {
+	return b >= byte('a') && b <= byte('z')
+}
+
+// IsLetter 检查给定的字节 b 是否是一个字母
+func IsLetter(b byte) (isLetter bool) {
+	return IsLetterUpper(b) || IsLetterLower(b)
+}
 
 // IsNumeric 检查给定字符串 s 是否为数字
 // 注意，类似于 "123.456" 的浮点数字符串也是数字
