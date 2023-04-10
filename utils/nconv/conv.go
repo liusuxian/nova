@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-07 12:48:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 15:43:40
+ * @LastEditTime: 2023-04-10 17:14:57
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv.go
  * @Description:
  *
@@ -23,13 +23,18 @@ import (
 	"time"
 )
 
-var emptyStringMap = map[string]struct{}{
-	"":      {},
-	"0":     {},
-	"no":    {},
-	"off":   {},
-	"false": {},
-}
+var (
+	// emptyStringMap 空字符串 map
+	emptyStringMap = map[string]struct{}{
+		"":      {},
+		"0":     {},
+		"no":    {},
+		"off":   {},
+		"false": {},
+	}
+	// StructTagPriority 定义 Map*/Struct* 函数的默认优先级标签
+	StructTagPriority = []string{"json"}
+)
 
 // ToByte 将 any 转换为 byte 类型
 func ToByte(val any) (b byte) {
