@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-22 12:17:05
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 00:10:58
+ * @LastEditTime: 2023-04-10 14:26:50
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nstr/str.go
  * @Description:
  *
@@ -32,7 +32,7 @@ func TrimAll(str string, characterMask ...string) (newStr string) {
 		trimChars += characterMask[0]
 	}
 	var filtered bool
-	var slice = make([]rune, 0, len(str))
+	var s = make([]rune, 0, len(str))
 	for _, char := range str {
 		filtered = false
 		for _, trimChar := range trimChars {
@@ -42,10 +42,10 @@ func TrimAll(str string, characterMask ...string) (newStr string) {
 			}
 		}
 		if !filtered {
-			slice = append(slice, char)
+			s = append(s, char)
 		}
 	}
-	return string(slice)
+	return string(s)
 }
 
 // Split 用 sep 将 str 拆分为 []string
