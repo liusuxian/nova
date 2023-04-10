@@ -17,7 +17,7 @@ import (
 	"strconv"
 )
 
-// ToFloat32
+// ToFloat32 将 any 转换为 float32 类型
 func ToFloat32(val any) (cVal float32) {
 	if val == nil {
 		return 0
@@ -41,7 +41,7 @@ func ToFloat32(val any) (cVal float32) {
 	}
 }
 
-// ToFloat64
+// ToFloat64 将 any 转换为 float64 类型
 func ToFloat64(val any) (cVal float64) {
 	if val == nil {
 		return 0

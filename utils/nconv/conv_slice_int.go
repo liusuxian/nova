@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-09 22:47:12
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 23:20:10
+ * @LastEditTime: 2023-04-10 15:41:11
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_slice_int.go
  * @Description:
  *
@@ -16,7 +16,7 @@ import (
 	"reflect"
 )
 
-// ToInts
+// ToInts 将 any 转换为 []int 类型
 func ToInts(val any) (s []int) {
 	if val == nil {
 		return nil
@@ -140,7 +140,7 @@ func ToInts(val any) (s []int) {
 	}
 }
 
-// ToInt8s
+// ToInt8s 将 any 转换为 []int8 类型
 func ToInt8s(val any) (s []int8) {
 	if val == nil {
 		return nil
@@ -263,7 +263,7 @@ func ToInt8s(val any) (s []int8) {
 	}
 }
 
-// ToInt16s
+// ToInt16s 将 any 转换为 []int16 类型
 func ToInt16s(val any) (s []int16) {
 	if val == nil {
 		return nil
@@ -386,7 +386,7 @@ func ToInt16s(val any) (s []int16) {
 	}
 }
 
-// ToInt32s
+// ToInt32s 将 any 转换为 []int32 类型
 func ToInt32s(val any) (s []int32) {
 	if val == nil {
 		return nil
@@ -509,7 +509,7 @@ func ToInt32s(val any) (s []int32) {
 	}
 }
 
-// ToInt64s
+// ToInt64s 将 any 转换为 []int64 类型
 func ToInt64s(val any) (s []int64) {
 	if val == nil {
 		return nil

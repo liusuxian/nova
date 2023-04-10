@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-07 17:18:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 22:30:47
+ * @LastEditTime: 2023-04-10 15:38:32
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_int.go
  * @Description:
  *
@@ -16,7 +16,7 @@ import (
 	"strconv"
 )
 
-// ToInt
+// ToInt 将 any 转换为 int 类型
 func ToInt(val any) (cVal int) {
 	if val == nil {
 		return 0
@@ -27,7 +27,7 @@ func ToInt(val any) (cVal int) {
 	return int(ToInt64(val))
 }
 
-// ToInt8
+// ToInt8 将 any 转换为 int8 类型
 func ToInt8(val any) (cVal int8) {
 	if val == nil {
 		return 0
@@ -38,7 +38,7 @@ func ToInt8(val any) (cVal int8) {
 	return int8(ToInt64(val))
 }
 
-// ToInt16
+// ToInt16 将 any 转换为 int16 类型
 func ToInt16(val any) (cVal int16) {
 	if val == nil {
 		return 0
@@ -49,7 +49,7 @@ func ToInt16(val any) (cVal int16) {
 	return int16(ToInt64(val))
 }
 
-// ToInt32
+// ToInt32 将 any 转换为 int32 类型
 func ToInt32(val any) (cVal int32) {
 	if val == nil {
 		return 0
@@ -60,7 +60,7 @@ func ToInt32(val any) (cVal int32) {
 	return int32(ToInt64(val))
 }
 
-// ToInt64
+// ToInt64 将 any 转换为 int64 类型
 func ToInt64(val any) (cVal int64) {
 	if val == nil {
 		return 0

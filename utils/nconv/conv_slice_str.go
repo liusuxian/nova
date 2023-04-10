@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-09 23:03:24
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 23:05:30
+ * @LastEditTime: 2023-04-10 15:41:54
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_slice_str.go
  * @Description:
  *
@@ -16,7 +16,7 @@ import (
 	"reflect"
 )
 
-// ToStrings
+// ToStrings 将 any 转换为 []string 类型
 func ToStrings(val any) (s []string) {
 	if val == nil {
 		return nil

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-06 21:19:37
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 21:58:43
+ * @LastEditTime: 2023-04-10 15:39:32
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_slice_any.go
  * @Description:
  *
@@ -16,7 +16,7 @@ import (
 	"reflect"
 )
 
-// ToSlice
+// ToSlice 将 any 转换为 []any 类型
 func ToSlice(val any) (s []any) {
 	if val == nil {
 		return

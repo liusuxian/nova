@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-09 22:16:19
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 23:01:53
+ * @LastEditTime: 2023-04-10 15:40:40
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_slice_float.go
  * @Description:
  *
@@ -16,7 +16,7 @@ import (
 	"reflect"
 )
 
-// ToFloat32s
+// ToFloat32s 将 any 转换为 []float32 类型
 func ToFloat32s(val any) (s []float32) {
 	if val == nil {
 		return nil
@@ -135,7 +135,7 @@ func ToFloat32s(val any) (s []float32) {
 	}
 }
 
-// ToFloat64s
+// ToFloat64s 将 any 转换为 []float64 类型
 func ToFloat64s(val any) (s []float64) {
 	if val == nil {
 		return nil

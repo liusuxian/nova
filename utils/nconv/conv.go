@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-07 12:48:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-09 22:30:06
+ * @LastEditTime: 2023-04-10 15:43:40
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv.go
  * @Description:
  *
@@ -31,7 +31,7 @@ var emptyStringMap = map[string]struct{}{
 	"false": {},
 }
 
-// ToByte
+// ToByte 将 any 转换为 byte 类型
 func ToByte(val any) (b byte) {
 	if v, ok := val.(byte); ok {
 		return v
@@ -39,7 +39,7 @@ func ToByte(val any) (b byte) {
 	return ToUint8(val)
 }
 
-// ToBytes
+// ToBytes 将 any 转换为 []byte 类型
 func ToBytes(val any) (bs []byte) {
 	if val == nil {
 		return nil
@@ -80,7 +80,7 @@ func ToBytes(val any) (bs []byte) {
 	}
 }
 
-// ToRune
+// ToRune 将 any 转换为 rune 类型
 func ToRune(val any) (cVal rune) {
 	if v, ok := val.(rune); ok {
 		return v
@@ -88,7 +88,7 @@ func ToRune(val any) (cVal rune) {
 	return ToInt32(val)
 }
 
-// ToRunes
+// ToRunes 将 any 转换为 []rune 类型
 func ToRunes(val any) (cVals []rune) {
 	if v, ok := val.([]rune); ok {
 		return v
@@ -96,7 +96,7 @@ func ToRunes(val any) (cVals []rune) {
 	return []rune(ToString(val))
 }
 
-// ToString
+// ToString 将 any 转换为 string 类型
 func ToString(val any) (cVal string) {
 	if val == nil {
 		return ""
@@ -182,7 +182,7 @@ func ToString(val any) (cVal string) {
 	}
 }
 
-// ToBool
+// ToBool 将 any 转换为 bool 类型
 func ToBool(val any) (cVal bool) {
 	if val == nil {
 		return false

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-09 23:19:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 00:13:09
+ * @LastEditTime: 2023-04-10 15:42:12
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_slice_uint.go
  * @Description:
  *
@@ -18,7 +18,7 @@ import (
 	"strings"
 )
 
-// ToUints
+// ToUints 将 any 转换为 []uint 类型
 func ToUints(val any) (s []uint) {
 	if val == nil {
 		return nil
@@ -144,7 +144,7 @@ func ToUints(val any) (s []uint) {
 	}
 }
 
-// ToUint8s
+// ToUint8s 将 any 转换为 []uint8 类型
 func ToUint8s(val any) (s []uint8) {
 	if val == nil {
 		return nil
@@ -270,7 +270,7 @@ func ToUint8s(val any) (s []uint8) {
 	}
 }
 
-// ToUint16s
+// ToUint16s 将 any 转换为 []uint16 类型
 func ToUint16s(val any) (s []uint16) {
 	if val == nil {
 		return nil
@@ -396,7 +396,7 @@ func ToUint16s(val any) (s []uint16) {
 	}
 }
 
-// ToUint32s
+// ToUint32s 将 any 转换为 []uint32 类型
 func ToUint32s(val any) (s []uint32) {
 	if val == nil {
 		return nil
@@ -522,7 +522,7 @@ func ToUint32s(val any) (s []uint32) {
 	}
 }
 
-// ToUint64s
+// ToUint64s 将 any 转换为 []uint64 类型
 func ToUint64s(val any) (s []uint64) {
 	if val == nil {
 		return nil
