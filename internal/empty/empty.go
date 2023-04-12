@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-10 18:03:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 18:19:58
+ * @LastEditTime: 2023-04-12 20:03:54
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/internal/empty/empty.go
  * @Description:
  *
@@ -123,24 +123,11 @@ func IsEmpty(value any) (isEmpty bool) {
 		switch rv.Kind() {
 		case reflect.Bool:
 			return !rv.Bool()
-		case
-			reflect.Int,
-			reflect.Int8,
-			reflect.Int16,
-			reflect.Int32,
-			reflect.Int64:
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			return rv.Int() == 0
-		case
-			reflect.Uint,
-			reflect.Uint8,
-			reflect.Uint16,
-			reflect.Uint32,
-			reflect.Uint64,
-			reflect.Uintptr:
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 			return rv.Uint() == 0
-		case
-			reflect.Float32,
-			reflect.Float64:
+		case reflect.Float32, reflect.Float64:
 			return rv.Float() == 0
 		case reflect.String:
 			return rv.Len() == 0
@@ -153,17 +140,9 @@ func IsEmpty(value any) (isEmpty bool) {
 				}
 			}
 			return true
-		case
-			reflect.Chan,
-			reflect.Map,
-			reflect.Slice,
-			reflect.Array:
+		case reflect.Chan, reflect.Map, reflect.Slice, reflect.Array:
 			return rv.Len() == 0
-		case
-			reflect.Func,
-			reflect.Ptr,
-			reflect.Interface,
-			reflect.UnsafePointer:
+		case reflect.Func, reflect.Ptr, reflect.Interface, reflect.UnsafePointer:
 			if rv.IsNil() {
 				return true
 			}
@@ -188,12 +167,7 @@ func IsNil(value any, traceSource ...bool) (isNil bool) {
 		rv = reflect.ValueOf(value)
 	}
 	switch rv.Kind() {
-	case reflect.Chan,
-		reflect.Map,
-		reflect.Slice,
-		reflect.Func,
-		reflect.Interface,
-		reflect.UnsafePointer:
+	case reflect.Chan, reflect.Map, reflect.Slice, reflect.Func, reflect.Interface, reflect.UnsafePointer:
 		return !rv.IsValid() || rv.IsNil()
 	case reflect.Ptr:
 		if len(traceSource) > 0 && traceSource[0] {
