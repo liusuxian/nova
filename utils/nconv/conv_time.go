@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-10 22:47:40
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-11 00:50:04
+ * @LastEditTime: 2023-04-12 18:31:14
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conv_time.go
  * @Description:
  *
@@ -205,5 +205,5 @@ func parseDateWith(s string, location *time.Location, formats []timeFormat) (d t
 			return
 		}
 	}
-	return d, errors.Errorf("Unable To Parse Date: %s", s)
+	return d, errors.Errorf("unable to parse date: %s", s)
 }

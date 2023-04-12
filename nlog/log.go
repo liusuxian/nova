@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 19:20:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-04 10:47:39
+ * @LastEditTime: 2023-04-12 18:28:10
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/log.go
  * @Description:
  *
@@ -91,11 +91,11 @@ func init() {
 	// 读取配置
 	var err error
 	if err = nconf.StructKey("logger", &logger.logConfig); err != nil {
-		panic(errors.Wrapf(err, "Get Logger Config Error"))
+		panic(errors.Wrapf(err, "get logger config error"))
 	}
 	// 初始化日志
 	if err = initLogger(logger.logConfig.Path, logger.logConfig.Details); err != nil {
-		panic(errors.Wrapf(err, "Init Logger Error"))
+		panic(errors.Wrapf(err, "init logger error"))
 	}
 }
 
@@ -103,14 +103,14 @@ func init() {
 func initLogger(logPath string, details []LogDetailConfig) (err error) {
 	detailsLen := len(details)
 	if detailsLen == 0 {
-		err = errors.Errorf("Logger Details Config Empty: %+v", details)
+		err = errors.Errorf("logger details config empty: %+v", details)
 		return
 	}
 	coreSlice := make([]zapcore.Core, 0, detailsLen)
 	for index, conf := range details {
 		// 日志打印级别
 		if conf.Level < 0 || conf.Level > 6 {
-			err = errors.Errorf("Logger Details Config `Level[%d]` Undefined", conf.Level)
+			err = errors.Errorf("logger details config `level[%d]` undefined", conf.Level)
 			return
 		}
 		level := zapcore.Level(conf.Level - 1)
@@ -129,7 +129,7 @@ func initLogger(logPath string, details []LogDetailConfig) (err error) {
 				return lvl >= zapcore.ErrorLevel && lvl >= level
 			})
 		default:
-			err = errors.Errorf("Logger Details Config `Type[%d]` Undefined", conf.Type)
+			err = errors.Errorf("logger details config `type[%d]` undefined", conf.Type)
 			return
 		}
 		// 获取日志输出方式
@@ -208,7 +208,7 @@ func getEncoder(conf LogDetailConfig) (encoder zapcore.Encoder, err error) {
 		encoder = zapcore.NewJSONEncoder(encoderConfig) // 以json格式写入
 		return
 	default:
-		err = errors.Errorf("Logger Details Config `Format[%d]` Undefined", conf.Format)
+		err = errors.Errorf("logger details config `format[%d]` undefined", conf.Format)
 		return
 	}
 }

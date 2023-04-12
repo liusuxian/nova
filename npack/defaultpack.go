@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:49:39
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-04 10:51:19
+ * @LastEditTime: 2023-04-12 18:29:18
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack.go
  * @Description:
  *
@@ -97,7 +97,7 @@ func (p *defaultPack) UnPack(conn gnet.Conn) (msg niface.IMessage, err error) {
 	// 读取并判断消息体长度是否超出我们允许的最大包长度
 	msgBodyLen := int(endianOrder.Uint32(buf[msgIdSize:bodyOffset]))
 	if p.maxPacketSize > 0 && msgBodyLen > p.maxPacketSize {
-		err = errors.New("Too Large Msg Data Received")
+		err = errors.New("too large msg data received")
 		return
 	}
 	// 读取整个消息数据

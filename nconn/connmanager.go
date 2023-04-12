@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:41:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 16:42:39
+ * @LastEditTime: 2023-04-12 18:27:15
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connmanager.go
  * @Description:
  *
@@ -50,7 +50,7 @@ func (cm *ConnManager) GetConn(connID int) (conn niface.IConnection, err error) 
 	if c, ok := cm.connMap.Get(key); ok {
 		return c, nil
 	}
-	return nil, errors.New("Connection Not Found")
+	return nil, errors.New("connection not found")
 }
 
 // GetAllConn 获取当前所有连接

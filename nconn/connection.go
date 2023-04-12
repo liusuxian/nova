@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:23:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 16:02:34
+ * @LastEditTime: 2023-04-12 18:26:28
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -150,7 +150,7 @@ func (c *Connection) LocalAddr() (addr net.Addr) {
 func (c *Connection) Send(data []byte, callback ...gnet.AsyncCallback) (err error) {
 	// 判断当前连接的关闭状态
 	if c.isClosed {
-		err = errors.New("Connection Closed When Send Data")
+		err = errors.New("connection closed when send data")
 		return
 	}
 	// 异步发送给客户端
@@ -166,7 +166,7 @@ func (c *Connection) Send(data []byte, callback ...gnet.AsyncCallback) (err erro
 func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCallback) (err error) {
 	// 判断当前连接的关闭状态
 	if c.isClosed {
-		err = errors.New("Connection Closed When Send Msg")
+		err = errors.New("connection closed when send msg")
 		return
 	}
 	// 封包
@@ -198,7 +198,7 @@ func (c *Connection) GetProperty(key string) (value any, err error) {
 
 	var ok bool
 	if value, ok = c.property[key]; !ok {
-		err = errors.New("Connection No Property Found")
+		err = errors.New("connection no property found")
 		return
 	}
 	return

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 21:26:26
+ * @LastEditTime: 2023-04-12 18:26:05
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -35,9 +35,9 @@ func NewConfig(path string) (cfg *Config, err error) {
 	// 加载配置文件内容
 	if err = v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			err = errors.Wrapf(err, "No Such Config File, Path: %s, ConfigType: %s", path, configType)
+			err = errors.Wrapf(err, "no such config file, path: %s, configType: %s", path, configType)
 		} else {
-			err = errors.Wrapf(err, "Read Config Error, Path: %s, ConfigType: %s", path, configType)
+			err = errors.Wrapf(err, "read config error, path: %s, configType: %s", path, configType)
 		}
 		return
 	}
@@ -53,9 +53,9 @@ func NewRemoteConfig(provider, endpoint, path, configType string) (cfg *Config, 
 	// 加载配置文件内容
 	if err = v.ReadRemoteConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			err = errors.Wrapf(err, "No Such Config File, Provider: %s, Endpoint: %s, Path: %s, Configtype: %s", provider, endpoint, path, configType)
+			err = errors.Wrapf(err, "no such config file, provider: %s, endpoint: %s, path: %s, configType: %s", provider, endpoint, path, configType)
 		} else {
-			err = errors.Wrapf(err, "Read Config Error, Provider: %s, Endpoint: %s, Path: %s, Configtype: %s", provider, endpoint, path, configType)
+			err = errors.Wrapf(err, "read config error, provider: %s, endpoint: %s, path: %s, configType: %s", provider, endpoint, path, configType)
 		}
 		return
 	}
@@ -71,9 +71,9 @@ func NewSecureRemoteConfig(provider, endpoint, path, secretkeyring, configType s
 	// 加载配置文件内容
 	if err = v.ReadRemoteConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			err = errors.Wrapf(err, "No Such Config File, Provider: %s, Endpoint: %s, Path: %s, Configtype: %s", provider, endpoint, path, configType)
+			err = errors.Wrapf(err, "no such config file, provider: %s, endpoint: %s, path: %s, configType: %s", provider, endpoint, path, configType)
 		} else {
-			err = errors.Wrapf(err, "Read Config Error, Provider: %s, Endpoint: %s, Path: %s, Configtype: %s", provider, endpoint, path, configType)
+			err = errors.Wrapf(err, "read config error, provider: %s, endpoint: %s, path: %s, configType: %s", provider, endpoint, path, configType)
 		}
 		return
 	}
@@ -292,7 +292,7 @@ func init() {
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 		} else {
-			panic(errors.Wrapf(err, "Read Default Config Error"))
+			panic(errors.Wrapf(err, "read default config error"))
 		}
 	}
 	defaultConfig = &Config{

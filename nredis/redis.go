@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-04 12:04:41
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-06 20:03:37
+ * @LastEditTime: 2023-04-12 18:30:12
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nredis/redis.go
  * @Description:
  *
@@ -106,7 +106,7 @@ func (rc *RedisClient) Do(ctx context.Context, cmd string, args ...any) (value a
 // Pipeline 执行 redis 管道命令
 func (rc *RedisClient) Pipeline(ctx context.Context, cmdArgsList ...[]any) (results []*niface.PipelineResult, err error) {
 	if len(cmdArgsList) == 0 {
-		err = errors.New("Pipeline CmdArgsList Is Empty")
+		err = errors.New("pipeline cmd args list is empty")
 		return
 	}
 	if ctx == nil {
