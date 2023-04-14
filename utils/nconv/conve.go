@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-14 17:23:53
+ * @LastEditTime: 2023-04-14 17:30:39
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve.go
  * @Description:
  *
@@ -111,9 +111,13 @@ func ToInt64E(i any) (iv int64, err error) {
 	case []byte:
 		return ToInt64E(string(val))
 	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
+		ipv, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
 		if err == nil {
-			return v, nil
+			return ipv, nil
+		}
+		ipf, err := strconv.ParseFloat(val, 64)
+		if err == nil {
+			return int64(ipf), nil
 		}
 		return 0, errors.Errorf("unable to convert %#v of type %T to int64", i, i)
 	case json.Number:
@@ -165,9 +169,13 @@ func ToInt32E(i any) (iv int32, err error) {
 	case []byte:
 		return ToInt32E(string(val))
 	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
+		ipv, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
 		if err == nil {
-			return int32(v), nil
+			return int32(ipv), nil
+		}
+		ipf, err := strconv.ParseFloat(val, 64)
+		if err == nil {
+			return int32(ipf), nil
 		}
 		return 0, errors.Errorf("unable to convert %#v of type %T to int32", i, i)
 	case json.Number:
@@ -219,9 +227,13 @@ func ToInt16E(i interface{}) (iv int16, err error) {
 	case []byte:
 		return ToInt16E(string(val))
 	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
+		ipv, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
 		if err == nil {
-			return int16(v), nil
+			return int16(ipv), nil
+		}
+		ipf, err := strconv.ParseFloat(val, 64)
+		if err == nil {
+			return int16(ipf), nil
 		}
 		return 0, errors.Errorf("unable to convert %#v of type %T to int16", i, i)
 	case json.Number:
@@ -273,9 +285,13 @@ func ToInt8E(i any) (iv int8, err error) {
 	case []byte:
 		return ToInt8E(string(val))
 	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
+		ipv, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
 		if err == nil {
-			return int8(v), nil
+			return int8(ipv), nil
+		}
+		ipf, err := strconv.ParseFloat(val, 64)
+		if err == nil {
+			return int8(ipf), nil
 		}
 		return 0, errors.Errorf("unable to convert %#v of type %T to int8", i, i)
 	case json.Number:

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-14 17:23:03
+ * @LastEditTime: 2023-04-14 17:41:11
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve_test.go
  * @Description:
  *
@@ -219,6 +219,16 @@ func TestToBoolE(t *testing.T) {
 	if assert.Error(err) {
 		assert.False(actualObj)
 	}
+	actualObj, err = nconv.ToBoolE(float64(1.23)) // float64
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.False(actualObj)
+	}
+	actualObj, err = nconv.ToBoolE(float32(1.56)) // float32
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.False(actualObj)
+	}
 }
 
 func TestToInt64E(t *testing.T) {
@@ -310,8 +320,8 @@ func TestToInt64E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt64E([]byte("1.23")) // []byte
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int64(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int64(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt64E([]byte("1.0")) // []byte
 	errLog(t, err)
@@ -320,18 +330,23 @@ func TestToInt64E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt64E([]byte("1.")) // []byte
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int64(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int64(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt64E([]byte("1")) // []byte
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int64(1), actualObj)
 	}
-	actualObj, err = nconv.ToInt64E("1.23") // string
+	actualObj, err = nconv.ToInt64E([]byte("a")) // []byte
 	errLog(t, err)
 	if assert.Error(err) {
 		assert.Equal(int64(0), actualObj)
+	}
+	actualObj, err = nconv.ToInt64E("1.23") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(int64(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt64E("1.0") // string
 	errLog(t, err)
@@ -340,13 +355,18 @@ func TestToInt64E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt64E("1.") // string
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int64(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int64(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt64E("1") // string
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int64(1), actualObj)
+	}
+	actualObj, err = nconv.ToInt64E("b") // string
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal(int64(0), actualObj)
 	}
 }
 
@@ -439,8 +459,8 @@ func TestToInt32E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt32E([]byte("1.23")) // []byte
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int32(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int32(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt32E([]byte("1.0")) // []byte
 	errLog(t, err)
@@ -449,18 +469,23 @@ func TestToInt32E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt32E([]byte("1.")) // []byte
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int32(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int32(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt32E([]byte("1")) // []byte
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int32(1), actualObj)
 	}
-	actualObj, err = nconv.ToInt32E("1.23") // string
+	actualObj, err = nconv.ToInt32E([]byte("a")) // []byte
 	errLog(t, err)
 	if assert.Error(err) {
 		assert.Equal(int32(0), actualObj)
+	}
+	actualObj, err = nconv.ToInt32E("1.23") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(int32(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt32E("1.0") // string
 	errLog(t, err)
@@ -469,13 +494,18 @@ func TestToInt32E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt32E("1.") // string
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int32(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int32(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt32E("1") // string
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int32(1), actualObj)
+	}
+	actualObj, err = nconv.ToInt32E("b") // string
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal(int32(0), actualObj)
 	}
 }
 
@@ -568,8 +598,8 @@ func TestToInt16E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt16E([]byte("1.23")) // []byte
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int16(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int16(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt16E([]byte("1.0")) // []byte
 	errLog(t, err)
@@ -578,18 +608,23 @@ func TestToInt16E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt16E([]byte("1.")) // []byte
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int16(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int16(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt16E([]byte("1")) // []byte
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int16(1), actualObj)
 	}
-	actualObj, err = nconv.ToInt16E("1.23") // string
+	actualObj, err = nconv.ToInt16E([]byte("a")) // []byte
 	errLog(t, err)
 	if assert.Error(err) {
 		assert.Equal(int16(0), actualObj)
+	}
+	actualObj, err = nconv.ToInt16E("1.23") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(int16(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt16E("1.0") // string
 	errLog(t, err)
@@ -598,13 +633,18 @@ func TestToInt16E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt16E("1.") // string
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int16(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int16(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt16E("1") // string
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int16(1), actualObj)
+	}
+	actualObj, err = nconv.ToInt16E("b") // string
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal(int16(0), actualObj)
 	}
 }
 
@@ -697,8 +737,8 @@ func TestToInt8E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt8E([]byte("1.23")) // []byte
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int8(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int8(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt8E([]byte("1.0")) // []byte
 	errLog(t, err)
@@ -707,18 +747,23 @@ func TestToInt8E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt8E([]byte("1.")) // []byte
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int8(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int8(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt8E([]byte("1")) // []byte
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int8(1), actualObj)
 	}
-	actualObj, err = nconv.ToInt8E("1.23") // string
+	actualObj, err = nconv.ToInt8E([]byte("a")) // []byte
 	errLog(t, err)
 	if assert.Error(err) {
 		assert.Equal(int8(0), actualObj)
+	}
+	actualObj, err = nconv.ToInt8E("1.23") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(int8(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt8E("1.0") // string
 	errLog(t, err)
@@ -727,13 +772,18 @@ func TestToInt8E(t *testing.T) {
 	}
 	actualObj, err = nconv.ToInt8E("1.") // string
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(int8(0), actualObj)
+	if assert.NoError(err) {
+		assert.Equal(int8(1), actualObj)
 	}
 	actualObj, err = nconv.ToInt8E("1") // string
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int8(1), actualObj)
+	}
+	actualObj, err = nconv.ToInt8E("b") // string
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal(int8(0), actualObj)
 	}
 }
 
