@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-15 00:01:41
+ * @LastEditTime: 2023-04-15 00:46:06
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve_test.go
  * @Description:
  *
@@ -11,9 +11,11 @@
 package nconv_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/liusuxian/nova/utils/nconv"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func errLog(t *testing.T, err error) {
@@ -1091,5 +1093,49 @@ func TestToUintE(t *testing.T) {
 	errLog(t, err)
 	if assert.Error(err) {
 		assert.Equal(uint(0), actualObj)
+	}
+}
+
+func TestToStringE(t *testing.T) {
+	assert := assert.New(t)
+	actualObj, err := nconv.ToStringE(nil) // nil
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal("", actualObj)
+	}
+	actualObj, err = nconv.ToStringE(int(1)) // int
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal("1", actualObj)
+	}
+	actualObj, err = nconv.ToStringE(float64(1.56)) // float64
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal("1.56", actualObj)
+	}
+	actualObj, err = nconv.ToStringE(true) // bool
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal("true", actualObj)
+	}
+	actualObj, err = nconv.ToStringE(false) // bool
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal("false", actualObj)
+	}
+	actualObj, err = nconv.ToStringE([]byte("1.23")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal("1.23", actualObj)
+	}
+	actualObj, err = nconv.ToStringE(time.Date(2023, 4, 15, 0, 0, 0, 0, time.UTC)) // time.Time
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal("2023-04-15 00:00:00 +0000 UTC", actualObj)
+	}
+	actualObj, err = nconv.ToStringE([]any{1, 1.2, "hello", true}) // []any
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal("[1,1.2,\"hello\",true]", actualObj)
 	}
 }
