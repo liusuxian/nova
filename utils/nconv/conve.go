@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-14 16:31:52
+ * @LastEditTime: 2023-04-14 16:41:04
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve.go
  * @Description:
  *
@@ -131,6 +131,64 @@ func ToInt64E(i any) (iv int64, err error) {
 		return ToInt64E(string(val))
 	default:
 		return 0, errors.Errorf("unable to convert %#v of type %T to int64", i, i)
+	}
+}
+
+// ToInt32E 将 any 转换为 int32 类型
+func ToInt32E(i any) (iv int32, err error) {
+	i = indirect(i)
+
+	intv, ok := toInt(i)
+	if ok {
+		return int32(intv), nil
+	}
+
+	switch val := i.(type) {
+	case nil:
+		return 0, nil
+	case int64:
+		return int32(val), nil
+	case int32:
+		return val, nil
+	case int16:
+		return int32(val), nil
+	case int8:
+		return int32(val), nil
+	case uint64:
+		return int32(val), nil
+	case uint32:
+		return int32(val), nil
+	case uint16:
+		return int32(val), nil
+	case uint8:
+		return int32(val), nil
+	case uint:
+		return int32(val), nil
+	case float64:
+		return int32(val), nil
+	case float32:
+		return int32(val), nil
+	case bool:
+		if val {
+			return 1, nil
+		}
+		return 0, nil
+	case []byte:
+		v, err := strconv.ParseInt(trimZeroDecimal(string(val)), 0, 0)
+		if err == nil {
+			return int32(v), nil
+		}
+		return 0, errors.Errorf("unable to convert %#v of type %T to int32", i, i)
+	case string:
+		v, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
+		if err == nil {
+			return int32(v), nil
+		}
+		return 0, errors.Errorf("unable to convert %#v of type %T to int32", i, i)
+	case json.Number:
+		return ToInt32E(string(val))
+	default:
+		return 0, errors.Errorf("unable to convert %#v of type %T to int32", i, i)
 	}
 }
 
