@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-14 16:50:33
+ * @LastEditTime: 2023-04-14 16:59:41
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve.go
  * @Description:
  *
@@ -48,14 +48,7 @@ func ToBoolE(i any) (bl bool, err error) {
 	case uint:
 		return val > 0, nil
 	case []byte:
-		if len(val) == 0 {
-			return false, nil
-		}
-		iv, err := strconv.ParseBool(string(val))
-		if err == nil {
-			return iv, nil
-		}
-		return false, errors.Errorf("unable to convert %#v of type %T to bool", i, i)
+		return ToBoolE(string(val))
 	case string:
 		if val == "" {
 			return false, nil
@@ -116,11 +109,7 @@ func ToInt64E(i any) (iv int64, err error) {
 		}
 		return 0, nil
 	case []byte:
-		v, err := strconv.ParseInt(trimZeroDecimal(string(val)), 0, 0)
-		if err == nil {
-			return v, nil
-		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to int64", i, i)
+		return ToInt64E(string(val))
 	case string:
 		v, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
 		if err == nil {
@@ -174,11 +163,7 @@ func ToInt32E(i any) (iv int32, err error) {
 		}
 		return 0, nil
 	case []byte:
-		v, err := strconv.ParseInt(trimZeroDecimal(string(val)), 0, 0)
-		if err == nil {
-			return int32(v), nil
-		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to int32", i, i)
+		return ToInt32E(string(val))
 	case string:
 		v, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
 		if err == nil {
@@ -232,11 +217,7 @@ func ToInt16E(i interface{}) (iv int16, err error) {
 		}
 		return 0, nil
 	case []byte:
-		v, err := strconv.ParseInt(trimZeroDecimal(string(val)), 0, 0)
-		if err == nil {
-			return int16(v), nil
-		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to int16", i, i)
+		return ToInt16E(string(val))
 	case string:
 		v, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
 		if err == nil {
