@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-14 23:27:43
+ * @LastEditTime: 2023-04-15 00:01:41
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve_test.go
  * @Description:
  *
@@ -39,66 +39,6 @@ func TestToBoolE(t *testing.T) {
 	if assert.NoError(err) {
 		assert.False(actualObj)
 	}
-	actualObj, err = nconv.ToBoolE(int64(0)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int64(-1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.True(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int32(0)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int32(-1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.True(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int16(0)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int16(-1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.True(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int8(0)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int8(-1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.True(actualObj)
-	}
 	actualObj, err = nconv.ToBoolE(byte('a')) // int8
 	errLog(t, err)
 	if assert.NoError(err) {
@@ -115,61 +55,6 @@ func TestToBoolE(t *testing.T) {
 		assert.False(actualObj)
 	}
 	actualObj, err = nconv.ToBoolE(1) // int
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.True(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(uint64(0)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.True(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(uint32(0)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.True(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(uint16(0)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.True(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(uint8(0)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.True(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(byte('A')) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.True(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(uint(0)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.False(actualObj)
-	}
-	actualObj, err = nconv.ToBoolE(uint(1)) // uint
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.True(actualObj)
@@ -224,10 +109,173 @@ func TestToBoolE(t *testing.T) {
 	if assert.Error(err) {
 		assert.False(actualObj)
 	}
-	actualObj, err = nconv.ToBoolE(float32(1.56)) // float32
+}
+
+func TestToFloat64E(t *testing.T) {
+	assert := assert.New(t)
+	actualObj, err := nconv.ToFloat64E(nil) // nil
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(0), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E(int(1)) // int
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E(float64(1.56)) // float64
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1.56), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E(true) // bool
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E(false) // bool
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(0), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E([]byte("1.23")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1.23), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E([]byte("1.0")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E([]byte("1.")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E([]byte("1")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E([]byte("a")) // []byte
 	errLog(t, err)
 	if assert.Error(err) {
-		assert.False(actualObj)
+		assert.Equal(float64(0), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E("1.23") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1.23), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E("1.0") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E("1.") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E("1") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E("-1") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float64(-1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat64E("b") // string
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal(float64(0), actualObj)
+	}
+}
+
+func TestToFloat32E(t *testing.T) {
+	assert := assert.New(t)
+	actualObj, err := nconv.ToFloat32E(nil) // nil
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(0), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E(int(1)) // int
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E(float64(1.56)) // float64
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1.56), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E(true) // bool
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E(false) // bool
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(0), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E([]byte("1.23")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1.23), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E([]byte("1.0")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E([]byte("1.")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E([]byte("1")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E([]byte("a")) // []byte
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal(float32(0), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E("1.23") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1.23), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E("1.0") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E("1.") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E("1") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E("-1") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(float32(-1), actualObj)
+	}
+	actualObj, err = nconv.ToFloat32E("b") // string
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal(float32(0), actualObj)
 	}
 }
 
@@ -238,72 +286,12 @@ func TestToInt64E(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(int64(0), actualObj)
 	}
-	actualObj, err = nconv.ToInt64E(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt64E(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt64E(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt64E(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
 	actualObj, err = nconv.ToInt64E(int(1)) // int
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int64(1), actualObj)
 	}
-	actualObj, err = nconv.ToInt64E(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt64E(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt64E(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt64E(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt64E(uint(1)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt64E(float64(1.23)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
 	actualObj, err = nconv.ToInt64E(float64(1.56)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt64E(float32(1.23)) // float32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int64(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt64E(float32(1.56)) // float32
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int64(1), actualObj)
@@ -377,72 +365,12 @@ func TestToInt32E(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(int32(0), actualObj)
 	}
-	actualObj, err = nconv.ToInt32E(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt32E(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt32E(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt32E(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
 	actualObj, err = nconv.ToInt32E(int(1)) // int
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int32(1), actualObj)
 	}
-	actualObj, err = nconv.ToInt32E(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt32E(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt32E(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt32E(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt32E(uint(1)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt32E(float64(1.23)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
 	actualObj, err = nconv.ToInt32E(float64(1.56)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt32E(float32(1.23)) // float32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int32(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt32E(float32(1.56)) // float32
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int32(1), actualObj)
@@ -516,72 +444,12 @@ func TestToInt16E(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(int16(0), actualObj)
 	}
-	actualObj, err = nconv.ToInt16E(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt16E(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt16E(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt16E(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
 	actualObj, err = nconv.ToInt16E(int(1)) // int
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int16(1), actualObj)
 	}
-	actualObj, err = nconv.ToInt16E(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt16E(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt16E(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt16E(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt16E(uint(1)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt16E(float64(1.23)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
 	actualObj, err = nconv.ToInt16E(float64(1.56)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt16E(float32(1.23)) // float32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int16(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt16E(float32(1.56)) // float32
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int16(1), actualObj)
@@ -655,72 +523,12 @@ func TestToInt8E(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(int8(0), actualObj)
 	}
-	actualObj, err = nconv.ToInt8E(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt8E(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt8E(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt8E(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
 	actualObj, err = nconv.ToInt8E(int(1)) // int
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int8(1), actualObj)
 	}
-	actualObj, err = nconv.ToInt8E(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt8E(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt8E(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt8E(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt8E(uint(1)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt8E(float64(1.23)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
 	actualObj, err = nconv.ToInt8E(float64(1.56)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt8E(float32(1.23)) // float32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int8(1), actualObj)
-	}
-	actualObj, err = nconv.ToInt8E(float32(1.56)) // float32
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int8(1), actualObj)
@@ -794,72 +602,12 @@ func TestToIntE(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(int(0), actualObj)
 	}
-	actualObj, err = nconv.ToIntE(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
-	actualObj, err = nconv.ToIntE(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
-	actualObj, err = nconv.ToIntE(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
-	actualObj, err = nconv.ToIntE(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
 	actualObj, err = nconv.ToIntE(int(1)) // int
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int(1), actualObj)
 	}
-	actualObj, err = nconv.ToIntE(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
-	actualObj, err = nconv.ToIntE(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
-	actualObj, err = nconv.ToIntE(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
-	actualObj, err = nconv.ToIntE(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
-	actualObj, err = nconv.ToIntE(uint(1)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
-	actualObj, err = nconv.ToIntE(float64(1.23)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
 	actualObj, err = nconv.ToIntE(float64(1.56)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
-	actualObj, err = nconv.ToIntE(float32(1.23)) // float32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(int(1), actualObj)
-	}
-	actualObj, err = nconv.ToIntE(float32(1.56)) // float32
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(int(1), actualObj)
@@ -933,77 +681,12 @@ func TestToUint64E(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(uint64(0), actualObj)
 	}
-	actualObj, err = nconv.ToUint64E(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(int64(-1)) // int64
-	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(uint64(0), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
 	actualObj, err = nconv.ToUint64E(int(1)) // int
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(uint64(1), actualObj)
 	}
-	actualObj, err = nconv.ToUint64E(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(uint(1)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(float64(1.23)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
 	actualObj, err = nconv.ToUint64E(float64(1.56)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(float32(1.23)) // float32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint64(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint64E(float32(1.56)) // float32
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(uint64(1), actualObj)
@@ -1082,77 +765,12 @@ func TestToUint32E(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(uint32(0), actualObj)
 	}
-	actualObj, err = nconv.ToUint32E(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(int64(-1)) // int64
-	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(uint32(0), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
 	actualObj, err = nconv.ToUint32E(int(1)) // int
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(uint32(1), actualObj)
 	}
-	actualObj, err = nconv.ToUint32E(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(uint(1)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(float64(1.23)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
 	actualObj, err = nconv.ToUint32E(float64(1.56)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(float32(1.23)) // float32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint32(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint32E(float32(1.56)) // float32
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(uint32(1), actualObj)
@@ -1231,77 +849,12 @@ func TestToUint16E(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(uint16(0), actualObj)
 	}
-	actualObj, err = nconv.ToUint16E(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(int64(-1)) // int64
-	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(uint16(0), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
 	actualObj, err = nconv.ToUint16E(int(1)) // int
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(uint16(1), actualObj)
 	}
-	actualObj, err = nconv.ToUint16E(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(uint(1)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(float64(1.23)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
 	actualObj, err = nconv.ToUint16E(float64(1.56)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(float32(1.23)) // float32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint16(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint16E(float32(1.56)) // float32
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(uint16(1), actualObj)
@@ -1380,77 +933,12 @@ func TestToUint8E(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(uint8(0), actualObj)
 	}
-	actualObj, err = nconv.ToUint8E(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(int64(-1)) // int64
-	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(uint8(0), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
 	actualObj, err = nconv.ToUint8E(int(1)) // int
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(uint8(1), actualObj)
 	}
-	actualObj, err = nconv.ToUint8E(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(uint(1)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(float64(1.23)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
 	actualObj, err = nconv.ToUint8E(float64(1.56)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(float32(1.23)) // float32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint8(1), actualObj)
-	}
-	actualObj, err = nconv.ToUint8E(float32(1.56)) // float32
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(uint8(1), actualObj)
@@ -1529,77 +1017,12 @@ func TestToUintE(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(uint(0), actualObj)
 	}
-	actualObj, err = nconv.ToUintE(int64(1)) // int64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(int64(-1)) // int64
-	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal(uint(0), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(int32(1)) // int32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(int16(1)) // int16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(int8(1)) // int8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
 	actualObj, err = nconv.ToUintE(int(1)) // int
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(uint(1), actualObj)
 	}
-	actualObj, err = nconv.ToUintE(uint64(1)) // uint64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(uint32(1)) // uint32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(uint16(1)) // uint16
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(uint8(1)) // uint8
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(uint(1)) // uint
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(float64(1.23)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
 	actualObj, err = nconv.ToUintE(float64(1.56)) // float64
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(float32(1.23)) // float32
-	errLog(t, err)
-	if assert.NoError(err) {
-		assert.Equal(uint(1), actualObj)
-	}
-	actualObj, err = nconv.ToUintE(float32(1.56)) // float32
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(uint(1), actualObj)
