@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-14 19:47:23
+ * @LastEditTime: 2023-04-14 23:23:50
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve.go
  * @Description:
  *
@@ -684,6 +684,88 @@ func ToUint8E(i any) (iv uint8, err error) {
 		return ToUint8E(string(val))
 	default:
 		return 0, convertError(i, "uint8")
+	}
+}
+
+// ToUintE 将 any 转换为 uint 类型
+func ToUintE(i any) (iv uint, err error) {
+	i = indirect(i)
+
+	intv, ok := toInt(i)
+	if ok {
+		if intv < 0 {
+			return 0, convertError(i, "uint")
+		}
+		return uint(intv), nil
+	}
+
+	switch val := i.(type) {
+	case nil:
+		return 0, nil
+	case int64:
+		if val < 0 {
+			return 0, convertError(i, "uint")
+		}
+		return uint(val), nil
+	case int32:
+		if val < 0 {
+			return 0, convertError(i, "uint")
+		}
+		return uint(val), nil
+	case int16:
+		if val < 0 {
+			return 0, convertError(i, "uint")
+		}
+		return uint(val), nil
+	case int8:
+		if val < 0 {
+			return 0, convertError(i, "uint")
+		}
+		return uint(val), nil
+	case uint64:
+		return uint(val), nil
+	case uint32:
+		return uint(val), nil
+	case uint16:
+		return uint(val), nil
+	case uint8:
+		return uint(val), nil
+	case uint:
+		return val, nil
+	case float32:
+		if val < 0 {
+			return 0, convertError(i, "uint")
+		}
+		return uint(val), nil
+	case float64:
+		if val < 0 {
+			return 0, convertError(i, "uint")
+		}
+		return uint(val), nil
+	case bool:
+		if val {
+			return 1, nil
+		}
+		return 0, nil
+	case []byte:
+		return ToUintE(string(val))
+	case string:
+		ipv, err := strconv.ParseUint(trimZeroDecimal(val), 0, 0)
+		if err == nil {
+			return uint(ipv), nil
+		}
+		ipf, err := strconv.ParseFloat(val, 64)
+		if err == nil {
+			if ipf < 0 {
+				return 0, convertError(i, "uint")
+			}
+			return uint(ipf), nil
+		}
+		return 0, convertError(i, "uint")
+	case json.Number:
+		return ToUintE(string(val))
+	default:
+		return 0, convertError(i, "uint")
 	}
 }
 
