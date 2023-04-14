@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-14 19:03:13
+ * @LastEditTime: 2023-04-14 19:47:23
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve.go
  * @Description:
  *
@@ -17,8 +17,6 @@ import (
 	"strconv"
 	"time"
 )
-
-var errNegativeNotAllowed = errors.New("unable to convert negative value")
 
 // ToBoolE 将 any 转换为 bool 类型
 func ToBoolE(i any) (bl bool, err error) {
@@ -59,15 +57,15 @@ func ToBoolE(i any) (bl bool, err error) {
 		if err == nil {
 			return iv, nil
 		}
-		return false, errors.Errorf("unable to convert %#v of type %T to bool", i, i)
+		return false, convertError(i, "bool")
 	case json.Number:
 		iv, err := ToInt64E(val)
 		if err == nil {
 			return iv > 0, nil
 		}
-		return false, errors.Errorf("unable to convert %#v of type %T to bool", i, i)
+		return false, convertError(i, "bool")
 	default:
-		return false, errors.Errorf("unable to convert %#v of type %T to bool", i, i)
+		return false, convertError(i, "bool")
 	}
 }
 
@@ -121,11 +119,11 @@ func ToInt64E(i any) (iv int64, err error) {
 		if err == nil {
 			return int64(ipf), nil
 		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to int64", i, i)
+		return 0, convertError(i, "int64")
 	case json.Number:
 		return ToInt64E(string(val))
 	default:
-		return 0, errors.Errorf("unable to convert %#v of type %T to int64", i, i)
+		return 0, convertError(i, "int64")
 	}
 }
 
@@ -179,11 +177,11 @@ func ToInt32E(i any) (iv int32, err error) {
 		if err == nil {
 			return int32(ipf), nil
 		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to int32", i, i)
+		return 0, convertError(i, "int32")
 	case json.Number:
 		return ToInt32E(string(val))
 	default:
-		return 0, errors.Errorf("unable to convert %#v of type %T to int32", i, i)
+		return 0, convertError(i, "int32")
 	}
 }
 
@@ -237,11 +235,11 @@ func ToInt16E(i interface{}) (iv int16, err error) {
 		if err == nil {
 			return int16(ipf), nil
 		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to int16", i, i)
+		return 0, convertError(i, "int16")
 	case json.Number:
 		return ToInt16E(string(val))
 	default:
-		return 0, errors.Errorf("unable to convert %#v of type %T to int16", i, i)
+		return 0, convertError(i, "int16")
 	}
 }
 
@@ -295,11 +293,11 @@ func ToInt8E(i any) (iv int8, err error) {
 		if err == nil {
 			return int8(ipf), nil
 		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to int8", i, i)
+		return 0, convertError(i, "int8")
 	case json.Number:
 		return ToInt8E(string(val))
 	default:
-		return 0, errors.Errorf("unable to convert %#v of type %T to int8", i, i)
+		return 0, convertError(i, "int8")
 	}
 }
 
@@ -353,11 +351,11 @@ func ToIntE(i interface{}) (iv int, err error) {
 		if err == nil {
 			return int(ipf), nil
 		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to int", i, i)
+		return 0, convertError(i, "int")
 	case json.Number:
 		return ToIntE(string(val))
 	default:
-		return 0, errors.Errorf("unable to convert %#v of type %T to int", i, i)
+		return 0, convertError(i, "int")
 	}
 }
 
@@ -368,7 +366,7 @@ func ToUint64E(i any) (iv uint64, err error) {
 	intv, ok := toInt(i)
 	if ok {
 		if intv < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint64")
 		}
 		return uint64(intv), nil
 	}
@@ -378,22 +376,22 @@ func ToUint64E(i any) (iv uint64, err error) {
 		return 0, nil
 	case int64:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint64")
 		}
 		return uint64(val), nil
 	case int32:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint64")
 		}
 		return uint64(val), nil
 	case int16:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint64")
 		}
 		return uint64(val), nil
 	case int8:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint64")
 		}
 		return uint64(val), nil
 	case uint64:
@@ -408,12 +406,12 @@ func ToUint64E(i any) (iv uint64, err error) {
 		return uint64(val), nil
 	case float32:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint64")
 		}
 		return uint64(val), nil
 	case float64:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint64")
 		}
 		return uint64(val), nil
 	case bool:
@@ -424,25 +422,22 @@ func ToUint64E(i any) (iv uint64, err error) {
 	case []byte:
 		return ToUint64E(string(val))
 	case string:
-		ipv, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
+		ipv, err := strconv.ParseUint(trimZeroDecimal(val), 0, 0)
 		if err == nil {
-			if ipv < 0 {
-				return 0, errNegativeNotAllowed
-			}
-			return uint64(ipv), nil
+			return ipv, nil
 		}
 		ipf, err := strconv.ParseFloat(val, 64)
 		if err == nil {
 			if ipf < 0 {
-				return 0, errNegativeNotAllowed
+				return 0, convertError(i, "uint64")
 			}
 			return uint64(ipf), nil
 		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to uint64", i, i)
+		return 0, convertError(i, "uint64")
 	case json.Number:
 		return ToUint64E(string(val))
 	default:
-		return 0, errors.Errorf("unable to convert %#v of type %T to uint64", i, i)
+		return 0, convertError(i, "uint64")
 	}
 }
 
@@ -453,7 +448,7 @@ func ToUint32E(i any) (iv uint32, err error) {
 	intv, ok := toInt(i)
 	if ok {
 		if intv < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint32")
 		}
 		return uint32(intv), nil
 	}
@@ -463,22 +458,22 @@ func ToUint32E(i any) (iv uint32, err error) {
 		return 0, nil
 	case int64:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint32")
 		}
 		return uint32(val), nil
 	case int32:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint32")
 		}
 		return uint32(val), nil
 	case int16:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint32")
 		}
 		return uint32(val), nil
 	case int8:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint32")
 		}
 		return uint32(val), nil
 	case uint64:
@@ -493,12 +488,12 @@ func ToUint32E(i any) (iv uint32, err error) {
 		return uint32(val), nil
 	case float32:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint32")
 		}
 		return uint32(val), nil
 	case float64:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint32")
 		}
 		return uint32(val), nil
 	case bool:
@@ -509,25 +504,22 @@ func ToUint32E(i any) (iv uint32, err error) {
 	case []byte:
 		return ToUint32E(string(val))
 	case string:
-		ipv, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
+		ipv, err := strconv.ParseUint(trimZeroDecimal(val), 0, 0)
 		if err == nil {
-			if ipv < 0 {
-				return 0, errNegativeNotAllowed
-			}
 			return uint32(ipv), nil
 		}
 		ipf, err := strconv.ParseFloat(val, 64)
 		if err == nil {
 			if ipf < 0 {
-				return 0, errNegativeNotAllowed
+				return 0, convertError(i, "uint32")
 			}
 			return uint32(ipf), nil
 		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to uint32", i, i)
+		return 0, convertError(i, "uint32")
 	case json.Number:
 		return ToUint32E(string(val))
 	default:
-		return 0, errors.Errorf("unable to convert %#v of type %T to uint32", i, i)
+		return 0, convertError(i, "uint32")
 	}
 }
 
@@ -538,7 +530,7 @@ func ToUint16E(i any) (iv uint16, err error) {
 	intv, ok := toInt(i)
 	if ok {
 		if intv < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint16")
 		}
 		return uint16(intv), nil
 	}
@@ -548,22 +540,22 @@ func ToUint16E(i any) (iv uint16, err error) {
 		return 0, nil
 	case int64:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint16")
 		}
 		return uint16(val), nil
 	case int32:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint16")
 		}
 		return uint16(val), nil
 	case int16:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint16")
 		}
 		return uint16(val), nil
 	case int8:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint16")
 		}
 		return uint16(val), nil
 	case uint64:
@@ -578,12 +570,12 @@ func ToUint16E(i any) (iv uint16, err error) {
 		return uint16(val), nil
 	case float32:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint16")
 		}
 		return uint16(val), nil
 	case float64:
 		if val < 0 {
-			return 0, errNegativeNotAllowed
+			return 0, convertError(i, "uint16")
 		}
 		return uint16(val), nil
 	case bool:
@@ -594,25 +586,104 @@ func ToUint16E(i any) (iv uint16, err error) {
 	case []byte:
 		return ToUint16E(string(val))
 	case string:
-		ipv, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
+		ipv, err := strconv.ParseUint(trimZeroDecimal(val), 0, 0)
 		if err == nil {
-			if ipv < 0 {
-				return 0, errNegativeNotAllowed
-			}
 			return uint16(ipv), nil
 		}
 		ipf, err := strconv.ParseFloat(val, 64)
 		if err == nil {
 			if ipf < 0 {
-				return 0, errNegativeNotAllowed
+				return 0, convertError(i, "uint16")
 			}
 			return uint16(ipf), nil
 		}
-		return 0, errors.Errorf("unable to convert %#v of type %T to uint16", i, i)
+		return 0, convertError(i, "uint16")
 	case json.Number:
 		return ToUint16E(string(val))
 	default:
-		return 0, errors.Errorf("unable to convert %#v of type %T to uint16", i, i)
+		return 0, convertError(i, "uint16")
+	}
+}
+
+// ToUint8E 将 any 转换为 uint8 类型
+func ToUint8E(i any) (iv uint8, err error) {
+	i = indirect(i)
+
+	intv, ok := toInt(i)
+	if ok {
+		if intv < 0 {
+			return 0, convertError(i, "uint8")
+		}
+		return uint8(intv), nil
+	}
+
+	switch val := i.(type) {
+	case nil:
+		return 0, nil
+	case int64:
+		if val < 0 {
+			return 0, convertError(i, "uint8")
+		}
+		return uint8(val), nil
+	case int32:
+		if val < 0 {
+			return 0, convertError(i, "uint8")
+		}
+		return uint8(val), nil
+	case int16:
+		if val < 0 {
+			return 0, convertError(i, "uint8")
+		}
+		return uint8(val), nil
+	case int8:
+		if val < 0 {
+			return 0, convertError(i, "uint8")
+		}
+		return uint8(val), nil
+	case uint64:
+		return uint8(val), nil
+	case uint32:
+		return uint8(val), nil
+	case uint16:
+		return uint8(val), nil
+	case uint8:
+		return val, nil
+	case uint:
+		return uint8(val), nil
+	case float32:
+		if val < 0 {
+			return 0, convertError(i, "uint8")
+		}
+		return uint8(val), nil
+	case float64:
+		if val < 0 {
+			return 0, convertError(i, "uint8")
+		}
+		return uint8(val), nil
+	case bool:
+		if val {
+			return 1, nil
+		}
+		return 0, nil
+	case []byte:
+		return ToUint8E(string(val))
+	case string:
+		ipv, err := strconv.ParseUint(trimZeroDecimal(val), 0, 0)
+		if err == nil {
+			return uint8(ipv), nil
+		}
+		ipf, err := strconv.ParseFloat(val, 64)
+		if err == nil {
+			if ipf < 0 {
+				return 0, convertError(i, "uint8")
+			}
+			return uint8(ipf), nil
+		}
+		return 0, convertError(i, "uint8")
+	case json.Number:
+		return ToUint8E(string(val))
+	default:
+		return 0, convertError(i, "uint8")
 	}
 }
 
@@ -662,4 +733,9 @@ func trimZeroDecimal(s string) (v string) {
 		}
 	}
 	return s
+}
+
+// convertError 转换错误
+func convertError(i any, typ string) (err error) {
+	return errors.Errorf("unable to convert %#v of type %T to %s", i, i, typ)
 }
