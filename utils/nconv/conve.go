@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-14 18:13:47
+ * @LastEditTime: 2023-04-14 18:21:58
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve.go
  * @Description:
  *
@@ -443,6 +443,91 @@ func ToUint64E(i any) (iv uint64, err error) {
 		return ToUint64E(string(val))
 	default:
 		return 0, errors.Errorf("unable to convert %#v of type %T to uint64", i, i)
+	}
+}
+
+// ToUint32E 将 any 转换为 uint32 类型
+func ToUint32E(i any) (iv uint32, err error) {
+	i = indirect(i)
+
+	intv, ok := toInt(i)
+	if ok {
+		if intv < 0 {
+			return 0, errNegativeNotAllowed
+		}
+		return uint32(intv), nil
+	}
+
+	switch val := i.(type) {
+	case nil:
+		return 0, nil
+	case int64:
+		if val < 0 {
+			return 0, errNegativeNotAllowed
+		}
+		return uint32(val), nil
+	case int32:
+		if val < 0 {
+			return 0, errNegativeNotAllowed
+		}
+		return uint32(val), nil
+	case int16:
+		if val < 0 {
+			return 0, errNegativeNotAllowed
+		}
+		return uint32(val), nil
+	case int8:
+		if val < 0 {
+			return 0, errNegativeNotAllowed
+		}
+		return uint32(val), nil
+	case uint64:
+		return uint32(val), nil
+	case uint32:
+		return val, nil
+	case uint16:
+		return uint32(val), nil
+	case uint8:
+		return uint32(val), nil
+	case uint:
+		return uint32(val), nil
+	case float32:
+		if val < 0 {
+			return 0, errNegativeNotAllowed
+		}
+		return uint32(val), nil
+	case float64:
+		if val < 0 {
+			return 0, errNegativeNotAllowed
+		}
+		return uint32(val), nil
+	case bool:
+		if val {
+			return 1, nil
+		}
+		return 0, nil
+	case []byte:
+		return ToUint32E(string(val))
+	case string:
+		ipv, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
+		if err == nil {
+			if ipv < 0 {
+				return 0, errNegativeNotAllowed
+			}
+			return uint32(ipv), nil
+		}
+		ipf, err := strconv.ParseFloat(val, 64)
+		if err == nil {
+			if ipf < 0 {
+				return 0, errNegativeNotAllowed
+			}
+			return uint32(ipf), nil
+		}
+		return 0, errors.Errorf("unable to convert %#v of type %T to uint32", i, i)
+	case json.Number:
+		return ToUint32E(string(val))
+	default:
+		return 0, errors.Errorf("unable to convert %#v of type %T to uint32", i, i)
 	}
 }
 
