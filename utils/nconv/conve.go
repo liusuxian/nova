@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-14 16:59:41
+ * @LastEditTime: 2023-04-14 17:02:51
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve.go
  * @Description:
  *
@@ -228,6 +228,60 @@ func ToInt16E(i interface{}) (iv int16, err error) {
 		return ToInt16E(string(val))
 	default:
 		return 0, errors.Errorf("unable to convert %#v of type %T to int16", i, i)
+	}
+}
+
+// ToInt8E 将 any 转换为 int8 类型
+func ToInt8E(i any) (iv int8, err error) {
+	i = indirect(i)
+
+	intv, ok := toInt(i)
+	if ok {
+		return int8(intv), nil
+	}
+
+	switch val := i.(type) {
+	case nil:
+		return 0, nil
+	case int64:
+		return int8(val), nil
+	case int32:
+		return int8(val), nil
+	case int16:
+		return int8(val), nil
+	case int8:
+		return val, nil
+	case uint64:
+		return int8(val), nil
+	case uint32:
+		return int8(val), nil
+	case uint16:
+		return int8(val), nil
+	case uint8:
+		return int8(val), nil
+	case uint:
+		return int8(val), nil
+	case float64:
+		return int8(val), nil
+	case float32:
+		return int8(val), nil
+	case bool:
+		if val {
+			return 1, nil
+		}
+		return 0, nil
+	case []byte:
+		return ToInt8E(string(val))
+	case string:
+		v, err := strconv.ParseInt(trimZeroDecimal(val), 0, 0)
+		if err == nil {
+			return int8(v), nil
+		}
+		return 0, errors.Errorf("unable to convert %#v of type %T to int8", i, i)
+	case json.Number:
+		return ToInt8E(string(val))
+	default:
+		return 0, errors.Errorf("unable to convert %#v of type %T to int8", i, i)
 	}
 }
 
