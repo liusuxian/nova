@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-15 00:39:15
+ * @LastEditTime: 2023-04-15 01:25:41
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve.go
  * @Description:
  *
@@ -11,8 +11,10 @@
 package nconv
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/liusuxian/nova/internal/reflection"
 	"github.com/pkg/errors"
 	"html/template"
 	"reflect"
@@ -950,6 +952,131 @@ func ToStringE(i any) (iv string, err error) {
 	}
 }
 
+// ToSliceE 将 any 转换为 []any 类型
+func ToSliceE(i any) (iv []any, err error) {
+	if i == nil {
+		return []any{}, convertError(i, "[]any")
+	}
+
+	switch val := i.(type) {
+	case []any:
+		return val, nil
+	case []int64:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []int32:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []int16:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []int8:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []int:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []uint64:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []uint32:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []uint16:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []uint8:
+		if json.Valid(val) {
+			if err := unmarshalUseNumber(val, &iv); err != nil {
+				return []any{}, convertError(i, "[]any")
+			}
+			return
+		}
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []uint:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []float64:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []float32:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []bool:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []string:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	case []map[string]any:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
+	default:
+		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
+		if checkJsonAndUnmarshalUseNumber(i, &iv) {
+			return
+		}
+		// 传入的参数不是常见的类型，则会使用反射进行转换
+		originValueAndKind := reflection.OriginValueAndKind(i)
+		originKind := originValueAndKind.OriginKind
+		if originKind == reflect.Slice || originKind == reflect.Array {
+			length := originValueAndKind.OriginValue.Len()
+			iv = make([]any, length)
+			for i := 0; i < length; i++ {
+				iv[i] = originValueAndKind.OriginValue.Index(i).Interface()
+			}
+			return
+		}
+		return []any{}, convertError(i, "[]any")
+	}
+}
+
 // indirect 对给定的值进行多次解引用以达到基本类型（或 nil）
 func indirect(i any) (iv any) {
 	if i == nil {
@@ -1012,6 +1139,38 @@ func trimZeroDecimal(s string) (v string) {
 		}
 	}
 	return s
+}
+
+// unmarshalUseNumber 使用 number 选项将 JSON 数据字节解码为目标接口
+func unmarshalUseNumber(data []byte, v any) (err error) {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.UseNumber()
+	if err = decoder.Decode(v); err != nil {
+		err = errors.Wrap(err, `json.UnmarshalUseNumber failed`)
+	}
+	return
+}
+
+// checkJsonAndUnmarshalUseNumber 检查给定的 i 是否为 JSON 格式的字符串值，并使用 unmarshalUseNumber 进行转换
+func checkJsonAndUnmarshalUseNumber(i, iv any) (isJson bool) {
+	switch val := i.(type) {
+	case []byte:
+		if json.Valid(val) {
+			if err := unmarshalUseNumber(val, &iv); err != nil {
+				return false
+			}
+			return true
+		}
+	case string:
+		anyBytes := []byte(val)
+		if json.Valid(anyBytes) {
+			if err := unmarshalUseNumber(anyBytes, &iv); err != nil {
+				return false
+			}
+			return true
+		}
+	}
+	return false
 }
 
 // convertError 转换错误
