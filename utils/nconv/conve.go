@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-15 01:25:41
+ * @LastEditTime: 2023-04-15 03:04:24
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve.go
  * @Description:
  *
@@ -1051,6 +1051,12 @@ func ToSliceE(i any) (iv []any, err error) {
 			iv[k] = v
 		}
 		return
+	case [][]byte:
+		iv = make([]any, len(val))
+		for k, v := range val {
+			iv[k] = v
+		}
+		return
 	case []map[string]any:
 		iv = make([]any, len(val))
 		for k, v := range val {
@@ -1062,7 +1068,7 @@ func ToSliceE(i any) (iv []any, err error) {
 		if checkJsonAndUnmarshalUseNumber(i, &iv) {
 			return
 		}
-		// 传入的参数不是常见的类型，则会使用反射进行转换
+		// 使用反射进行转换
 		originValueAndKind := reflection.OriginValueAndKind(i)
 		originKind := originValueAndKind.OriginKind
 		if originKind == reflect.Slice || originKind == reflect.Array {
@@ -1073,7 +1079,168 @@ func ToSliceE(i any) (iv []any, err error) {
 			}
 			return
 		}
+
 		return []any{}, convertError(i, "[]any")
+	}
+}
+
+// ToBoolSliceE  将 any 转换为 []bool 类型
+func ToBoolSliceE(i any) (iv []bool, err error) {
+	if i == nil {
+		return []bool{}, convertError(i, "[]bool")
+	}
+
+	switch val := i.(type) {
+	case []bool:
+		return val, nil
+	case []any:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []int64:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []int32:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []int16:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []int8:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []int:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []uint64:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []uint32:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []uint16:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []uint8:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []uint:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case []string:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	case [][]byte:
+		iv = make([]bool, len(val))
+		for k, v := range val {
+			bl, err := ToBoolE(v)
+			if err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv[k] = bl
+		}
+		return
+	default:
+		// 使用反射进行转换
+		originValueAndKind := reflection.OriginValueAndKind(i)
+		originKind := originValueAndKind.OriginKind
+		if originKind == reflect.Slice || originKind == reflect.Array {
+			length := originValueAndKind.OriginValue.Len()
+			iv = make([]bool, length)
+			for i := 0; i < length; i++ {
+				bl, err := ToBoolE(originValueAndKind.OriginValue.Index(i).Interface())
+				if err != nil {
+					return []bool{}, convertError(i, "[]bool")
+				}
+				iv[i] = bl
+			}
+			return
+		}
+
+		return []bool{}, convertError(i, "[]bool")
 	}
 }
 

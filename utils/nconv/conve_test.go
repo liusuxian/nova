@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-14 13:31:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-15 01:39:49
+ * @LastEditTime: 2023-04-15 03:19:10
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve_test.go
  * @Description:
  *
@@ -1168,5 +1168,24 @@ func TestToSliceE(t *testing.T) {
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal([]any{[]int{1, 2}, []int{3, 4}}, actualObj)
+	}
+}
+
+func TestToBoolSliceE(t *testing.T) {
+	assert := assert.New(t)
+	actualObj, err := nconv.ToBoolSliceE([]int{0, 1, 0}) // []int
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]bool{false, true, false}, actualObj)
+	}
+	actualObj, err = nconv.ToBoolSliceE([]string{"true", "false"}) // []string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]bool{true, false}, actualObj)
+	}
+	actualObj, err = nconv.ToBoolSliceE([][]byte{[]byte("1"), []byte("0")}) // [][]byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]bool{true, false}, actualObj)
 	}
 }
