@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:23:40
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 02:24:45
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve_slice_string.go
+ * @LastEditTime: 2023-04-16 03:25:37
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_string.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -11,10 +11,9 @@
 package nconv
 
 import (
+	"github.com/liusuxian/nova/internal/reflection"
 	"reflect"
 	"strings"
-
-	"github.com/liusuxian/nova/internal/reflection"
 )
 
 // ToStringSliceE 将 any 转换为 []string 类型

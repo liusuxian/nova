@@ -2,8 +2,8 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:18:08
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-15 13:18:12
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve_int.go
+ * @LastEditTime: 2023-04-16 03:21:28
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/int.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.

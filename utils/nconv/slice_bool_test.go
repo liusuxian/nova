@@ -1,9 +1,9 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-04-16 02:20:09
+ * @Date: 2023-04-16 02:21:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 02:21:35
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve_slice_bool_test.go
+ * @LastEditTime: 2023-04-16 03:24:05
+ * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_bool_test.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
