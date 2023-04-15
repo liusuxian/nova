@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:22:49
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-15 13:43:42
+ * @LastEditTime: 2023-04-16 01:50:36
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve_slice_test.go
  * @Description:
  *
@@ -41,6 +41,16 @@ func TestToSliceE(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal([]any{map[string]any{"a1": 1, "b1": 2}, map[string]any{"a2": 3, "b2": 4}}, actualObj)
 	}
+	actualObj, err = nconv.ToSliceE([]map[string]int{{"a1": 1, "b1": 2}, {"a2": 3, "b2": 4}}) // []map[string]int
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]any{map[string]int{"a1": 1, "b1": 2}, map[string]int{"a2": 3, "b2": 4}}, actualObj)
+	}
+	actualObj, err = nconv.ToSliceE([]map[string]bool{{"a1": true, "b1": false}, {"a2": true, "b2": false}}) // []map[string]bool
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]any{map[string]bool{"a1": true, "b1": false}, map[string]bool{"a2": true, "b2": false}}, actualObj)
+	}
 	actualObj, err = nconv.ToSliceE([][]int{{1, 2}, {3, 4}}) // [][]int
 	errLog(t, err)
 	if assert.NoError(err) {
@@ -64,5 +74,44 @@ func TestToBoolSliceE(t *testing.T) {
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal([]bool{true, false}, actualObj)
+	}
+	actualObj, err = nconv.ToBoolSliceE([]map[string]any{{"a1": 1, "b1": 2}, {"a2": 3, "b2": 4}}) // []map[string]any
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal([]bool{}, actualObj)
+	}
+}
+
+func TestToStringSliceE(t *testing.T) {
+	assert := assert.New(t)
+	actualObj, err := nconv.ToStringSliceE([]int{0, 1, 0}) // []int
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]string{"0", "1", "0"}, actualObj)
+	}
+	actualObj, err = nconv.ToStringSliceE([][]byte{[]byte("1"), []byte("0")}) // [][]byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]string{"1", "0"}, actualObj)
+	}
+	actualObj, err = nconv.ToStringSliceE([]map[string]any{{"a1": 1, "b1": 2}, {"a2": 3, "b2": 4}}) // []map[string]any
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]string{"{\"a1\":1,\"b1\":2}", "{\"a2\":3,\"b2\":4}"}, actualObj)
+	}
+	actualObj, err = nconv.ToStringSliceE([]map[string]int{{"a1": 1, "b1": 2}, {"a2": 3, "b2": 4}}) // []map[string]int
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]string{"{\"a1\":1,\"b1\":2}", "{\"a2\":3,\"b2\":4}"}, actualObj)
+	}
+	actualObj, err = nconv.ToStringSliceE([]map[string]bool{{"a1": true, "b1": false}, {"a2": true, "b2": false}}) // []map[string]bool
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]string{"{\"a1\":true,\"b1\":false}", "{\"a2\":true,\"b2\":false}"}, actualObj)
+	}
+	actualObj, err = nconv.ToStringSliceE([][]int{{1, 2}, {3, 4}}) // [][]int
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]string{"[1,2]", "[3,4]"}, actualObj)
 	}
 }
