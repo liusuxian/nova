@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:22:49
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 01:50:36
+ * @LastEditTime: 2023-04-16 02:10:15
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/conve_slice_test.go
  * @Description:
  *
@@ -113,5 +113,44 @@ func TestToStringSliceE(t *testing.T) {
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal([]string{"[1,2]", "[3,4]"}, actualObj)
+	}
+}
+
+func TestToIntSliceE(t *testing.T) {
+	assert := assert.New(t)
+	actualObj, err := nconv.ToIntSliceE([]any{1, 1.2, "1.56"}) // []any
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int{1, 1, 1}, actualObj)
+	}
+	actualObj, err = nconv.ToIntSliceE([][]byte{[]byte("1"), []byte("0")}) // [][]byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int{1, 0}, actualObj)
+	}
+	actualObj, err = nconv.ToIntSliceE([]string{"1.57", "2", "0.1"}) // []string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int{1, 2, 0}, actualObj)
+	}
+	actualObj, err = nconv.ToIntSliceE([]map[string]any{{"a1": 1, "b1": 2}, {"a2": 3, "b2": 4}}) // []map[string]any
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal([]int{}, actualObj)
+	}
+	actualObj, err = nconv.ToIntSliceE([]map[string]int{{"a1": 1, "b1": 2}, {"a2": 3, "b2": 4}}) // []map[string]int
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal([]int{}, actualObj)
+	}
+	actualObj, err = nconv.ToIntSliceE([]map[string]bool{{"a1": true, "b1": false}, {"a2": true, "b2": false}}) // []map[string]bool
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal([]int{}, actualObj)
+	}
+	actualObj, err = nconv.ToIntSliceE([][]int{{1, 2}, {3, 4}}) // [][]int
+	errLog(t, err)
+	if assert.Error(err) {
+		assert.Equal([]int{}, actualObj)
 	}
 }
