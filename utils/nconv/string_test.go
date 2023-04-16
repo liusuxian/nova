@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:42:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 03:26:47
+ * @LastEditTime: 2023-04-16 04:56:33
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/string_test.go
  * @Description:
  *
@@ -18,10 +18,10 @@ import (
 )
 
 type A struct {
-	A int
-	B float64
-	C string
-	D []any
+	A int     `json:"a" dc:"a"`
+	B float64 `json:"b" dc:"b"`
+	C string  `json:"c" dc:"c"`
+	D []any   `json:"d" dc:"d"`
 }
 
 func TestToStringE(t *testing.T) {
@@ -74,6 +74,6 @@ func TestToStringE(t *testing.T) {
 	actualObj, err = nconv.ToStringE(&A{A: 1, B: 1.2, C: "hello", D: []any{1, 1.2, "hello", true}}) // struct
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal("{\"A\":1,\"B\":1.2,\"C\":\"hello\",\"D\":[1,1.2,\"hello\",true]}", actualObj)
+		assert.Equal("{\"a\":1,\"b\":1.2,\"c\":\"hello\",\"d\":[1,1.2,\"hello\",true]}", actualObj)
 	}
 }

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:23:47
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 04:35:59
+ * @LastEditTime: 2023-04-16 16:51:15
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/struct.go
  * @Description:
  *
@@ -27,52 +27,22 @@ func ToStructE(input, output any, opts ...DecoderConfigOption) (err error) {
 	if output == nil {
 		return errors.New("object output cannot be nil")
 	}
-	switch val := input.(type) {
-	case []byte:
-		// 如果它是 JSON 字符串，自动反序列化它
-		if json.Valid(val) {
-			return json.Unmarshal(val, output)
-		}
-		return convertError(input, "struct")
-	case string:
-		// 如果它是 JSON 字符串，自动反序列化它
-		anyBytes := []byte(val)
-		if json.Valid(anyBytes) {
-			return json.Unmarshal(anyBytes, output)
-		}
-		return convertError(input, "struct")
-	default:
-		return decode(input, defaultDecoderConfig(output, opts...))
-	}
-}
 
-// ToStructExactE 将 any 转换为 struct 类型。如果目标结构体中不存在某个字段，则会报错
-func ToStructExactE(input, output any, opts ...DecoderConfigOption) (err error) {
-	if input == nil {
-		return nil
-	}
-	if output == nil {
-		return errors.New("object output cannot be nil")
-	}
 	switch val := input.(type) {
 	case []byte:
 		// 如果它是 JSON 字符串，自动反序列化它
 		if json.Valid(val) {
 			return json.Unmarshal(val, output)
 		}
-		return convertError(input, "struct")
 	case string:
 		// 如果它是 JSON 字符串，自动反序列化它
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			return json.Unmarshal(anyBytes, output)
 		}
-		return convertError(input, "struct")
-	default:
-		config := defaultDecoderConfig(output, opts...)
-		config.ErrorUnused = true
-		return decode(input, config)
 	}
+
+	return decode(input, defaultDecoderConfig(output, opts...))
 }
 
 // decode 解码
