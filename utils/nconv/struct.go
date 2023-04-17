@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:23:47
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 16:51:15
+ * @LastEditTime: 2023-04-18 00:52:24
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/struct.go
  * @Description:
  *
@@ -19,7 +19,7 @@ import (
 // DecoderConfigOption 解码配置选项
 type DecoderConfigOption func(*mapstructure.DecoderConfig)
 
-// ToStructE 将 any 转换为 struct 类型
+// ToStructE 将 any 转换为 struct/[]struct 类型
 func ToStructE(input, output any, opts ...DecoderConfigOption) (err error) {
 	if input == nil {
 		return nil
