@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:29:45
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 03:27:27
+ * @LastEditTime: 2023-04-18 00:40:53
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/utils.go
  * @Description:
  *
@@ -91,28 +91,6 @@ func unmarshalUseNumber(data []byte, v any) (err error) {
 		err = errors.Wrap(err, `json.UnmarshalUseNumber failed`)
 	}
 	return
-}
-
-// checkJsonAndUnmarshalUseNumber 检查给定的 i 是否为 JSON 格式的字符串值，并使用 unmarshalUseNumber 进行转换
-func checkJsonAndUnmarshalUseNumber(i, iv any) (isJson bool) {
-	switch val := i.(type) {
-	case []byte:
-		if json.Valid(val) {
-			if err := unmarshalUseNumber(val, &iv); err != nil {
-				return false
-			}
-			return true
-		}
-	case string:
-		anyBytes := []byte(val)
-		if json.Valid(anyBytes) {
-			if err := unmarshalUseNumber(anyBytes, &iv); err != nil {
-				return false
-			}
-			return true
-		}
-	}
-	return false
 }
 
 // convertError 转换错误

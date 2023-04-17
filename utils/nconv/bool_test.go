@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:34:47
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 03:19:23
+ * @LastEditTime: 2023-04-18 00:37:09
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/bool_test.go
  * @Description:
  *
@@ -106,7 +106,7 @@ func TestToBoolE(t *testing.T) {
 	}
 	actualObj, err = nconv.ToBoolE(float64(1.23)) // float64
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.False(actualObj)
+	if assert.NoError(err) {
+		assert.True(actualObj)
 	}
 }

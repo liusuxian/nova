@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:20:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 03:23:39
+ * @LastEditTime: 2023-04-18 00:17:10
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_bool.go
  * @Description:
  *
@@ -11,8 +11,10 @@
 package nconv
 
 import (
-	"github.com/liusuxian/nova/internal/reflection"
+	"encoding/json"
 	"reflect"
+
+	"github.com/liusuxian/nova/internal/reflection"
 )
 
 // ToBoolSliceE  将 any 转换为 []bool 类型
@@ -115,6 +117,22 @@ func ToBoolSliceE(i any) (iv []bool, err error) {
 		}
 		return
 	case []uint8:
+		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
+		if json.Valid(val) {
+			anyV := make([]any, len(val))
+			if err := unmarshalUseNumber(val, &anyV); err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv = make([]bool, len(anyV))
+			for k, v := range anyV {
+				bl, err := ToBoolE(v)
+				if err != nil {
+					return []bool{}, convertError(i, "[]bool")
+				}
+				iv[k] = bl
+			}
+			return
+		}
 		iv = make([]bool, len(val))
 		for k, v := range val {
 			bl, err := ToBoolE(v)
@@ -154,6 +172,25 @@ func ToBoolSliceE(i any) (iv []bool, err error) {
 			iv[k] = bl
 		}
 		return
+	case string:
+		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
+		anyBytes := []byte(val)
+		if json.Valid(anyBytes) {
+			anyV := make([]any, len(val))
+			if err := unmarshalUseNumber(anyBytes, &anyV); err != nil {
+				return []bool{}, convertError(i, "[]bool")
+			}
+			iv = make([]bool, len(anyV))
+			for k, v := range anyV {
+				bl, err := ToBoolE(v)
+				if err != nil {
+					return []bool{}, convertError(i, "[]bool")
+				}
+				iv[k] = bl
+			}
+			return
+		}
+		return []bool{}, convertError(i, "[]bool")
 	default:
 		// 使用反射进行转换
 		originValueAndKind := reflection.OriginValueAndKind(i)

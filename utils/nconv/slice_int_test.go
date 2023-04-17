@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:29:36
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 03:25:19
+ * @LastEditTime: 2023-04-18 00:34:38
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_int_test.go
  * @Description:
  *
@@ -53,6 +53,16 @@ func TestToInt64SliceE(t *testing.T) {
 	if assert.Error(err) {
 		assert.Equal([]int64{}, actualObj)
 	}
+	actualObj, err = nconv.ToInt64SliceE([]byte("[1, 2, true, \"0\", \"1.2\"]")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int64{1, 2, 1, 0, 1}, actualObj)
+	}
+	actualObj, err = nconv.ToInt64SliceE("[1, 2, true, \"0\", \"1.2\"]") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int64{1, 2, 1, 0, 1}, actualObj)
+	}
 }
 
 func TestToInt32SliceE(t *testing.T) {
@@ -91,6 +101,16 @@ func TestToInt32SliceE(t *testing.T) {
 	errLog(t, err)
 	if assert.Error(err) {
 		assert.Equal([]int32{}, actualObj)
+	}
+	actualObj, err = nconv.ToInt32SliceE([]byte("[1, 2, true, \"0\", \"1.2\"]")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int32{1, 2, 1, 0, 1}, actualObj)
+	}
+	actualObj, err = nconv.ToInt32SliceE("[1, 2, true, \"0\", \"1.2\"]") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int32{1, 2, 1, 0, 1}, actualObj)
 	}
 }
 
@@ -131,6 +151,16 @@ func TestToInt16SliceE(t *testing.T) {
 	if assert.Error(err) {
 		assert.Equal([]int16{}, actualObj)
 	}
+	actualObj, err = nconv.ToInt16SliceE([]byte("[1, 2, true, \"0\", \"1.2\"]")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int16{1, 2, 1, 0, 1}, actualObj)
+	}
+	actualObj, err = nconv.ToInt16SliceE("[1, 2, true, \"0\", \"1.2\"]") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int16{1, 2, 1, 0, 1}, actualObj)
+	}
 }
 
 func TestToInt8SliceE(t *testing.T) {
@@ -170,6 +200,16 @@ func TestToInt8SliceE(t *testing.T) {
 	if assert.Error(err) {
 		assert.Equal([]int8{}, actualObj)
 	}
+	actualObj, err = nconv.ToInt8SliceE([]byte("[1, 2, true, \"0\", \"1.2\"]")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int8{1, 2, 1, 0, 1}, actualObj)
+	}
+	actualObj, err = nconv.ToInt8SliceE("[1, 2, true, \"0\", \"1.2\"]") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int8{1, 2, 1, 0, 1}, actualObj)
+	}
 }
 
 func TestToIntSliceE(t *testing.T) {
@@ -208,5 +248,15 @@ func TestToIntSliceE(t *testing.T) {
 	errLog(t, err)
 	if assert.Error(err) {
 		assert.Equal([]int{}, actualObj)
+	}
+	actualObj, err = nconv.ToIntSliceE([]byte("[1, 2, true, \"0\", \"1.2\"]")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int{1, 2, 1, 0, 1}, actualObj)
+	}
+	actualObj, err = nconv.ToIntSliceE("[1, 2, true, \"0\", \"1.2\"]") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]int{1, 2, 1, 0, 1}, actualObj)
 	}
 }

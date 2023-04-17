@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:18:32
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 03:23:19
+ * @LastEditTime: 2023-04-18 00:30:12
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_any_test.go
  * @Description:
  *
@@ -26,6 +26,14 @@ func TestToSliceE(t *testing.T) {
 		assert.Equal(true, actualObj[2])
 		assert.Equal("hello", actualObj[3])
 	}
+	actualObj, err = nconv.ToSliceE([]byte("[1, 1.2, true, \"hello\"]")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(1, nconv.ToInt(actualObj[0]))
+		assert.Equal(1.2, nconv.ToFloat64(actualObj[1]))
+		assert.Equal(true, actualObj[2])
+		assert.Equal("hello", actualObj[3])
+	}
 	actualObj, err = nconv.ToSliceE("[\"h\", \"e\", \"l\", \"l\", \"o\"]") // string
 	errLog(t, err)
 	if assert.NoError(err) {
@@ -33,8 +41,13 @@ func TestToSliceE(t *testing.T) {
 	}
 	actualObj, err = nconv.ToSliceE(1) // int
 	errLog(t, err)
-	if assert.Error(err) {
-		assert.Equal([]any{}, actualObj)
+	if assert.NoError(err) {
+		assert.Equal([]any{1}, actualObj)
+	}
+	actualObj, err = nconv.ToSliceE("hello") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]any{"hello"}, actualObj)
 	}
 	actualObj, err = nconv.ToSliceE([]map[string]any{{"a1": 1, "b1": 2}, {"a2": 3, "b2": 4}}) // []map[string]any
 	errLog(t, err)

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:24:36
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-16 03:26:00
+ * @LastEditTime: 2023-04-18 00:16:19
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_string_test.go
  * @Description:
  *
@@ -47,5 +47,15 @@ func TestToStringSliceE(t *testing.T) {
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal([]string{"[1,2]", "[3,4]"}, actualObj)
+	}
+	actualObj, err = nconv.ToStringSliceE([]byte("[1, 1.2, true, \"hello\", \"world\"]")) // []byte
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]string{"1", "1.2", "true", "hello", "world"}, actualObj)
+	}
+	actualObj, err = nconv.ToStringSliceE("[1, 1.2, true, \"hello\", \"world\"]") // string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal([]string{"1", "1.2", "true", "hello", "world"}, actualObj)
 	}
 }
