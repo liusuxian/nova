@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:23:47
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 00:52:24
+ * @LastEditTime: 2023-04-18 13:25:05
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/struct.go
  * @Description:
  *
@@ -12,12 +12,8 @@ package nconv
 
 import (
 	"encoding/json"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
-
-// DecoderConfigOption 解码配置选项
-type DecoderConfigOption func(*mapstructure.DecoderConfig)
 
 // ToStructE 将 any 转换为 struct/[]struct 类型
 func ToStructE(input, output any, opts ...DecoderConfigOption) (err error) {
@@ -43,30 +39,4 @@ func ToStructE(input, output any, opts ...DecoderConfigOption) (err error) {
 	}
 
 	return decode(input, defaultDecoderConfig(output, opts...))
-}
-
-// decode 解码
-func decode(input any, config *mapstructure.DecoderConfig) (err error) {
-	decoder, err := mapstructure.NewDecoder(config)
-	if err != nil {
-		return err
-	}
-	return decoder.Decode(input)
-}
-
-// defaultDecoderConfig 默认的解码配置
-func defaultDecoderConfig(output any, opts ...DecoderConfigOption) (config *mapstructure.DecoderConfig) {
-	c := &mapstructure.DecoderConfig{
-		Metadata:         nil,
-		Result:           output,
-		WeaklyTypedInput: true,
-		DecodeHook: mapstructure.ComposeDecodeHookFunc(
-			mapstructure.StringToTimeDurationHookFunc(),
-			mapstructure.StringToSliceHookFunc(","),
-		),
-	}
-	for _, opt := range opts {
-		opt(c)
-	}
-	return c
 }
