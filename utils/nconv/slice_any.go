@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:17:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 00:27:16
+ * @LastEditTime: 2023-04-18 14:23:21
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_any.go
  * @Description:
  *
@@ -76,7 +76,7 @@ func ToSliceE(i any) (iv []any, err error) {
 	case []uint8:
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
-			if err := unmarshalUseNumber(val, &iv); err != nil {
+			if err := json.Unmarshal(val, &iv); err != nil {
 				return []any{}, convertError(i, "[]any")
 			}
 			return
@@ -132,7 +132,7 @@ func ToSliceE(i any) (iv []any, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
-			if err := unmarshalUseNumber(anyBytes, &iv); err != nil {
+			if err := json.Unmarshal(anyBytes, &iv); err != nil {
 				return []any{}, convertError(i, "[]any")
 			}
 			return

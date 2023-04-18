@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:23:40
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 00:14:33
+ * @LastEditTime: 2023-04-18 14:25:47
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_string.go
  * @Description:
  *
@@ -120,7 +120,7 @@ func ToStringSliceE(i any) (iv []string, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(val, &anyV); err != nil {
+			if err := json.Unmarshal(val, &anyV); err != nil {
 				return []string{}, convertError(i, "[]string")
 			}
 			iv = make([]string, len(anyV))
@@ -197,7 +197,7 @@ func ToStringSliceE(i any) (iv []string, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(anyBytes, &anyV); err != nil {
+			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
 				return []string{}, convertError(i, "[]string")
 			}
 			iv = make([]string, len(anyV))

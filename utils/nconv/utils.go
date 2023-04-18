@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:29:45
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 00:40:53
+ * @LastEditTime: 2023-04-18 14:21:21
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/utils.go
  * @Description:
  *
@@ -11,8 +11,6 @@
 package nconv
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
 	"reflect"
@@ -81,16 +79,6 @@ func trimZeroDecimal(s string) (v string) {
 		}
 	}
 	return s
-}
-
-// unmarshalUseNumber 使用 number 选项将 JSON 数据字节解码为目标接口
-func unmarshalUseNumber(data []byte, v any) (err error) {
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.UseNumber()
-	if err = decoder.Decode(v); err != nil {
-		err = errors.Wrap(err, `json.UnmarshalUseNumber failed`)
-	}
-	return
 }
 
 // convertError 转换错误

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:18:32
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 00:30:12
+ * @LastEditTime: 2023-04-18 14:24:16
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_any_test.go
  * @Description:
  *
@@ -21,18 +21,12 @@ func TestToSliceE(t *testing.T) {
 	actualObj, err := nconv.ToSliceE("[1, 1.2, true, \"hello\"]") // string
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal(1, nconv.ToInt(actualObj[0]))
-		assert.Equal(1.2, nconv.ToFloat64(actualObj[1]))
-		assert.Equal(true, actualObj[2])
-		assert.Equal("hello", actualObj[3])
+		assert.Equal([]any{1.0, 1.2, true, "hello"}, actualObj)
 	}
 	actualObj, err = nconv.ToSliceE([]byte("[1, 1.2, true, \"hello\"]")) // []byte
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal(1, nconv.ToInt(actualObj[0]))
-		assert.Equal(1.2, nconv.ToFloat64(actualObj[1]))
-		assert.Equal(true, actualObj[2])
-		assert.Equal("hello", actualObj[3])
+		assert.Equal([]any{1.0, 1.2, true, "hello"}, actualObj)
 	}
 	actualObj, err = nconv.ToSliceE("[\"h\", \"e\", \"l\", \"l\", \"o\"]") // string
 	errLog(t, err)

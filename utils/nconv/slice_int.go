@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:26:46
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 00:24:31
+ * @LastEditTime: 2023-04-18 14:26:19
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_int.go
  * @Description:
  *
@@ -99,7 +99,7 @@ func ToInt64SliceE(i any) (iv []int64, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(val, &anyV); err != nil {
+			if err := json.Unmarshal(val, &anyV); err != nil {
 				return []int64{}, convertError(i, "[]int64")
 			}
 			iv = make([]int64, len(anyV))
@@ -196,7 +196,7 @@ func ToInt64SliceE(i any) (iv []int64, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(anyBytes, &anyV); err != nil {
+			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
 				return []int64{}, convertError(i, "[]int64")
 			}
 			iv = make([]int64, len(anyV))
@@ -314,7 +314,7 @@ func ToInt32SliceE(i any) (iv []int32, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(val, &anyV); err != nil {
+			if err := json.Unmarshal(val, &anyV); err != nil {
 				return []int32{}, convertError(i, "[]int32")
 			}
 			iv = make([]int32, len(anyV))
@@ -411,7 +411,7 @@ func ToInt32SliceE(i any) (iv []int32, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(anyBytes, &anyV); err != nil {
+			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
 				return []int32{}, convertError(i, "[]int32")
 			}
 			iv = make([]int32, len(anyV))
@@ -529,7 +529,7 @@ func ToInt16SliceE(i any) (iv []int16, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(val, &anyV); err != nil {
+			if err := json.Unmarshal(val, &anyV); err != nil {
 				return []int16{}, convertError(i, "[]int16")
 			}
 			iv = make([]int16, len(anyV))
@@ -626,7 +626,7 @@ func ToInt16SliceE(i any) (iv []int16, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(anyBytes, &anyV); err != nil {
+			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
 				return []int16{}, convertError(i, "[]int16")
 			}
 			iv = make([]int16, len(anyV))
@@ -744,7 +744,7 @@ func ToInt8SliceE(i any) (iv []int8, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(val, &anyV); err != nil {
+			if err := json.Unmarshal(val, &anyV); err != nil {
 				return []int8{}, convertError(i, "[]int8")
 			}
 			iv = make([]int8, len(anyV))
@@ -841,7 +841,7 @@ func ToInt8SliceE(i any) (iv []int8, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(anyBytes, &anyV); err != nil {
+			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
 				return []int8{}, convertError(i, "[]int8")
 			}
 			iv = make([]int8, len(anyV))
@@ -959,7 +959,7 @@ func ToIntSliceE(i any) (iv []int, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(val, &anyV); err != nil {
+			if err := json.Unmarshal(val, &anyV); err != nil {
 				return []int{}, convertError(i, "[]int")
 			}
 			iv = make([]int, len(anyV))
@@ -1056,7 +1056,7 @@ func ToIntSliceE(i any) (iv []int, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := unmarshalUseNumber(anyBytes, &anyV); err != nil {
+			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
 				return []int{}, convertError(i, "[]int")
 			}
 			iv = make([]int, len(anyV))
