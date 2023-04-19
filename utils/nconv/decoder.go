@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-18 13:07:45
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 18:26:26
+ * @LastEditTime: 2023-04-19 11:50:27
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/decoder.go
  * @Description:
  *
@@ -64,9 +64,13 @@ func decode(input any, config *mapstructure.DecoderConfig) (err error) {
 func defaultDecoderConfig(output any, opts ...DecoderConfigOption) (config *mapstructure.DecoderConfig) {
 	c := &mapstructure.DecoderConfig{
 		DecodeHook: mapstructure.ComposeDecodeHookFunc(
-			mapstructure.StringToTimeDurationHookFunc(),
-			mapstructure.StringToSliceHookFunc(","),
 			mapstructure.RecursiveStructToMapHookFunc(),
+			mapstructure.StringToIPHookFunc(),
+			mapstructure.StringToIPNetHookFunc(),
+			mapstructure.StringToSliceHookFunc(","),
+			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToTimeHookFunc("2006-01-02 15:04:05"),
+			mapstructure.TextUnmarshallerHookFunc(),
 		),
 		WeaklyTypedInput: true,
 		Metadata:         nil,

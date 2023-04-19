@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 03:16:46
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 14:29:36
+ * @LastEditTime: 2023-04-19 10:39:27
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/struct_test.go
  * @Description:
  *
@@ -13,15 +13,33 @@ package nconv_test
 import (
 	"github.com/liusuxian/nova/utils/nconv"
 	"github.com/stretchr/testify/assert"
+	"net"
 	"testing"
+	"time"
 )
 
 type B struct {
-	A int      `json:"a" dc:"a"`
-	B float64  `json:"b" dc:"b"`
-	C string   `json:"c" dc:"c"`
-	D []string `json:"d" dc:"d"`
-	E *B       `json:"e" dc:"e"`
+	A int
+	B float64
+	C string
+	D []string
+	E *B
+}
+
+type C struct {
+	Time1 time.Duration
+	Time2 time.Time
+}
+
+type D struct {
+	Time1 *time.Duration
+	Time2 *time.Time
+}
+
+type E struct {
+	IP    net.IP
+	IPNet net.IPNet
+	S     []any
 }
 
 func TestToStructE(t *testing.T) {
@@ -70,5 +88,33 @@ func TestToStructE(t *testing.T) {
 			{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}, E: &B{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}}},
 			{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}, E: &B{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}}},
 		}, val6)
+	}
+	val7 := &C{}
+	err = nconv.ToStructE(map[string]string{"Time1": "3s", "Time2": "2023-04-18 00:00:00"}, &val7) // map[string]string
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(&C{Time1: 3000000000, Time2: time.Date(2023, 4, 18, 0, 0, 0, 0, time.UTC)}, val7)
+	}
+	val8 := &D{}
+	err = nconv.ToStructE(map[string]string{"Time1": "3s", "Time2": "2023-04-18 00:00:00"}, &val8) // map[string]string
+	errLog(t, err)
+	if assert.NoError(err) {
+		time1 := time.Duration(3000000000)
+		time2 := time.Date(2023, 4, 18, 0, 0, 0, 0, time.UTC)
+		assert.Equal(&D{Time1: &time1, Time2: &time2}, val8)
+	}
+	val9 := &E{}
+	err = nconv.ToStructE(map[string]any{
+		"IP":    "127.0.0.1",
+		"IPNet": map[string]string{"IP": "127.0.0.1", "Mask": "255,255,255,0"},
+		"S":     "1,1.2,true,hello",
+	}, &val9) // map[string]any
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(&E{
+			IP:    net.IPv4(127, 0, 0, 1),
+			IPNet: net.IPNet{IP: net.IPv4(127, 0, 0, 1), Mask: net.IPv4Mask(255, 255, 255, 0)},
+			S:     []any{"1", "1.2", "true", "hello"},
+		}, val9)
 	}
 }
