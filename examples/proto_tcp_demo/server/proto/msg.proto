@@ -21,8 +21,9 @@ enum Mode {
 
 // 登录请求
 message LoginRequest {
-  uint32 mode = 1;     // 登录方式，1:游客 2:微信
-  string passport = 2; // 登录账号，仅支持游客登录方式
+  uint32 mode = 1;  // 登录方式，1:游客 2:微信
+  uint32 uid = 2;   // 玩家uid
+  string token = 3; // 登录凭证
 }
 
 // 登录响应
