@@ -13,20 +13,38 @@ message Heartbeat {
 }
 
 // 登录方式
-enum Mode {
+enum LoginMode {
   UNKNOWN_MODE = 0; // 未知登录方式
-  VISITOR = 1;      // 游客
-  WECHAT = 2;       // 微信
+  WECHAT = 1;       // 微信
+  VISITOR = 2;      // 游客
+}
+
+// 玩家性别
+enum UserSex {
+  UNKNOWN_SEX = 0; // 未知性别
+  MALE = 1;        // 男性
+  FEMALE = 2;      // 女性
+}
+
+// 玩家信息
+message UserInfo {
+  uint32 uid = 1;      // uid
+  string nickname = 2; // 昵称
+  uint32 sex = 3;      // 性别 0:未知 1:男性 2:女性
+  string avatar = 4;   // 头像
+  uint32 mobile = 5;   // 手机号
+  uint32 from_id = 6;  // 投放渠道ID
 }
 
 // 登录请求
 message LoginRequest {
-  uint32 mode = 1;  // 登录方式，1:游客 2:微信
+  uint32 mode = 1;  // 登录方式，1:微信 2:游客
   uint32 uid = 2;   // 玩家uid
   string token = 3; // 登录凭证
 }
 
 // 登录响应
 message LoginResponse {
-  uint32 code = 1; // 响应码，0:成功 >=1:错误码
+  uint32 code = 1;        // 响应码，0:成功 >=1:错误码
+  UserInfo user_info = 2; // 玩家信息
 }

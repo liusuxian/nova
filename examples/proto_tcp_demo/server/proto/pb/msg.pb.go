@@ -21,53 +21,103 @@ const (
 )
 
 // 登录方式
-type Mode int32
+type LoginMode int32
 
 const (
-	Mode_UNKNOWN_MODE Mode = 0 // 未知登录方式
-	Mode_VISITOR      Mode = 1 // 游客
-	Mode_WECHAT       Mode = 2 // 微信
+	LoginMode_UNKNOWN_MODE LoginMode = 0 // 未知登录方式
+	LoginMode_WECHAT       LoginMode = 1 // 微信
+	LoginMode_VISITOR      LoginMode = 2 // 游客
 )
 
-// Enum value maps for Mode.
+// Enum value maps for LoginMode.
 var (
-	Mode_name = map[int32]string{
+	LoginMode_name = map[int32]string{
 		0: "UNKNOWN_MODE",
-		1: "VISITOR",
-		2: "WECHAT",
+		1: "WECHAT",
+		2: "VISITOR",
 	}
-	Mode_value = map[string]int32{
+	LoginMode_value = map[string]int32{
 		"UNKNOWN_MODE": 0,
-		"VISITOR":      1,
-		"WECHAT":       2,
+		"WECHAT":       1,
+		"VISITOR":      2,
 	}
 )
 
-func (x Mode) Enum() *Mode {
-	p := new(Mode)
+func (x LoginMode) Enum() *LoginMode {
+	p := new(LoginMode)
 	*p = x
 	return p
 }
 
-func (x Mode) String() string {
+func (x LoginMode) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (Mode) Descriptor() protoreflect.EnumDescriptor {
+func (LoginMode) Descriptor() protoreflect.EnumDescriptor {
 	return file_msg_proto_enumTypes[0].Descriptor()
 }
 
-func (Mode) Type() protoreflect.EnumType {
+func (LoginMode) Type() protoreflect.EnumType {
 	return &file_msg_proto_enumTypes[0]
 }
 
-func (x Mode) Number() protoreflect.EnumNumber {
+func (x LoginMode) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Mode.Descriptor instead.
-func (Mode) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use LoginMode.Descriptor instead.
+func (LoginMode) EnumDescriptor() ([]byte, []int) {
 	return file_msg_proto_rawDescGZIP(), []int{0}
+}
+
+// 玩家性别
+type UserSex int32
+
+const (
+	UserSex_UNKNOWN_SEX UserSex = 0 // 未知性别
+	UserSex_MALE        UserSex = 1 // 男性
+	UserSex_FEMALE      UserSex = 2 // 女性
+)
+
+// Enum value maps for UserSex.
+var (
+	UserSex_name = map[int32]string{
+		0: "UNKNOWN_SEX",
+		1: "MALE",
+		2: "FEMALE",
+	}
+	UserSex_value = map[string]int32{
+		"UNKNOWN_SEX": 0,
+		"MALE":        1,
+		"FEMALE":      2,
+	}
+)
+
+func (x UserSex) Enum() *UserSex {
+	p := new(UserSex)
+	*p = x
+	return p
+}
+
+func (x UserSex) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (UserSex) Descriptor() protoreflect.EnumDescriptor {
+	return file_msg_proto_enumTypes[1].Descriptor()
+}
+
+func (UserSex) Type() protoreflect.EnumType {
+	return &file_msg_proto_enumTypes[1]
+}
+
+func (x UserSex) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use UserSex.Descriptor instead.
+func (UserSex) EnumDescriptor() ([]byte, []int) {
+	return file_msg_proto_rawDescGZIP(), []int{1}
 }
 
 // 服务器人数超载
@@ -157,13 +207,101 @@ func (x *Heartbeat) GetTimestamp() int64 {
 	return 0
 }
 
+// 玩家信息
+type UserInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Uid      uint32 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`                     // uid
+	Nickname string `protobuf:"bytes,2,opt,name=nickname,proto3" json:"nickname,omitempty"`            // 昵称
+	Sex      uint32 `protobuf:"varint,3,opt,name=sex,proto3" json:"sex,omitempty"`                     // 性别 0:未知 1:男性 2:女性
+	Avatar   string `protobuf:"bytes,4,opt,name=avatar,proto3" json:"avatar,omitempty"`                // 头像
+	Mobile   uint32 `protobuf:"varint,5,opt,name=mobile,proto3" json:"mobile,omitempty"`               // 手机号
+	FromId   uint32 `protobuf:"varint,6,opt,name=from_id,json=fromId,proto3" json:"from_id,omitempty"` // 投放渠道ID
+}
+
+func (x *UserInfo) Reset() {
+	*x = UserInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_msg_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserInfo) ProtoMessage() {}
+
+func (x *UserInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_msg_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserInfo.ProtoReflect.Descriptor instead.
+func (*UserInfo) Descriptor() ([]byte, []int) {
+	return file_msg_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *UserInfo) GetUid() uint32 {
+	if x != nil {
+		return x.Uid
+	}
+	return 0
+}
+
+func (x *UserInfo) GetNickname() string {
+	if x != nil {
+		return x.Nickname
+	}
+	return ""
+}
+
+func (x *UserInfo) GetSex() uint32 {
+	if x != nil {
+		return x.Sex
+	}
+	return 0
+}
+
+func (x *UserInfo) GetAvatar() string {
+	if x != nil {
+		return x.Avatar
+	}
+	return ""
+}
+
+func (x *UserInfo) GetMobile() uint32 {
+	if x != nil {
+		return x.Mobile
+	}
+	return 0
+}
+
+func (x *UserInfo) GetFromId() uint32 {
+	if x != nil {
+		return x.FromId
+	}
+	return 0
+}
+
 // 登录请求
 type LoginRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Mode  uint32 `protobuf:"varint,1,opt,name=mode,proto3" json:"mode,omitempty"`  // 登录方式，1:游客 2:微信
+	Mode  uint32 `protobuf:"varint,1,opt,name=mode,proto3" json:"mode,omitempty"`  // 登录方式，1:微信 2:游客
 	Uid   uint32 `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`    // 玩家uid
 	Token string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"` // 登录凭证
 }
@@ -171,7 +309,7 @@ type LoginRequest struct {
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_proto_msgTypes[2]
+		mi := &file_msg_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -184,7 +322,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_proto_msgTypes[2]
+	mi := &file_msg_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -197,7 +335,7 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_msg_proto_rawDescGZIP(), []int{2}
+	return file_msg_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *LoginRequest) GetMode() uint32 {
@@ -227,13 +365,14 @@ type LoginResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Code uint32 `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"` // 响应码，0:成功 >=1:错误码
+	Code     uint32    `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`                        // 响应码，0:成功 >=1:错误码
+	UserInfo *UserInfo `protobuf:"bytes,2,opt,name=user_info,json=userInfo,proto3" json:"user_info,omitempty"` // 玩家信息
 }
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_msg_proto_msgTypes[3]
+		mi := &file_msg_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -246,7 +385,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_msg_proto_msgTypes[3]
+	mi := &file_msg_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -259,7 +398,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_msg_proto_rawDescGZIP(), []int{3}
+	return file_msg_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *LoginResponse) GetCode() uint32 {
@@ -269,6 +408,13 @@ func (x *LoginResponse) GetCode() uint32 {
 	return 0
 }
 
+func (x *LoginResponse) GetUserInfo() *UserInfo {
+	if x != nil {
+		return x.UserInfo
+	}
+	return nil
+}
+
 var File_msg_proto protoreflect.FileDescriptor
 
 var file_msg_proto_rawDesc = []byte{
@@ -276,19 +422,34 @@ var file_msg_proto_rawDesc = []byte{
 	0x10, 0x0a, 0x0e, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x4f, 0x76, 0x65, 0x72, 0x6c, 0x6f, 0x61,
 	0x64, 0x22, 0x29, 0x0a, 0x09, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x12, 0x1c,
 	0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x03, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x4a, 0x0a, 0x0c,
-	0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04,
-	0x6d, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x6d, 0x6f, 0x64, 0x65,
-	0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x03, 0x75,
-	0x69, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x23, 0x0a, 0x0d, 0x4c, 0x6f, 0x67, 0x69,
-	0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64,
-	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x2a, 0x31, 0x0a,
-	0x04, 0x4d, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a, 0x0c, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e,
-	0x5f, 0x4d, 0x4f, 0x44, 0x45, 0x10, 0x00, 0x12, 0x0b, 0x0a, 0x07, 0x56, 0x49, 0x53, 0x49, 0x54,
-	0x4f, 0x52, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x57, 0x45, 0x43, 0x48, 0x41, 0x54, 0x10, 0x02,
-	0x42, 0x0c, 0x5a, 0x05, 0x2e, 0x2f, 0x3b, 0x70, 0x62, 0xaa, 0x02, 0x02, 0x50, 0x62, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x03, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x93, 0x01, 0x0a,
+	0x08, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x6e,
+	0x69, 0x63, 0x6b, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6e,
+	0x69, 0x63, 0x6b, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x73, 0x65, 0x78, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0d, 0x52, 0x03, 0x73, 0x65, 0x78, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x76, 0x61,
+	0x74, 0x61, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61, 0x76, 0x61, 0x74, 0x61,
+	0x72, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x6f, 0x62, 0x69, 0x6c, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28,
+	0x0d, 0x52, 0x06, 0x6d, 0x6f, 0x62, 0x69, 0x6c, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x66, 0x72, 0x6f,
+	0x6d, 0x5f, 0x69, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x66, 0x72, 0x6f, 0x6d,
+	0x49, 0x64, 0x22, 0x4a, 0x0a, 0x0c, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d,
+	0x52, 0x04, 0x6d, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0d, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65,
+	0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x4e,
+	0x0a, 0x0d, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x63,
+	0x6f, 0x64, 0x65, 0x12, 0x29, 0x0a, 0x09, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x6e, 0x66, 0x6f,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x70, 0x62, 0x2e, 0x55, 0x73, 0x65, 0x72,
+	0x49, 0x6e, 0x66, 0x6f, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x2a, 0x36,
+	0x0a, 0x09, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x4d, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a, 0x0c, 0x55,
+	0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x5f, 0x4d, 0x4f, 0x44, 0x45, 0x10, 0x00, 0x12, 0x0a, 0x0a,
+	0x06, 0x57, 0x45, 0x43, 0x48, 0x41, 0x54, 0x10, 0x01, 0x12, 0x0b, 0x0a, 0x07, 0x56, 0x49, 0x53,
+	0x49, 0x54, 0x4f, 0x52, 0x10, 0x02, 0x2a, 0x30, 0x0a, 0x07, 0x55, 0x73, 0x65, 0x72, 0x53, 0x65,
+	0x78, 0x12, 0x0f, 0x0a, 0x0b, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x5f, 0x53, 0x45, 0x58,
+	0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x4d, 0x41, 0x4c, 0x45, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06,
+	0x46, 0x45, 0x4d, 0x41, 0x4c, 0x45, 0x10, 0x02, 0x42, 0x0c, 0x5a, 0x05, 0x2e, 0x2f, 0x3b, 0x70,
+	0x62, 0xaa, 0x02, 0x02, 0x50, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -303,21 +464,24 @@ func file_msg_proto_rawDescGZIP() []byte {
 	return file_msg_proto_rawDescData
 }
 
-var file_msg_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_msg_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_msg_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_msg_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_msg_proto_goTypes = []interface{}{
-	(Mode)(0),              // 0: pb.Mode
-	(*ServerOverload)(nil), // 1: pb.ServerOverload
-	(*Heartbeat)(nil),      // 2: pb.Heartbeat
-	(*LoginRequest)(nil),   // 3: pb.LoginRequest
-	(*LoginResponse)(nil),  // 4: pb.LoginResponse
+	(LoginMode)(0),         // 0: pb.LoginMode
+	(UserSex)(0),           // 1: pb.UserSex
+	(*ServerOverload)(nil), // 2: pb.ServerOverload
+	(*Heartbeat)(nil),      // 3: pb.Heartbeat
+	(*UserInfo)(nil),       // 4: pb.UserInfo
+	(*LoginRequest)(nil),   // 5: pb.LoginRequest
+	(*LoginResponse)(nil),  // 6: pb.LoginResponse
 }
 var file_msg_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: pb.LoginResponse.user_info:type_name -> pb.UserInfo
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_msg_proto_init() }
@@ -351,7 +515,7 @@ func file_msg_proto_init() {
 			}
 		}
 		file_msg_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LoginRequest); i {
+			switch v := v.(*UserInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -363,6 +527,18 @@ func file_msg_proto_init() {
 			}
 		}
 		file_msg_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LoginRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_msg_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*LoginResponse); i {
 			case 0:
 				return &v.state
@@ -380,8 +556,8 @@ func file_msg_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_msg_proto_rawDesc,
-			NumEnums:      1,
-			NumMessages:   4,
+			NumEnums:      2,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
