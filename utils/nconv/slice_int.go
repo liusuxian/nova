@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:26:46
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 14:26:19
+ * @LastEditTime: 2023-05-05 17:17:48
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_int.go
  * @Description:
  *
@@ -99,18 +99,17 @@ func ToInt64SliceE(i any) (iv []int64, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(val, &anyV); err != nil {
-				return []int64{}, convertError(i, "[]int64")
-			}
-			iv = make([]int64, len(anyV))
-			for k, v := range anyV {
-				intv, err := ToInt64E(v)
-				if err != nil {
-					return []int64{}, convertError(i, "[]int64")
+			if e := json.Unmarshal(val, &anyV); e == nil {
+				iv = make([]int64, len(anyV))
+				for k, v := range anyV {
+					intv, err := ToInt64E(v)
+					if err != nil {
+						return []int64{}, convertError(i, "[]int64")
+					}
+					iv[k] = intv
 				}
-				iv[k] = intv
+				return
 			}
-			return
 		}
 		iv = make([]int64, len(val))
 		for k, v := range val {
@@ -196,18 +195,17 @@ func ToInt64SliceE(i any) (iv []int64, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
-				return []int64{}, convertError(i, "[]int64")
-			}
-			iv = make([]int64, len(anyV))
-			for k, v := range anyV {
-				intv, err := ToInt64E(v)
-				if err != nil {
-					return []int64{}, convertError(i, "[]int64")
+			if e := json.Unmarshal(anyBytes, &anyV); e == nil {
+				iv = make([]int64, len(anyV))
+				for k, v := range anyV {
+					intv, err := ToInt64E(v)
+					if err != nil {
+						return []int64{}, convertError(i, "[]int64")
+					}
+					iv[k] = intv
 				}
-				iv[k] = intv
+				return
 			}
-			return
 		}
 		return []int64{}, convertError(i, "[]int64")
 	default:
@@ -314,18 +312,17 @@ func ToInt32SliceE(i any) (iv []int32, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(val, &anyV); err != nil {
-				return []int32{}, convertError(i, "[]int32")
-			}
-			iv = make([]int32, len(anyV))
-			for k, v := range anyV {
-				intv, err := ToInt32E(v)
-				if err != nil {
-					return []int32{}, convertError(i, "[]int32")
+			if e := json.Unmarshal(val, &anyV); e == nil {
+				iv = make([]int32, len(anyV))
+				for k, v := range anyV {
+					intv, err := ToInt32E(v)
+					if err != nil {
+						return []int32{}, convertError(i, "[]int32")
+					}
+					iv[k] = intv
 				}
-				iv[k] = intv
+				return
 			}
-			return
 		}
 		iv = make([]int32, len(val))
 		for k, v := range val {
@@ -411,18 +408,17 @@ func ToInt32SliceE(i any) (iv []int32, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
-				return []int32{}, convertError(i, "[]int32")
-			}
-			iv = make([]int32, len(anyV))
-			for k, v := range anyV {
-				intv, err := ToInt32E(v)
-				if err != nil {
-					return []int32{}, convertError(i, "[]int32")
+			if e := json.Unmarshal(anyBytes, &anyV); e == nil {
+				iv = make([]int32, len(anyV))
+				for k, v := range anyV {
+					intv, err := ToInt32E(v)
+					if err != nil {
+						return []int32{}, convertError(i, "[]int32")
+					}
+					iv[k] = intv
 				}
-				iv[k] = intv
+				return
 			}
-			return
 		}
 		return []int32{}, convertError(i, "[]int32")
 	default:
@@ -529,18 +525,17 @@ func ToInt16SliceE(i any) (iv []int16, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(val, &anyV); err != nil {
-				return []int16{}, convertError(i, "[]int16")
-			}
-			iv = make([]int16, len(anyV))
-			for k, v := range anyV {
-				intv, err := ToInt16E(v)
-				if err != nil {
-					return []int16{}, convertError(i, "[]int16")
+			if e := json.Unmarshal(val, &anyV); e == nil {
+				iv = make([]int16, len(anyV))
+				for k, v := range anyV {
+					intv, err := ToInt16E(v)
+					if err != nil {
+						return []int16{}, convertError(i, "[]int16")
+					}
+					iv[k] = intv
 				}
-				iv[k] = intv
+				return
 			}
-			return
 		}
 		iv = make([]int16, len(val))
 		for k, v := range val {
@@ -626,18 +621,17 @@ func ToInt16SliceE(i any) (iv []int16, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
-				return []int16{}, convertError(i, "[]int16")
-			}
-			iv = make([]int16, len(anyV))
-			for k, v := range anyV {
-				intv, err := ToInt16E(v)
-				if err != nil {
-					return []int16{}, convertError(i, "[]int16")
+			if e := json.Unmarshal(anyBytes, &anyV); e == nil {
+				iv = make([]int16, len(anyV))
+				for k, v := range anyV {
+					intv, err := ToInt16E(v)
+					if err != nil {
+						return []int16{}, convertError(i, "[]int16")
+					}
+					iv[k] = intv
 				}
-				iv[k] = intv
+				return
 			}
-			return
 		}
 		return []int16{}, convertError(i, "[]int16")
 	default:
@@ -744,18 +738,17 @@ func ToInt8SliceE(i any) (iv []int8, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(val, &anyV); err != nil {
-				return []int8{}, convertError(i, "[]int8")
-			}
-			iv = make([]int8, len(anyV))
-			for k, v := range anyV {
-				intv, err := ToInt8E(v)
-				if err != nil {
-					return []int8{}, convertError(i, "[]int8")
+			if e := json.Unmarshal(val, &anyV); e == nil {
+				iv = make([]int8, len(anyV))
+				for k, v := range anyV {
+					intv, err := ToInt8E(v)
+					if err != nil {
+						return []int8{}, convertError(i, "[]int8")
+					}
+					iv[k] = intv
 				}
-				iv[k] = intv
+				return
 			}
-			return
 		}
 		iv = make([]int8, len(val))
 		for k, v := range val {
@@ -841,18 +834,17 @@ func ToInt8SliceE(i any) (iv []int8, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
-				return []int8{}, convertError(i, "[]int8")
-			}
-			iv = make([]int8, len(anyV))
-			for k, v := range anyV {
-				intv, err := ToInt8E(v)
-				if err != nil {
-					return []int8{}, convertError(i, "[]int8")
+			if e := json.Unmarshal(anyBytes, &anyV); e == nil {
+				iv = make([]int8, len(anyV))
+				for k, v := range anyV {
+					intv, err := ToInt8E(v)
+					if err != nil {
+						return []int8{}, convertError(i, "[]int8")
+					}
+					iv[k] = intv
 				}
-				iv[k] = intv
+				return
 			}
-			return
 		}
 		return []int8{}, convertError(i, "[]int8")
 	default:
@@ -959,18 +951,17 @@ func ToIntSliceE(i any) (iv []int, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(val, &anyV); err != nil {
-				return []int{}, convertError(i, "[]int")
-			}
-			iv = make([]int, len(anyV))
-			for k, v := range anyV {
-				intv, err := ToIntE(v)
-				if err != nil {
-					return []int{}, convertError(i, "[]int")
+			if e := json.Unmarshal(val, &anyV); e == nil {
+				iv = make([]int, len(anyV))
+				for k, v := range anyV {
+					intv, err := ToIntE(v)
+					if err != nil {
+						return []int{}, convertError(i, "[]int")
+					}
+					iv[k] = intv
 				}
-				iv[k] = intv
+				return
 			}
-			return
 		}
 		iv = make([]int, len(val))
 		for k, v := range val {
@@ -1056,18 +1047,17 @@ func ToIntSliceE(i any) (iv []int, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
-				return []int{}, convertError(i, "[]int")
-			}
-			iv = make([]int, len(anyV))
-			for k, v := range anyV {
-				intv, err := ToIntE(v)
-				if err != nil {
-					return []int{}, convertError(i, "[]int")
+			if e := json.Unmarshal(anyBytes, &anyV); e == nil {
+				iv = make([]int, len(anyV))
+				for k, v := range anyV {
+					intv, err := ToIntE(v)
+					if err != nil {
+						return []int{}, convertError(i, "[]int")
+					}
+					iv[k] = intv
 				}
-				iv[k] = intv
+				return
 			}
-			return
 		}
 		return []int{}, convertError(i, "[]int")
 	default:

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-18 00:54:28
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-03 16:34:59
+ * @LastEditTime: 2023-05-05 17:41:47
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/map_string_any.go
  * @Description:
  *
@@ -34,19 +34,17 @@ func ToStringMapE(i any, opts ...DecoderConfigOption) (iv map[string]any, err er
 	case []byte:
 		// 如果它是 JSON 字符串，自动反序列化它
 		if json.Valid(val) {
-			if err := json.Unmarshal(val, &iv); err != nil {
-				return map[string]any{}, convertError(i, "map[string]any")
+			if e := json.Unmarshal(val, &iv); e == nil {
+				return
 			}
-			return
 		}
 	case string:
 		// 如果它是 JSON 字符串，自动反序列化它
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
-			if err := json.Unmarshal(anyBytes, &iv); err != nil {
-				return map[string]any{}, convertError(i, "map[string]any")
+			if e := json.Unmarshal(anyBytes, &iv); e == nil {
+				return
 			}
-			return
 		}
 	}
 

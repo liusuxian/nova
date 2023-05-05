@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:23:40
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 14:25:47
+ * @LastEditTime: 2023-05-05 17:06:20
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_string.go
  * @Description:
  *
@@ -120,18 +120,17 @@ func ToStringSliceE(i any) (iv []string, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(val, &anyV); err != nil {
-				return []string{}, convertError(i, "[]string")
-			}
-			iv = make([]string, len(anyV))
-			for k, v := range anyV {
-				str, err := ToStringE(v)
-				if err != nil {
-					return []string{}, convertError(i, "[]string")
+			if e := json.Unmarshal(val, &anyV); e == nil {
+				iv = make([]string, len(anyV))
+				for k, v := range anyV {
+					str, err := ToStringE(v)
+					if err != nil {
+						return []string{}, convertError(i, "[]string")
+					}
+					iv[k] = str
 				}
-				iv[k] = str
+				return
 			}
-			return
 		}
 		iv = make([]string, len(val))
 		for k, v := range val {
@@ -197,18 +196,17 @@ func ToStringSliceE(i any) (iv []string, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
-				return []string{}, convertError(i, "[]string")
-			}
-			iv = make([]string, len(anyV))
-			for k, v := range anyV {
-				str, err := ToStringE(v)
-				if err != nil {
-					return []string{}, convertError(i, "[]string")
+			if e := json.Unmarshal(anyBytes, &anyV); e == nil {
+				iv = make([]string, len(anyV))
+				for k, v := range anyV {
+					str, err := ToStringE(v)
+					if err != nil {
+						return []string{}, convertError(i, "[]string")
+					}
+					iv[k] = str
 				}
-				iv[k] = str
+				return
 			}
-			return
 		}
 		return strings.Fields(val), nil
 	case []error:

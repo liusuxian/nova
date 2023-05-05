@@ -119,18 +119,17 @@ func ToBoolSliceE(i any) (iv []bool, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(val, &anyV); err != nil {
-				return []bool{}, convertError(i, "[]bool")
-			}
-			iv = make([]bool, len(anyV))
-			for k, v := range anyV {
-				bl, err := ToBoolE(v)
-				if err != nil {
-					return []bool{}, convertError(i, "[]bool")
+			if e := json.Unmarshal(val, &anyV); e == nil {
+				iv = make([]bool, len(anyV))
+				for k, v := range anyV {
+					bl, err := ToBoolE(v)
+					if err != nil {
+						return []bool{}, convertError(i, "[]bool")
+					}
+					iv[k] = bl
 				}
-				iv[k] = bl
+				return
 			}
-			return
 		}
 		iv = make([]bool, len(val))
 		for k, v := range val {
@@ -176,18 +175,17 @@ func ToBoolSliceE(i any) (iv []bool, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
-				return []bool{}, convertError(i, "[]bool")
-			}
-			iv = make([]bool, len(anyV))
-			for k, v := range anyV {
-				bl, err := ToBoolE(v)
-				if err != nil {
-					return []bool{}, convertError(i, "[]bool")
+			if e := json.Unmarshal(anyBytes, &anyV); e == nil {
+				iv = make([]bool, len(anyV))
+				for k, v := range anyV {
+					bl, err := ToBoolE(v)
+					if err != nil {
+						return []bool{}, convertError(i, "[]bool")
+					}
+					iv[k] = bl
 				}
-				iv[k] = bl
+				return
 			}
-			return
 		}
 		return []bool{}, convertError(i, "[]bool")
 	default:

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 13:23:47
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 13:25:05
+ * @LastEditTime: 2023-05-05 17:08:19
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/struct.go
  * @Description:
  *
@@ -28,13 +28,17 @@ func ToStructE(input, output any, opts ...DecoderConfigOption) (err error) {
 	case []byte:
 		// 如果它是 JSON 字符串，自动反序列化它
 		if json.Valid(val) {
-			return json.Unmarshal(val, output)
+			if e := json.Unmarshal(val, output); e == nil {
+				return
+			}
 		}
 	case string:
 		// 如果它是 JSON 字符串，自动反序列化它
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
-			return json.Unmarshal(anyBytes, output)
+			if e := json.Unmarshal(anyBytes, output); e == nil {
+				return
+			}
 		}
 	}
 

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-05 14:55:53
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-05 15:19:55
+ * @LastEditTime: 2023-05-05 17:21:11
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_float.go
  * @Description:
  *
@@ -107,18 +107,17 @@ func ToFloat64SliceE(i any) (iv []float64, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(val, &anyV); err != nil {
-				return []float64{}, convertError(i, "[]float64")
-			}
-			iv = make([]float64, len(anyV))
-			for k, v := range anyV {
-				floatv, err := ToFloat64E(v)
-				if err != nil {
-					return []float64{}, convertError(i, "[]float64")
+			if e := json.Unmarshal(val, &anyV); e == nil {
+				iv = make([]float64, len(anyV))
+				for k, v := range anyV {
+					floatv, err := ToFloat64E(v)
+					if err != nil {
+						return []float64{}, convertError(i, "[]float64")
+					}
+					iv[k] = floatv
 				}
-				iv[k] = floatv
+				return
 			}
-			return
 		}
 		iv = make([]float64, len(val))
 		for k, v := range val {
@@ -196,18 +195,17 @@ func ToFloat64SliceE(i any) (iv []float64, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
-				return []float64{}, convertError(i, "[]float64")
-			}
-			iv = make([]float64, len(anyV))
-			for k, v := range anyV {
-				floatv, err := ToFloat64E(v)
-				if err != nil {
-					return []float64{}, convertError(i, "[]float64")
+			if e := json.Unmarshal(anyBytes, &anyV); e == nil {
+				iv = make([]float64, len(anyV))
+				for k, v := range anyV {
+					floatv, err := ToFloat64E(v)
+					if err != nil {
+						return []float64{}, convertError(i, "[]float64")
+					}
+					iv[k] = floatv
 				}
-				iv[k] = floatv
+				return
 			}
-			return
 		}
 		return []float64{}, convertError(i, "[]float64")
 	default:
@@ -322,18 +320,17 @@ func ToFloat32SliceE(i any) (iv []float32, err error) {
 		// 检查给定的 i 是否为 JSON 格式的字符串值，并使用 json.UnmarshalUseNumber 进行转换
 		if json.Valid(val) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(val, &anyV); err != nil {
-				return []float32{}, convertError(i, "[]float32")
-			}
-			iv = make([]float32, len(anyV))
-			for k, v := range anyV {
-				floatv, err := ToFloat32E(v)
-				if err != nil {
-					return []float32{}, convertError(i, "[]float32")
+			if e := json.Unmarshal(val, &anyV); e == nil {
+				iv = make([]float32, len(anyV))
+				for k, v := range anyV {
+					floatv, err := ToFloat32E(v)
+					if err != nil {
+						return []float32{}, convertError(i, "[]float32")
+					}
+					iv[k] = floatv
 				}
-				iv[k] = floatv
+				return
 			}
-			return
 		}
 		iv = make([]float32, len(val))
 		for k, v := range val {
@@ -411,18 +408,17 @@ func ToFloat32SliceE(i any) (iv []float32, err error) {
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
 			anyV := make([]any, len(val))
-			if err := json.Unmarshal(anyBytes, &anyV); err != nil {
-				return []float32{}, convertError(i, "[]float32")
-			}
-			iv = make([]float32, len(anyV))
-			for k, v := range anyV {
-				floatv, err := ToFloat32E(v)
-				if err != nil {
-					return []float32{}, convertError(i, "[]float32")
+			if e := json.Unmarshal(anyBytes, &anyV); e == nil {
+				iv = make([]float32, len(anyV))
+				for k, v := range anyV {
+					floatv, err := ToFloat32E(v)
+					if err != nil {
+						return []float32{}, convertError(i, "[]float32")
+					}
+					iv[k] = floatv
 				}
-				iv[k] = floatv
+				return
 			}
-			return
 		}
 		return []float32{}, convertError(i, "[]float32")
 	default:
