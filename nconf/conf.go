@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-05 21:03:22
+ * @LastEditTime: 2023-05-05 23:42:18
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -288,9 +288,10 @@ var defaultConfig *Config
 
 func init() {
 	v := viper.New()
-	v.SetConfigName("config") // 设置配置文件名，不需要配置文件扩展名，配置文件的类型会自动根据扩展名自动匹配
-	v.AddConfigPath(".")      // 设置配置文件的搜索目录
-	v.AddConfigPath("config") // 设置配置文件的搜索目录
+	v.SetConfigName("config")          // 设置配置文件名，不需要配置文件扩展名，配置文件的类型会自动根据扩展名自动匹配
+	v.AddConfigPath(".")               // 设置配置文件的搜索目录
+	v.AddConfigPath("config")          // 设置配置文件的搜索目录
+	v.AddConfigPath("manifest/config") // 设置配置文件的搜索目录
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 		} else {
