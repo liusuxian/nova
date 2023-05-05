@@ -30,7 +30,7 @@ func main() {
 			// 创建 Client
 			c := nclient.NewClient(
 				"tcp",
-				"05807165157c4471.natapp.cc:1688",
+				"127.0.0.1:8888",
 				nclient.WithLockOSThread(true),
 				nclient.WithHeartbeat(time.Duration(10000)*time.Millisecond),
 				nclient.WithMaxHeartbeat(time.Duration(15000)*time.Millisecond),
