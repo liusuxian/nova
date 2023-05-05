@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-04 12:04:41
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-12 18:30:12
+ * @LastEditTime: 2023-05-05 23:12:21
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nredis/redis.go
  * @Description:
  *
@@ -16,9 +16,11 @@ import (
 	"encoding/json"
 	"github.com/liusuxian/nova/internal/reflection"
 	"github.com/liusuxian/nova/niface"
+	"github.com/liusuxian/nova/utils/nfile"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -148,6 +150,34 @@ func (rc *RedisClient) Pipeline(ctx context.Context, cmdArgsList ...[]any) (resu
 			Val: v.(*redis.Cmd).Val(),
 			Err: v.Err(),
 		})
+	}
+	return
+}
+
+// ScriptLoad 加载 lua 脚本
+func (rc *RedisClient) ScriptLoad(ctx context.Context, scriptFilePath string) (err error) {
+	script := nfile.GetContents(scriptFilePath)
+	if strings.EqualFold("", script) {
+		return errors.Errorf("[%s] script not found", scriptFilePath)
+	}
+	evalsha, err := rc.redis.ScriptLoad(ctx, script).Result()
+	if err != nil {
+		return err
+	}
+	scriptFileName := nfile.Name(scriptFilePath)
+	rc.luaScriptMap[scriptFileName] = evalsha
+	return nil
+}
+
+// EvalSha 执行 lua 脚本
+func (rc *RedisClient) EvalSha(ctx context.Context, scriptFileName string, keys []string, args ...any) (value any, err error) {
+	evalsha, ok := rc.luaScriptMap[scriptFileName]
+	if !ok {
+		return nil, errors.Errorf("[%s] Script Not Found", scriptFileName)
+	}
+	value, err = rc.redis.EvalSha(ctx, evalsha, keys, args...).Result()
+	if err == redis.Nil {
+		err = nil
 	}
 	return
 }

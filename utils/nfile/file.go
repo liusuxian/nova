@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 21:04:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-02 01:23:00
+ * @LastEditTime: 2023-05-05 22:49:35
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nfile/file.go
  * @Description:
  *
@@ -25,4 +25,27 @@ func PathExists(path string) (isExist bool) {
 // ExtName 获取文件扩展名
 func ExtName(path string) (extName string) {
 	return strings.TrimLeft(filepath.Ext(path), ".")
+}
+
+// GetContents 获取文件的内容
+func GetContents(path string) (str string) {
+	return string(GetBytes(path))
+}
+
+// GetBytes 获取文件的内容
+func GetBytes(path string) (buf []byte) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+	return data
+}
+
+// Name 返回路径的最后一个元素，但不包括文件扩展名
+func Name(path string) (str string) {
+	base := filepath.Base(path)
+	if i := strings.LastIndexByte(base, '.'); i != -1 {
+		return base[:i]
+	}
+	return base
 }

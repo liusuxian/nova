@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-12 18:26:05
+ * @LastEditTime: 2023-05-05 21:03:22
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -15,10 +15,11 @@ import (
 	"github.com/liusuxian/nova/utils/nconv"
 	"github.com/liusuxian/nova/utils/nfile"
 	"github.com/pkg/errors"
-	"github.com/spf13/cast"
 	"github.com/spf13/viper"
 	_ "github.com/spf13/viper/remote"
+	"strings"
 	"time"
+	"unicode"
 )
 
 // Config 配置结构
@@ -88,12 +89,12 @@ func (c *Config) Get(key string) (val any) {
 
 // GetBool 获取 bool
 func (c *Config) GetBool(key string) (val bool) {
-	return c.v.GetBool(key)
+	return nconv.ToBool(c.v.Get(key))
 }
 
 // GetDuration 获取 Duration
 func (c *Config) GetDuration(key string) (val time.Duration) {
-	return c.v.GetDuration(key)
+	return nconv.ToDuration(c.v.Get(key))
 }
 
 // GetFloat32 获取 float32
@@ -103,12 +104,12 @@ func (c *Config) GetFloat32(key string) (val float32) {
 
 // GetFloat64 获取 float64
 func (c *Config) GetFloat64(key string) (val float64) {
-	return c.v.GetFloat64(key)
+	return nconv.ToFloat64(c.v.Get(key))
 }
 
 // GetInt 获取 int
 func (c *Config) GetInt(key string) (val int) {
-	return c.v.GetInt(key)
+	return nconv.ToInt(c.v.Get(key))
 }
 
 // GetInt8 获取 int8
@@ -123,12 +124,12 @@ func (c *Config) GetInt16(key string) (val int16) {
 
 // GetInt32 获取 int32
 func (c *Config) GetInt32(key string) (val int32) {
-	return c.v.GetInt32(key)
+	return nconv.ToInt32(c.v.Get(key))
 }
 
 // GetInt64 获取 int64
 func (c *Config) GetInt64(key string) (val int64) {
-	return c.v.GetInt64(key)
+	return nconv.ToInt64(c.v.Get(key))
 }
 
 // GetAnySlice 获取 []any
@@ -138,72 +139,73 @@ func (c *Config) GetAnySlice(key string) (vals []any) {
 
 // GetBoolSlice 获取 []bool
 func (c *Config) GetBoolSlice(key string) (vals []bool) {
-	return cast.ToBoolSlice(c.v.Get(key))
+	return nconv.ToBoolSlice(c.v.Get(key))
 }
 
 // GetStringSlice 获取 []string
 func (c *Config) GetStringSlice(key string) (vals []string) {
-	return c.v.GetStringSlice(key)
+	return nconv.ToStringSlice(c.v.Get(key))
 }
 
 // GetIntSlice 获取 []int
 func (c *Config) GetIntSlice(key string) (vals []int) {
-	return c.v.GetIntSlice(key)
+	return nconv.ToIntSlice(c.v.Get(key))
 }
 
 // GetDurationSlice 获取 []time.Duration
 func (c *Config) GetDurationSlice(key string) (vals []time.Duration) {
-	return cast.ToDurationSlice(c.v.Get(key))
+	return nconv.ToDurationSlice(c.v.Get(key))
 }
 
 // GetSizeInBytes 获取某个配置项对应的值所占用的内存大小（以字节为单位）
 func (c *Config) GetSizeInBytes(key string) (val uint) {
-	return c.v.GetSizeInBytes(key)
+	sizeStr := nconv.ToString(c.v.Get(key))
+	return parseSizeInBytes(sizeStr)
 }
 
 // GetString 获取 string
 func (c *Config) GetString(key string) (val string) {
-	return c.v.GetString(key)
+	return nconv.ToString(c.v.Get(key))
 }
 
 // GetStringMap 获取 map[string]any
 func (c *Config) GetStringMap(key string) (val map[string]any) {
-	return c.v.GetStringMap(key)
+	return nconv.ToStringMap(c.v.Get(key))
 }
 
 // GetStringMapBool 获取 map[string]bool
 func (c *Config) GetStringMapBool(key string) (val map[string]bool) {
-	return cast.ToStringMapBool(c.v.Get(key))
+	return nconv.ToStringMapBool(c.v.Get(key))
 }
 
 // GetStringMapInt 获取 map[string]int
 func (c *Config) GetStringMapInt(key string) (val map[string]int) {
-	return cast.ToStringMapInt(c.v.Get(key))
+	return nconv.ToStringMapInt(c.v.Get(key))
 }
 
 // GetStringMapInt64 获取 map[string]int64
 func (c *Config) GetStringMapInt64(key string) (val map[string]int64) {
-	return cast.ToStringMapInt64(c.v.Get(key))
+	return nconv.ToStringMapInt64(c.v.Get(key))
 }
 
 // GetStringMapString 获取 map[string]string
 func (c *Config) GetStringMapString(key string) (val map[string]string) {
-	return c.v.GetStringMapString(key)
+	return nconv.ToStringMapString(c.v.Get(key))
 }
 
 // GetStringMapStringSlice 获取 map[string][]string
 func (c *Config) GetStringMapStringSlice(key string) (val map[string][]string) {
-	return c.v.GetStringMapStringSlice(key)
+	return nconv.ToStringMapStringSlice(c.v.Get(key))
 }
 
 // GetTime 获取 Time
 func (c *Config) GetTime(key string) (val time.Time) {
-	return c.v.GetTime(key)
+	return nconv.ToTime(c.v.Get(key))
 }
 
 // GetUint 获取 uint
 func (c *Config) GetUint(key string) (val uint) {
-	return c.v.GetUint(key)
+	return nconv.ToUint(c.v.Get(key))
 }
 
 // GetUint8 获取 uint8
@@ -213,17 +215,17 @@ func (c *Config) GetUint8(key string) (val uint8) {
 
 // GetUint16 获取 uint16
 func (c *Config) GetUint16(key string) (val uint16) {
-	return c.v.GetUint16(key)
+	return nconv.ToUint16(c.v.Get(key))
 }
 
 // GetUint32 获取 uint32
 func (c *Config) GetUint32(key string) (val uint32) {
-	return c.v.GetUint32(key)
+	return nconv.ToUint32(c.v.Get(key))
 }
 
 // GetUint64 获取 uint64
 func (c *Config) GetUint64(key string) (val uint64) {
-	return c.v.GetUint64(key)
+	return nconv.ToUint64(c.v.Get(key))
 }
 
 // InConfig 检查给定的键(或别名)是否在配置文件中
@@ -328,12 +330,12 @@ func Get(key string) (val any) {
 
 // GetBool 获取 bool
 func GetBool(key string) (val bool) {
-	return defaultConfig.v.GetBool(key)
+	return nconv.ToBool(defaultConfig.v.Get(key))
 }
 
 // GetDuration 获取 Duration
 func GetDuration(key string) (val time.Duration) {
-	return defaultConfig.v.GetDuration(key)
+	return nconv.ToDuration(defaultConfig.v.Get(key))
 }
 
 // GetFloat32 获取 float32
@@ -343,12 +345,12 @@ func GetFloat32(key string) (val float32) {
 
 // GetFloat64 获取 float64
 func GetFloat64(key string) (val float64) {
-	return defaultConfig.v.GetFloat64(key)
+	return nconv.ToFloat64(defaultConfig.v.Get(key))
 }
 
 // GetInt 获取 int
 func GetInt(key string) (val int) {
-	return defaultConfig.v.GetInt(key)
+	return nconv.ToInt(defaultConfig.v.Get(key))
 }
 
 // GetInt8 获取 int8
@@ -363,12 +365,12 @@ func GetInt16(key string) (val int16) {
 
 // GetInt32 获取 int32
 func GetInt32(key string) (val int32) {
-	return defaultConfig.v.GetInt32(key)
+	return nconv.ToInt32(defaultConfig.v.Get(key))
 }
 
 // GetInt64 获取 int64
 func GetInt64(key string) (val int64) {
-	return defaultConfig.v.GetInt64(key)
+	return nconv.ToInt64(defaultConfig.v.Get(key))
 }
 
 // GetAnySlice 获取 []any
@@ -378,72 +380,73 @@ func GetAnySlice(key string) (vals []any) {
 
 // GetBoolSlice 获取 []bool
 func GetBoolSlice(key string) (vals []bool) {
-	return cast.ToBoolSlice(defaultConfig.v.Get(key))
+	return nconv.ToBoolSlice(defaultConfig.v.Get(key))
 }
 
 // GetStringSlice 获取 []string
 func GetStringSlice(key string) (vals []string) {
-	return defaultConfig.v.GetStringSlice(key)
+	return nconv.ToStringSlice(defaultConfig.v.Get(key))
 }
 
 // GetIntSlice 获取 []int
 func GetIntSlice(key string) (vals []int) {
-	return defaultConfig.v.GetIntSlice(key)
+	return nconv.ToIntSlice(defaultConfig.v.Get(key))
 }
 
 // GetDurationSlice 获取 []time.Duration
 func GetDurationSlice(key string) (vals []time.Duration) {
-	return cast.ToDurationSlice(defaultConfig.v.Get(key))
+	return nconv.ToDurationSlice(defaultConfig.v.Get(key))
 }
 
 // GetSizeInBytes 获取某个配置项对应的值所占用的内存大小（以字节为单位）
 func GetSizeInBytes(key string) (val uint) {
-	return defaultConfig.v.GetSizeInBytes(key)
+	sizeStr := nconv.ToString(defaultConfig.v.Get(key))
+	return parseSizeInBytes(sizeStr)
 }
 
 // GetString 获取 string
 func GetString(key string) (val string) {
-	return defaultConfig.v.GetString(key)
+	return nconv.ToString(defaultConfig.v.Get(key))
 }
 
 // GetStringMap 获取 map[string]any
 func GetStringMap(key string) (val map[string]any) {
-	return defaultConfig.v.GetStringMap(key)
+	return nconv.ToStringMap(defaultConfig.v.Get(key))
 }
 
 // GetStringMapBool 获取 map[string]bool
 func GetStringMapBool(key string) (val map[string]bool) {
-	return cast.ToStringMapBool(defaultConfig.v.Get(key))
+	return nconv.ToStringMapBool(defaultConfig.v.Get(key))
 }
 
 // GetStringMapInt 获取 map[string]int
 func GetStringMapInt(key string) (val map[string]int) {
-	return cast.ToStringMapInt(defaultConfig.v.Get(key))
+	return nconv.ToStringMapInt(defaultConfig.v.Get(key))
 }
 
 // GetStringMapInt64 获取 map[string]int64
 func GetStringMapInt64(key string) (val map[string]int64) {
-	return cast.ToStringMapInt64(defaultConfig.v.Get(key))
+	return nconv.ToStringMapInt64(defaultConfig.v.Get(key))
 }
 
 // GetStringMapString 获取 map[string]string
 func GetStringMapString(key string) (val map[string]string) {
-	return defaultConfig.v.GetStringMapString(key)
+	return nconv.ToStringMapString(defaultConfig.v.Get(key))
 }
 
 // GetStringMapStringSlice 获取 map[string][]string
 func GetStringMapStringSlice(key string) (val map[string][]string) {
-	return defaultConfig.v.GetStringMapStringSlice(key)
+	return nconv.ToStringMapStringSlice(defaultConfig.v.Get(key))
 }
 
 // GetTime 获取 Time
 func GetTime(key string) (val time.Time) {
-	return defaultConfig.v.GetTime(key)
+	return nconv.ToTime(defaultConfig.v.Get(key))
 }
 
 // GetUint 获取 uint
 func GetUint(key string) (val uint) {
-	return defaultConfig.v.GetUint(key)
+	return nconv.ToUint(defaultConfig.v.Get(key))
 }
 
 // GetUint8 获取 uint8
@@ -453,17 +456,17 @@ func GetUint8(key string) (val uint8) {
 
 // GetUint16 获取 uint16
 func GetUint16(key string) (val uint16) {
-	return defaultConfig.v.GetUint16(key)
+	return nconv.ToUint16(defaultConfig.v.Get(key))
 }
 
 // GetUint32 获取 uint32
 func GetUint32(key string) (val uint32) {
-	return defaultConfig.v.GetUint32(key)
+	return nconv.ToUint32(defaultConfig.v.Get(key))
 }
 
 // GetUint64 获取 uint64
 func GetUint64(key string) (val uint64) {
-	return defaultConfig.v.GetUint64(key)
+	return nconv.ToUint64(defaultConfig.v.Get(key))
 }
 
 // InConfig 检查给定的键(或别名)是否在配置文件中
@@ -509,4 +512,47 @@ func StructKey(key string, rawVal any, opts ...viper.DecoderConfigOption) (err e
 // WatchConfig 监视配置文件的变化
 func WatchConfig() {
 	defaultConfig.v.WatchConfig()
+}
+
+// parseSizeInBytes 将像1GB或12MB这样的字符串转换为无符号整数字节数
+func parseSizeInBytes(sizeStr string) (s uint) {
+	sizeStr = strings.TrimSpace(sizeStr)
+	lastChar := len(sizeStr) - 1
+	multiplier := uint(1)
+
+	if lastChar > 0 {
+		if sizeStr[lastChar] == 'b' || sizeStr[lastChar] == 'B' {
+			if lastChar > 1 {
+				switch unicode.ToLower(rune(sizeStr[lastChar-1])) {
+				case 'k':
+					multiplier = 1 << 10
+					sizeStr = strings.TrimSpace(sizeStr[:lastChar-1])
+				case 'm':
+					multiplier = 1 << 20
+					sizeStr = strings.TrimSpace(sizeStr[:lastChar-1])
+				case 'g':
+					multiplier = 1 << 30
+					sizeStr = strings.TrimSpace(sizeStr[:lastChar-1])
+				default:
+					multiplier = 1
+					sizeStr = strings.TrimSpace(sizeStr[:lastChar])
+				}
+			}
+		}
+	}
+
+	size := nconv.ToInt(sizeStr)
+	if size < 0 {
+		size = 0
+	}
+
+	return safeMul(uint(size), multiplier)
+}
+
+func safeMul(a, b uint) (s uint) {
+	c := a * b
+	if a > 1 && b > 1 && c/b != a {
+		return 0
+	}
+	return c
 }

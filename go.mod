@@ -11,8 +11,7 @@ require (
 	github.com/panjf2000/ants/v2 v2.7.3
 	github.com/panjf2000/gnet/v2 v2.2.7
 	github.com/pkg/errors v0.9.1
-	github.com/redis/go-redis/v9 v9.0.3
-	github.com/spf13/cast v1.5.0
+	github.com/redis/go-redis/v9 v9.0.4
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.2
 	go.uber.org/zap v1.24.0
@@ -58,6 +57,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sagikazarmark/crypt v0.9.0 // indirect
 	github.com/spf13/afero v1.9.3 // indirect
+	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
