@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 17:18:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 19:57:21
+ * @LastEditTime: 2023-05-06 00:46:07
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/heartbeat/heartbeat.go
  * @Description:
  *
@@ -25,6 +25,9 @@ type HeartBeatRouter struct {
 	initiate           bool // 发起心跳
 }
 
+// 是否已发送登录消息
+var isSendLogin bool
+
 // Handle 处理心跳消息
 func (hbr *HeartBeatRouter) Handle(request niface.IRequest) {
 	// 收到心跳消息
@@ -45,6 +48,23 @@ func (hbr *HeartBeatRouter) Handle(request niface.IRequest) {
 			nlog.Error("Send Heartbeat Error", nlog.Err(err))
 			return
 		}
+	}
+	// 登录
+	if !isSendLogin {
+		loginMsg, err := proto.Marshal(&pb.LoginRequest{
+			Mode:  uint32(pb.LoginMode_VISITOR),
+			Uid:   7,
+			Token: "eyJpZCI6NywidGltZSI6MTY4MzIxMTI1MH0=.008ba9663fa59fb05ce11f80a3df1d8b",
+		})
+		if err != nil {
+			nlog.Error("Marshal Login Msg Error", nlog.Err(err))
+			return
+		}
+		if err := request.GetConnection().SendMsg(uint16(pb.MsgID_LOGIN), loginMsg); err != nil {
+			nlog.Error("Send Login Error", nlog.Err(err))
+			return
+		}
+		isSendLogin = true
 	}
 }
 
