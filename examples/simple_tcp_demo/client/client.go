@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 20:34:11
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 18:55:43
+ * @LastEditTime: 2023-05-05 23:20:31
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/client/client.go
  * @Description:
  *
@@ -28,7 +28,7 @@ func main() {
 			// 创建 Client
 			c := nclient.NewClient(
 				"tcp",
-				"05807165157c4471.natapp.cc:1688",
+				"127.0.0.1:8888",
 				nclient.WithLockOSThread(true),
 				nclient.WithHeartbeat(time.Duration(10000)*time.Millisecond),
 				nclient.WithMaxHeartbeat(time.Duration(15000)*time.Millisecond),
