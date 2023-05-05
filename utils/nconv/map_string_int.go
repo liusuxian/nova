@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-03 16:47:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-04 11:27:48
+ * @LastEditTime: 2023-05-05 14:09:40
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/map_string_int.go
  * @Description:
  *
@@ -48,8 +48,17 @@ func ToStringMapInt64E(i any, opts ...DecoderConfigOption) (iv map[string]int64,
 	case []byte:
 		// 如果它是 JSON 字符串，自动反序列化它
 		if json.Valid(val) {
-			if err := json.Unmarshal(val, &iv); err != nil {
+			im := map[string]any{}
+			if err := json.Unmarshal(val, &im); err != nil {
 				return map[string]int64{}, convertError(i, "map[string]int64")
+			}
+			iv = make(map[string]int64, len(im))
+			for k, v := range im {
+				value, err := ToInt64E(v)
+				if err != nil {
+					return map[string]int64{}, convertError(i, "map[string]int64")
+				}
+				iv[k] = value
 			}
 			return
 		}
@@ -57,16 +66,33 @@ func ToStringMapInt64E(i any, opts ...DecoderConfigOption) (iv map[string]int64,
 		// 如果它是 JSON 字符串，自动反序列化它
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
-			if err := json.Unmarshal(anyBytes, &iv); err != nil {
+			im := map[string]any{}
+			if err := json.Unmarshal(anyBytes, &im); err != nil {
 				return map[string]int64{}, convertError(i, "map[string]int64")
+			}
+			iv = make(map[string]int64, len(im))
+			for k, v := range im {
+				value, err := ToInt64E(v)
+				if err != nil {
+					return map[string]int64{}, convertError(i, "map[string]int64")
+				}
+				iv[k] = value
 			}
 			return
 		}
 	}
 
-	iv = map[string]int64{}
-	if err := decode(i, defaultDecoderConfig(&iv, opts...)); err != nil {
+	im := map[string]any{}
+	if err := decode(i, defaultDecoderConfig(&im, opts...)); err != nil {
 		return map[string]int64{}, convertError(i, "map[string]int64")
+	}
+	iv = make(map[string]int64, len(im))
+	for k, v := range im {
+		value, err := ToInt64E(v)
+		if err != nil {
+			return map[string]int64{}, convertError(i, "map[string]int64")
+		}
+		iv[k] = value
 	}
 	return
 }
@@ -107,8 +133,17 @@ func ToStringMapInt32E(i any, opts ...DecoderConfigOption) (iv map[string]int32,
 	case []byte:
 		// 如果它是 JSON 字符串，自动反序列化它
 		if json.Valid(val) {
-			if err := json.Unmarshal(val, &iv); err != nil {
+			im := map[string]any{}
+			if err := json.Unmarshal(val, &im); err != nil {
 				return map[string]int32{}, convertError(i, "map[string]int32")
+			}
+			iv = make(map[string]int32, len(im))
+			for k, v := range im {
+				value, err := ToInt32E(v)
+				if err != nil {
+					return map[string]int32{}, convertError(i, "map[string]int32")
+				}
+				iv[k] = value
 			}
 			return
 		}
@@ -116,16 +151,33 @@ func ToStringMapInt32E(i any, opts ...DecoderConfigOption) (iv map[string]int32,
 		// 如果它是 JSON 字符串，自动反序列化它
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
-			if err := json.Unmarshal(anyBytes, &iv); err != nil {
+			im := map[string]any{}
+			if err := json.Unmarshal(anyBytes, &im); err != nil {
 				return map[string]int32{}, convertError(i, "map[string]int32")
+			}
+			iv = make(map[string]int32, len(im))
+			for k, v := range im {
+				value, err := ToInt32E(v)
+				if err != nil {
+					return map[string]int32{}, convertError(i, "map[string]int32")
+				}
+				iv[k] = value
 			}
 			return
 		}
 	}
 
-	iv = map[string]int32{}
-	if err := decode(i, defaultDecoderConfig(&iv, opts...)); err != nil {
+	im := map[string]any{}
+	if err := decode(i, defaultDecoderConfig(&im, opts...)); err != nil {
 		return map[string]int32{}, convertError(i, "map[string]int32")
+	}
+	iv = make(map[string]int32, len(im))
+	for k, v := range im {
+		value, err := ToInt32E(v)
+		if err != nil {
+			return map[string]int32{}, convertError(i, "map[string]int32")
+		}
+		iv[k] = value
 	}
 	return
 }
@@ -166,8 +218,17 @@ func ToStringMapInt16E(i any, opts ...DecoderConfigOption) (iv map[string]int16,
 	case []byte:
 		// 如果它是 JSON 字符串，自动反序列化它
 		if json.Valid(val) {
-			if err := json.Unmarshal(val, &iv); err != nil {
+			im := map[string]any{}
+			if err := json.Unmarshal(val, &im); err != nil {
 				return map[string]int16{}, convertError(i, "map[string]int16")
+			}
+			iv = make(map[string]int16, len(im))
+			for k, v := range im {
+				value, err := ToInt16E(v)
+				if err != nil {
+					return map[string]int16{}, convertError(i, "map[string]int16")
+				}
+				iv[k] = value
 			}
 			return
 		}
@@ -175,16 +236,33 @@ func ToStringMapInt16E(i any, opts ...DecoderConfigOption) (iv map[string]int16,
 		// 如果它是 JSON 字符串，自动反序列化它
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
-			if err := json.Unmarshal(anyBytes, &iv); err != nil {
+			im := map[string]any{}
+			if err := json.Unmarshal(anyBytes, &im); err != nil {
 				return map[string]int16{}, convertError(i, "map[string]int16")
+			}
+			iv = make(map[string]int16, len(im))
+			for k, v := range im {
+				value, err := ToInt16E(v)
+				if err != nil {
+					return map[string]int16{}, convertError(i, "map[string]int16")
+				}
+				iv[k] = value
 			}
 			return
 		}
 	}
 
-	iv = map[string]int16{}
-	if err := decode(i, defaultDecoderConfig(&iv, opts...)); err != nil {
+	im := map[string]any{}
+	if err := decode(i, defaultDecoderConfig(&im, opts...)); err != nil {
 		return map[string]int16{}, convertError(i, "map[string]int16")
+	}
+	iv = make(map[string]int16, len(im))
+	for k, v := range im {
+		value, err := ToInt16E(v)
+		if err != nil {
+			return map[string]int16{}, convertError(i, "map[string]int16")
+		}
+		iv[k] = value
 	}
 	return
 }
@@ -225,8 +303,17 @@ func ToStringMapInt8E(i any, opts ...DecoderConfigOption) (iv map[string]int8, e
 	case []byte:
 		// 如果它是 JSON 字符串，自动反序列化它
 		if json.Valid(val) {
-			if err := json.Unmarshal(val, &iv); err != nil {
+			im := map[string]any{}
+			if err := json.Unmarshal(val, &im); err != nil {
 				return map[string]int8{}, convertError(i, "map[string]int8")
+			}
+			iv = make(map[string]int8, len(im))
+			for k, v := range im {
+				value, err := ToInt8E(v)
+				if err != nil {
+					return map[string]int8{}, convertError(i, "map[string]int8")
+				}
+				iv[k] = value
 			}
 			return
 		}
@@ -234,16 +321,33 @@ func ToStringMapInt8E(i any, opts ...DecoderConfigOption) (iv map[string]int8, e
 		// 如果它是 JSON 字符串，自动反序列化它
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
-			if err := json.Unmarshal(anyBytes, &iv); err != nil {
+			im := map[string]any{}
+			if err := json.Unmarshal(anyBytes, &im); err != nil {
 				return map[string]int8{}, convertError(i, "map[string]int8")
+			}
+			iv = make(map[string]int8, len(im))
+			for k, v := range im {
+				value, err := ToInt8E(v)
+				if err != nil {
+					return map[string]int8{}, convertError(i, "map[string]int8")
+				}
+				iv[k] = value
 			}
 			return
 		}
 	}
 
-	iv = map[string]int8{}
-	if err := decode(i, defaultDecoderConfig(&iv, opts...)); err != nil {
+	im := map[string]any{}
+	if err := decode(i, defaultDecoderConfig(&im, opts...)); err != nil {
 		return map[string]int8{}, convertError(i, "map[string]int8")
+	}
+	iv = make(map[string]int8, len(im))
+	for k, v := range im {
+		value, err := ToInt8E(v)
+		if err != nil {
+			return map[string]int8{}, convertError(i, "map[string]int8")
+		}
+		iv[k] = value
 	}
 	return
 }
@@ -284,8 +388,17 @@ func ToStringMapIntE(i any, opts ...DecoderConfigOption) (iv map[string]int, err
 	case []byte:
 		// 如果它是 JSON 字符串，自动反序列化它
 		if json.Valid(val) {
-			if err := json.Unmarshal(val, &iv); err != nil {
+			im := map[string]any{}
+			if err := json.Unmarshal(val, &im); err != nil {
 				return map[string]int{}, convertError(i, "map[string]int")
+			}
+			iv = make(map[string]int, len(im))
+			for k, v := range im {
+				value, err := ToIntE(v)
+				if err != nil {
+					return map[string]int{}, convertError(i, "map[string]int")
+				}
+				iv[k] = value
 			}
 			return
 		}
@@ -293,16 +406,33 @@ func ToStringMapIntE(i any, opts ...DecoderConfigOption) (iv map[string]int, err
 		// 如果它是 JSON 字符串，自动反序列化它
 		anyBytes := []byte(val)
 		if json.Valid(anyBytes) {
-			if err := json.Unmarshal(anyBytes, &iv); err != nil {
+			im := map[string]any{}
+			if err := json.Unmarshal(anyBytes, &im); err != nil {
 				return map[string]int{}, convertError(i, "map[string]int")
+			}
+			iv = make(map[string]int, len(im))
+			for k, v := range im {
+				value, err := ToIntE(v)
+				if err != nil {
+					return map[string]int{}, convertError(i, "map[string]int")
+				}
+				iv[k] = value
 			}
 			return
 		}
 	}
 
-	iv = map[string]int{}
-	if err := decode(i, defaultDecoderConfig(&iv, opts...)); err != nil {
+	im := map[string]any{}
+	if err := decode(i, defaultDecoderConfig(&im, opts...)); err != nil {
 		return map[string]int{}, convertError(i, "map[string]int")
+	}
+	iv = make(map[string]int, len(im))
+	for k, v := range im {
+		value, err := ToIntE(v)
+		if err != nil {
+			return map[string]int{}, convertError(i, "map[string]int")
+		}
+		iv[k] = value
 	}
 	return
 }
