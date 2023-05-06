@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-06 00:04:56
+ * @LastEditTime: 2023-05-06 14:23:22
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconf/conf.go
  * @Description:
  *
@@ -13,11 +13,11 @@ package nconf
 import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/liusuxian/nova/utils/nconv"
+	"github.com/liusuxian/nova/utils/nenv"
 	"github.com/liusuxian/nova/utils/nfile"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	_ "github.com/spf13/viper/remote"
-	"os"
 	"strings"
 	"time"
 	"unicode"
@@ -293,9 +293,8 @@ func init() {
 	v.AddConfigPath("./")                 // 设置配置文件的搜索目录
 	v.AddConfigPath("./config/")          // 设置配置文件的搜索目录
 	v.AddConfigPath("./manifest/config/") // 设置配置文件的搜索目录
-	envConfigPath := os.Getenv("NOVA_CONFIG_FILE_PATH")
-	if !strings.EqualFold("", envConfigPath) {
-		v.AddConfigPath(envConfigPath) // 设置配置文件的搜索目录
+	if nenv.Contains("NOVA_CONFIG_FILE_PATH") {
+		v.AddConfigPath(nenv.Get("NOVA_CONFIG_FILE_PATH")) // 设置配置文件的搜索目录
 	}
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
