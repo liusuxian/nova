@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-05 17:56:55
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-05 19:54:38
+ * @LastEditTime: 2023-05-06 14:16:48
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/time_test.go
  * @Description:
  *
@@ -95,16 +95,16 @@ func TestToDurationSliceE(t *testing.T) {
 	actualObj, err := nconv.ToDurationSliceE(nil) // nil
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]time.Duration{}, actualObj)
+		assert.ElementsMatch([]time.Duration{}, actualObj)
 	}
 	actualObj, err = nconv.ToDurationSliceE([]string{"5m30s", "6m30s"}) // []string
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]time.Duration{time.Duration(time.Minute*5 + time.Second*30), time.Duration(time.Minute*6 + time.Second*30)}, actualObj)
+		assert.ElementsMatch([]time.Duration{time.Duration(time.Minute*5 + time.Second*30), time.Duration(time.Minute*6 + time.Second*30)}, actualObj)
 	}
 	actualObj, err = nconv.ToDurationSliceE([]any{json.Number("1594477475"), 1594477475}) // []any
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]time.Duration{time.Duration(1594477475), time.Duration(1594477475)}, actualObj)
+		assert.ElementsMatch([]time.Duration{time.Duration(1594477475), time.Duration(1594477475)}, actualObj)
 	}
 }

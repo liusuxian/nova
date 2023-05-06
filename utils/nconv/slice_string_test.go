@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 02:24:36
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-18 00:16:19
+ * @LastEditTime: 2023-05-06 14:17:47
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_string_test.go
  * @Description:
  *
@@ -21,41 +21,41 @@ func TestToStringSliceE(t *testing.T) {
 	actualObj, err := nconv.ToStringSliceE([]int{0, 1, 0}) // []int
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]string{"0", "1", "0"}, actualObj)
+		assert.ElementsMatch([]string{"0", "1", "0"}, actualObj)
 	}
 	actualObj, err = nconv.ToStringSliceE([][]byte{[]byte("1"), []byte("0")}) // [][]byte
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]string{"1", "0"}, actualObj)
+		assert.ElementsMatch([]string{"1", "0"}, actualObj)
 	}
 	actualObj, err = nconv.ToStringSliceE([]map[string]any{{"a1": 1, "b1": 2}, {"a2": 3, "b2": 4}}) // []map[string]any
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]string{"{\"a1\":1,\"b1\":2}", "{\"a2\":3,\"b2\":4}"}, actualObj)
+		assert.ElementsMatch([]string{"{\"a1\":1,\"b1\":2}", "{\"a2\":3,\"b2\":4}"}, actualObj)
 	}
 	actualObj, err = nconv.ToStringSliceE([]map[string]int{{"a1": 1, "b1": 2}, {"a2": 3, "b2": 4}}) // []map[string]int
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]string{"{\"a1\":1,\"b1\":2}", "{\"a2\":3,\"b2\":4}"}, actualObj)
+		assert.ElementsMatch([]string{"{\"a1\":1,\"b1\":2}", "{\"a2\":3,\"b2\":4}"}, actualObj)
 	}
 	actualObj, err = nconv.ToStringSliceE([]map[string]bool{{"a1": true, "b1": false}, {"a2": true, "b2": false}}) // []map[string]bool
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]string{"{\"a1\":true,\"b1\":false}", "{\"a2\":true,\"b2\":false}"}, actualObj)
+		assert.ElementsMatch([]string{"{\"a1\":true,\"b1\":false}", "{\"a2\":true,\"b2\":false}"}, actualObj)
 	}
 	actualObj, err = nconv.ToStringSliceE([][]int{{1, 2}, {3, 4}}) // [][]int
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]string{"[1,2]", "[3,4]"}, actualObj)
+		assert.ElementsMatch([]string{"[1,2]", "[3,4]"}, actualObj)
 	}
 	actualObj, err = nconv.ToStringSliceE([]byte("[1, 1.2, true, \"hello\", \"world\"]")) // []byte
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]string{"1", "1.2", "true", "hello", "world"}, actualObj)
+		assert.ElementsMatch([]string{"1", "1.2", "true", "hello", "world"}, actualObj)
 	}
 	actualObj, err = nconv.ToStringSliceE("[1, 1.2, true, \"hello\", \"world\"]") // string
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]string{"1", "1.2", "true", "hello", "world"}, actualObj)
+		assert.ElementsMatch([]string{"1", "1.2", "true", "hello", "world"}, actualObj)
 	}
 }

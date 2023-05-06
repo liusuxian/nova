@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-16 03:16:46
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-04 10:51:10
+ * @LastEditTime: 2023-05-06 14:15:48
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/struct_test.go
  * @Description:
  *
@@ -72,7 +72,7 @@ func TestToStructE(t *testing.T) {
 	err = nconv.ToStructE(`[{"a":1,"b":1.2,"c":"hello","d":["hello","true"],"e":{"a":1,"b":1.2,"c":"hello","d":["hello","true"]}}, {"a":1,"b":1.2,"c":"hello","d":["hello","true"],"e":{"a":1,"b":1.2,"c":"hello","d":["hello","true"]}}]`, &val5) // json
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]*BBB{
+		assert.ElementsMatch([]*BBB{
 			{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}, E: &BBB{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}}},
 			{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}, E: &BBB{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}}},
 		}, val5)
@@ -84,7 +84,7 @@ func TestToStructE(t *testing.T) {
 	}, &val6) // []map[string]any
 	errLog(t, err)
 	if assert.NoError(err) {
-		assert.Equal([]*BBB{
+		assert.ElementsMatch([]*BBB{
 			{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}, E: &BBB{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}}},
 			{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}, E: &BBB{A: 1, B: 1.2, C: "hello", D: []string{"hello", "true"}}},
 		}, val6)

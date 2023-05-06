@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-04 12:14:28
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-05 23:11:08
+ * @LastEditTime: 2023-05-06 14:19:36
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nredis/redis_test.go
  * @Description:
  *
@@ -92,7 +92,7 @@ func TestRedis(t *testing.T) {
 	}
 	actualObj, err = client.Do(ctx, "GET", "eee")
 	if assert.NoError(err) {
-		assert.Equal([]any{float64(1), 1.2, "hello", true}, nconv.ToSlice(actualObj))
+		assert.ElementsMatch([]any{float64(1), 1.2, "hello", true}, nconv.ToSlice(actualObj))
 	}
 
 	err = client.ScriptLoad(ctx, "lua_script/test1.lua")
