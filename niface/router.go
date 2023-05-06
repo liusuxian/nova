@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 01:27:08
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-06 17:21:51
+ * @LastEditTime: 2023-05-06 19:09:38
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/router.go
  * @Description:
  *
@@ -19,6 +19,7 @@ type IRouter interface {
 	AddHandler(msgID uint16, handlers ...RouterHandler)                                // 添加路由
 	Group(startMsgID, endMsgID uint16, handlers ...RouterHandler) (group IGroupRouter) // 路由组管理
 	GetHandlers(msgID uint16) (handlers []RouterHandler, isExist bool)                 // 获取路由处理函数集合
+	PrintRouters()                                                                     // 打印所有路由
 }
 
 // IGroupRouter 路由组接口
