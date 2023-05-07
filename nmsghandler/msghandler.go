@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:01:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-06 19:56:37
+ * @LastEditTime: 2023-05-07 23:06:55
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -53,6 +53,11 @@ func (mh *MsgHandle) Group(startMsgID, endMsgID uint16, handlers ...niface.Route
 func (mh *MsgHandle) Use(handlers ...niface.RouterHandler) (router niface.IRouter) {
 	mh.router.Use(handlers...)
 	return mh.router
+}
+
+// PrintRouters 打印所有路由
+func (mh *MsgHandle) PrintRouters() {
+	mh.router.PrintRouters()
 }
 
 // StartWorkerPool 启动 Worker 工作池

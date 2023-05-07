@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-01 17:52:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-07 22:34:15
+ * @LastEditTime: 2023-05-08 00:26:05
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserveroverload/serveroverload.go
  * @Description:
  *
@@ -24,8 +24,8 @@ type ServerOverloadChecker struct {
 	clientCall bool                         // 是否是客户端调用
 }
 
-// ServerOverloadDefaultHandlers 默认的处理服务器人数超载消息业务处理器
-func ServerOverloadDefaultHandlers(request niface.IRequest) {
+// ServerOverloadDefaultHandler 默认的处理服务器人数超载消息业务处理器
+func ServerOverloadDefaultHandler(request niface.IRequest) {
 	nlog.Debug("Receive Server Overload Msg", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("Data", request.GetData()))
 }
 
@@ -38,7 +38,7 @@ func NewServerOverloadChecker(clientCall bool) (checker niface.IServerOverloadCh
 		clientCall: clientCall,
 	}
 	if clientCall {
-		serverOverload.handlers = []niface.RouterHandler{ServerOverloadDefaultHandlers}
+		serverOverload.handlers = []niface.RouterHandler{ServerOverloadDefaultHandler}
 	}
 	return serverOverload
 }

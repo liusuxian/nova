@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 20:34:11
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-06 00:50:45
+ * @LastEditTime: 2023-05-08 00:43:35
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/client/client.go
  * @Description:
  *
@@ -36,7 +36,7 @@ func main() {
 			// 设置当前 Client 的服务器人数超载检测器
 			c.SetServerOverload()
 			// 设置当前 Client 的心跳检测器
-			c.SetHeartBeat(false)
+			c.SetHeartBeat(true)
 			// 启动 Client
 			c.Start()
 			// 停止 Client

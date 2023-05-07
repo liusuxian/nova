@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-18 23:25:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-07 22:17:49
+ * @LastEditTime: 2023-05-08 00:38:12
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/server.go
  * @Description:
  *
@@ -29,7 +29,7 @@ type IServer interface {
 	GetPacket() (packet IDataPack)                                                     // 获取当前 Server 绑定的数据协议封包和拆包方式
 	GetMsgHandler() (handler IMsgHandle)                                               // 获取当前 Server 绑定的消息处理模块
 	SetServerOverload(option ...*ServerOverloadOption)                                 // 设置当前 Server 的服务器人数超载检测器
-	SetHeartBeat(option ...*HeartBeatOption)                                           // 设置当前 Server 的心跳检测器
+	SetHeartBeat(initiate bool, option ...*HeartBeatOption)                            // 设置当前 Server 的心跳检测器
 	GetHeartBeat() (checker IHeartBeatChecker)                                         // 获取当前 Server 的心跳检测器
 	AddInterceptor(interceptor IInterceptor)                                           // 添加拦截器
 }

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-07 22:41:17
+ * @LastEditTime: 2023-05-08 00:39:20
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -175,10 +175,10 @@ func (s *Server) SetServerOverload(option ...*niface.ServerOverloadOption) {
 }
 
 // SetHeartBeat 设置当前 Server 的心跳检测器
-func (s *Server) SetHeartBeat(option ...*niface.HeartBeatOption) {
+func (s *Server) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
 	// 创建心跳检测器
 	interval := time.Duration(s.serverConf.Heartbeat) * time.Millisecond
-	checker := nheartbeat.NewHeartbeatChecker(interval)
+	checker := nheartbeat.NewHeartBeatChecker(interval, initiate)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
@@ -209,8 +209,8 @@ func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	s.callOnStart()
 	// 启动 Worker 工作池
 	s.msgHandler.StartWorkerPool()
-	// TODO 打印所有路由
-	// s.msgHandler.PrintRouters()
+	// 打印所有路由
+	s.msgHandler.PrintRouters()
 	return
 }
 

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 10:49:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-07 22:43:09
+ * @LastEditTime: 2023-05-08 00:39:47
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -153,8 +153,8 @@ func (c *Client) SetServerOverload(option ...*niface.ServerOverloadOption) {
 }
 
 // SetHeartBeat 设置当前 Client 的心跳检测器
-func (c *Client) SetHeartBeat(option ...*niface.HeartBeatOption) {
-	checker := nheartbeat.NewHeartbeatChecker(c.heartbeat)
+func (c *Client) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
+	checker := nheartbeat.NewHeartBeatChecker(c.heartbeat, initiate)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
@@ -184,8 +184,8 @@ func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	if _, err := c.client.Dial(c.network, c.addr); err != nil {
 		nlog.Fatal("Client OnBoot Error", nlog.Err(err))
 	}
-	// TODO 打印所有路由
-	// c.msgHandler.PrintRouters()
+	// 打印所有路由
+	c.msgHandler.PrintRouters()
 	return
 }
 
