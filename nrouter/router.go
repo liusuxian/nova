@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 15:22:54
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-06 19:10:12
+ * @LastEditTime: 2023-05-07 15:03:11
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrouter/router.go
  * @Description:
  *
@@ -24,16 +24,16 @@ import (
 
 // Router 路由结构
 type Router struct {
-	apis         map[uint16][]niface.RouterHandler // 存放每个 MsgID 所对应的路由处理函数集合
-	handlers     []niface.RouterHandler            // 存放全局路由处理函数集合
+	apis         map[uint16][]niface.RouterHandler // 存放每个 MsgID 所对应的业务处理器集合
+	handlers     []niface.RouterHandler            // 存放全局组件
 	sync.RWMutex                                   // 并发读写锁
 }
 
-// GroupRouter 路由组结构
+// GroupRouter 路由分组结构
 type GroupRouter struct {
 	startMsgID uint16                 // 起始 MsgID
 	endMsgID   uint16                 // 终止 MsgID
-	handlers   []niface.RouterHandler // 存放全局路由处理函数集合
+	handlers   []niface.RouterHandler // 存放全局组件
 	router     niface.IRouter         // 路由
 }
 
@@ -45,7 +45,7 @@ func NewRouter() (r *Router) {
 	}
 }
 
-// NewGroupRouter 创建路由组
+// NewGroupRouter 创建路由分组
 func NewGroupRouter(startMsgID, endMsgID uint16, router *Router, handlers ...niface.RouterHandler) (group *GroupRouter) {
 	group = &GroupRouter{
 		startMsgID: startMsgID,
@@ -57,12 +57,12 @@ func NewGroupRouter(startMsgID, endMsgID uint16, router *Router, handlers ...nif
 	return
 }
 
-// Use 添加全局路由
+// Use 添加全局组件
 func (r *Router) Use(handlers ...niface.RouterHandler) {
 	r.handlers = append(r.handlers, handlers...)
 }
 
-// AddHandler 添加路由
+// AddHandler 添加业务处理器集合
 func (r *Router) AddHandler(msgID uint16, handlers ...niface.RouterHandler) {
 	if _, ok := r.apis[msgID]; ok {
 		panic("Repeated Api MsgID = " + strconv.Itoa(int(msgID)))
@@ -75,12 +75,12 @@ func (r *Router) AddHandler(msgID uint16, handlers ...niface.RouterHandler) {
 	r.apis[msgID] = append(r.apis[msgID], newHandlers...)
 }
 
-// Group 路由组管理
+// Group 路由分组管理，并且会返回一个组管理器
 func (r *Router) Group(startMsgID uint16, endMsgID uint16, handlers ...niface.RouterHandler) (group niface.IGroupRouter) {
 	return NewGroupRouter(startMsgID, endMsgID, r, handlers...)
 }
 
-// GetHandlers 获取路由处理函数集合
+// GetHandlers 获取当前所有注册在 MsgID 的处理器集合
 func (r *Router) GetHandlers(msgID uint16) (handlers []niface.RouterHandler, isExist bool) {
 	r.RLock()
 	defer r.RUnlock()
@@ -130,12 +130,12 @@ func (r *Router) PrintRouters() {
 	nlog.Write(tableData.Bytes(), nlog.LOGTYPE_ERROR)
 }
 
-// Use 添加全局路由
+// Use 添加全局组件
 func (gr *GroupRouter) Use(handlers ...niface.RouterHandler) {
 	gr.handlers = append(gr.handlers, handlers...)
 }
 
-// AddHandler 添加路由
+// AddHandler 添加业务处理器集合
 func (gr *GroupRouter) AddHandler(msgID uint16, handlers ...niface.RouterHandler) {
 	if msgID < gr.startMsgID || msgID > gr.endMsgID {
 		panic("Add Router To Group Error In MsgID: " + strconv.Itoa(int(msgID)))

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-03 21:32:49
+ * @LastEditTime: 2023-05-07 22:41:17
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -37,6 +37,8 @@ type Server struct {
 	connMgr               niface.IConnManager           // 当前 Server 的连接管理模块
 	onConnStart           func(conn niface.IConnection) // 当前 Server 的连接创建时的 Hook 函数
 	onConnStop            func(conn niface.IConnection) // 当前 Server 的连接断开时的 Hook 函数
+	onStart               func(s niface.IServer)        // 当前 Server 启动时的 Hook 函数
+	onStop                func(s niface.IServer)        // 当前 Server 停止时的 Hook 函数
 	packet                niface.IDataPack              // 当前 Server 绑定的数据协议封包方式
 	serverOverloadChecker niface.IServerOverloadChecker // 服务器人数超载检测器
 	heartbeatChecker      niface.IHeartBeatChecker      // 心跳检测器
@@ -90,9 +92,19 @@ func (s *Server) Stop() {
 	s.eng.Stop(context.Background())
 }
 
-// AddRouter 给当前 Server 添加路由
-func (s *Server) AddRouter(msgID uint16, router niface.IRouter) {
-	s.msgHandler.AddRouter(msgID, router)
+// AddRouter 添加业务处理器集合
+func (s *Server) AddRouter(msgID uint16, handlers ...niface.RouterHandler) (router niface.IRouter) {
+	return s.msgHandler.AddRouter(msgID, handlers...)
+}
+
+// Group 路由分组管理，并且会返回一个组管理器
+func (s *Server) Group(startMsgID, endMsgID uint16, handlers ...niface.RouterHandler) (group niface.IGroupRouter) {
+	return s.msgHandler.Group(startMsgID, endMsgID, handlers...)
+}
+
+// Use 添加全局组件
+func (s *Server) Use(handlers ...niface.RouterHandler) (router niface.IRouter) {
+	return s.msgHandler.Use(handlers...)
 }
 
 // GetConnManager 获取当前 Server 的连接管理
@@ -125,6 +137,16 @@ func (s *Server) GetOnConnStop() (f func(conn niface.IConnection)) {
 	return s.onConnStop
 }
 
+// SetOnStart 设置当前 Server 启动时的 Hook 函数
+func (s *Server) SetOnStart(f func(s niface.IServer)) {
+	s.onStart = f
+}
+
+// SetOnStop 设置当前 Server 停止时的 Hook 函数
+func (s *Server) SetOnStop(f func(s niface.IServer)) {
+	s.onStop = f
+}
+
 // SetPacket 设置当前 Server 绑定的数据协议封包和拆包方式
 func (s *Server) SetPacket(packet niface.IDataPack) {
 	s.packet = packet
@@ -147,25 +169,25 @@ func (s *Server) SetServerOverload(option ...*niface.ServerOverloadOption) {
 	if len(option) > 0 {
 		opt := option[0]
 		checker.SetServerOverloadMsgFunc(opt.MakeMsg)
-		checker.BindRouter(opt.MsgID, opt.Router)
+		checker.BindRouter(opt.MsgID, opt.RouterHandlers...)
 	}
 	s.serverOverloadChecker = checker
 }
 
 // SetHeartBeat 设置当前 Server 的心跳检测器
-func (s *Server) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
+func (s *Server) SetHeartBeat(option ...*niface.HeartBeatOption) {
 	// 创建心跳检测器
 	interval := time.Duration(s.serverConf.Heartbeat) * time.Millisecond
-	checker := nheartbeat.NewHeartbeatChecker(interval, initiate)
+	checker := nheartbeat.NewHeartbeatChecker(interval)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
 		checker.SetHeartBeatMsgFunc(opt.MakeMsg)
 		checker.SetOnRemoteNotAlive(opt.OnRemoteNotAlive)
-		checker.BindRouter(opt.MsgID, opt.Router)
+		checker.BindRouter(opt.MsgID, opt.RouterHandlers...)
 	}
 	// 添加心跳检测的路由
-	s.AddRouter(checker.GetMsgID(), checker.GetRouter())
+	s.AddRouter(checker.GetMsgID(), checker.GetHandlers()...)
 	s.heartbeatChecker = checker
 }
 
@@ -183,10 +205,12 @@ func (s *Server) AddInterceptor(interceptor niface.IInterceptor) {
 func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	nlog.Info("Server OnBoot", nlog.String("listening", s.addr), nlog.Reflect("ServerConf", s.serverConf), nlog.Reflect("options", s.options))
 	s.eng = eng
+	// 调用 Server 启动时的 Hook 函数
+	s.callOnStart()
 	// 启动 Worker 工作池
 	s.msgHandler.StartWorkerPool()
-	// 打印所有路由
-	s.msgHandler.PrintRouters()
+	// TODO 打印所有路由
+	// s.msgHandler.PrintRouters()
 	return
 }
 
@@ -228,6 +252,8 @@ func (s *Server) OnShutdown(eng gnet.Engine) {
 	nlog.Info("Server OnShutdown")
 	// 停止 Worker 工作池
 	s.msgHandler.StopWorkerPool()
+	// 调用 Server 停止时的 Hook 函数
+	s.callOnStop()
 }
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
@@ -266,4 +292,20 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 func (s *Server) doKickConn(conn gnet.Conn) {
 	<-time.After(10 * time.Millisecond)
 	_ = conn.Close()
+}
+
+// callOnStart 调用 Server 启动时的 Hook 函数
+func (s *Server) callOnStart() {
+	if s.onStart != nil {
+		nlog.Info("Server CallOnStart...")
+		s.onStart(s)
+	}
+}
+
+// callOnStop 调用 Server 停止时的 Hook 函数
+func (s *Server) callOnStop() {
+	if s.onStop != nil {
+		nlog.Info("Server CallOnStop...")
+		s.onStop(s)
+	}
 }

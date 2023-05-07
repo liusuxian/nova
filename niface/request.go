@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 21:35:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-06 18:29:03
+ * @LastEditTime: 2023-05-07 15:07:26
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/request.go
  * @Description:
  *
@@ -23,8 +23,8 @@ type IRequest interface {
 	GetMessage() (msg IMessage)          // 获取请求消息的原始数据
 	GetResponse() (resp IcResp)          // 获取解析完后的序列化数据
 	SetResponse(resp IcResp)             // 设置解析完后的序列化数据
-	BindRouter(handlers []RouterHandler) // 绑定这次请求的路由处理函数集合
-	RouterNext()                         // 执行下一个路由处理函数
+	BindRouter(handlers []RouterHandler) // 绑定这次请求的业务处理器集合
+	RouterNext()                         // 执行下一个业务处理器
 }
 
 // BaseRequest 基础请求结构
@@ -48,8 +48,8 @@ func (br *BaseRequest) GetResponse() (resp IcResp) { return nil }
 // SetResponse 设置解析完后的序列化数据
 func (br *BaseRequest) SetResponse(resp IcResp) {}
 
-// BindRouter 绑定这次请求的路由处理函数集合
+// BindRouter 绑定这次请求的业务处理器集合
 func (br *BaseRequest) BindRouter(handlers []RouterHandler) {}
 
-// RouterNext 执行下一个路由处理函数
+// RouterNext 执行下一个业务处理器
 func (br *BaseRequest) RouterNext() {}

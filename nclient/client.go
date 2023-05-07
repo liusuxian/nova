@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 10:49:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-04 11:21:20
+ * @LastEditTime: 2023-05-07 22:43:09
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -83,9 +83,19 @@ func (c *Client) Stop() {
 	_ = c.client.Stop()
 }
 
-// AddRouter 给当前 Client 添加路由
-func (c *Client) AddRouter(msgID uint16, router niface.IRouter) {
-	c.msgHandler.AddRouter(msgID, router)
+// AddRouter 添加业务处理器集合
+func (c *Client) AddRouter(msgID uint16, handlers ...niface.RouterHandler) (router niface.IRouter) {
+	return c.msgHandler.AddRouter(msgID, handlers...)
+}
+
+// Group 路由分组管理，并且会返回一个组管理器
+func (c *Client) Group(startMsgID, endMsgID uint16, handlers ...niface.RouterHandler) (group niface.IGroupRouter) {
+	return c.msgHandler.Group(startMsgID, endMsgID, handlers...)
+}
+
+// Use 添加全局组件
+func (c *Client) Use(handlers ...niface.RouterHandler) (router niface.IRouter) {
+	return c.msgHandler.Use(handlers...)
 }
 
 // Conn 当前 Client 的连接信息
@@ -135,25 +145,25 @@ func (c *Client) SetServerOverload(option ...*niface.ServerOverloadOption) {
 	if len(option) > 0 {
 		opt := option[0]
 		checker.SetServerOverloadMsgFunc(opt.MakeMsg)
-		checker.BindRouter(opt.MsgID, opt.Router)
+		checker.BindRouter(opt.MsgID, opt.RouterHandlers...)
 	}
 	// 添加服务器人数超载消息的路由
-	c.AddRouter(checker.GetMsgID(), checker.GetRouter())
+	c.AddRouter(checker.GetMsgID(), checker.GetHandlers()...)
 	c.serverOverloadChecker = checker
 }
 
 // SetHeartBeat 设置当前 Client 的心跳检测器
-func (c *Client) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
-	checker := nheartbeat.NewHeartbeatChecker(c.heartbeat, initiate)
+func (c *Client) SetHeartBeat(option ...*niface.HeartBeatOption) {
+	checker := nheartbeat.NewHeartbeatChecker(c.heartbeat)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
 		checker.SetHeartBeatMsgFunc(opt.MakeMsg)
 		checker.SetOnRemoteNotAlive(opt.OnRemoteNotAlive)
-		checker.BindRouter(opt.MsgID, opt.Router)
+		checker.BindRouter(opt.MsgID, opt.RouterHandlers...)
 	}
 	// 添加心跳检测的路由
-	c.AddRouter(checker.GetMsgID(), checker.GetRouter())
+	c.AddRouter(checker.GetMsgID(), checker.GetHandlers()...)
 	c.heartbeatChecker = checker
 }
 
@@ -174,8 +184,8 @@ func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	if _, err := c.client.Dial(c.network, c.addr); err != nil {
 		nlog.Fatal("Client OnBoot Error", nlog.Err(err))
 	}
-	// 打印所有路由
-	c.msgHandler.PrintRouters()
+	// TODO 打印所有路由
+	// c.msgHandler.PrintRouters()
 	return
 }
 

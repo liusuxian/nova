@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:06:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-06 20:13:58
+ * @LastEditTime: 2023-05-07 15:07:14
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrequest/request.go
  * @Description:
  *
@@ -18,8 +18,8 @@ type Request struct {
 	conn               niface.IConnection     // 已经和客户端建立好的连接
 	msg                niface.IMessage        // 客户端请求的数据
 	icResp             niface.IcResp          // 拦截器返回的数据
-	handlers           []niface.RouterHandler // 路由处理函数集合
-	index              int                    // 路由处理函数集合索引
+	handlers           []niface.RouterHandler // 业务处理器集合
+	index              int                    // 业务处理器集合索引
 }
 
 // NewRequest 创建请求
@@ -60,13 +60,13 @@ func (r *Request) SetResponse(resp niface.IcResp) {
 	r.icResp = resp
 }
 
-// BindRouter 绑定这次请求的路由处理函数集合
+// BindRouter 绑定这次请求的业务处理器集合
 func (r *Request) BindRouter(handlers []niface.RouterHandler) {
 	r.handlers = handlers
 	r.index = -1
 }
 
-// RouterNext 执行下一个路由处理函数
+// RouterNext 执行下一个业务处理器
 func (r *Request) RouterNext() {
 	r.index++
 	for r.index < len(r.handlers) {
