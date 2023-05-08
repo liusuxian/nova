@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-08 01:42:26
+ * @LastEditTime: 2023-05-08 21:22:13
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/server.go
  * @Description:
  *
@@ -35,7 +35,7 @@ func main() {
 	// 设置当前 Server 的心跳检测器
 	heartbeat.SetHeartBeat(s, true)
 	// 添加解析消息拦截器
-	s.AddInterceptor(&unmarshalmsg.UnmarshalMsg{})
+	unmarshalmsg.AddInterceptor(s)
 	go func() {
 		// 创建一个通道，用于接收信号
 		sc := make(chan os.Signal, 1)

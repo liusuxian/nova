@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:23:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-12 18:26:28
+ * @LastEditTime: 2023-05-09 02:52:35
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -97,23 +97,10 @@ func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Dura
 
 // Start 启动连接
 func (c *Connection) Start() {
-	nlog.Info("Connection Start", nlog.Int("ConnID", c.connID))
-
-	c.cancelCtx, c.cancelFunc = context.WithCancel(context.Background())
-	// 调用连接创建时的 Hook 函数
-	c.callOnConnStart()
-
-	// 启动心跳检测
-	if c.heartbeatChecker != nil {
-		// 启动心跳检测
-		c.heartbeatChecker.Start()
-		// 更新连接活动时间
-		c.UpdateActivity()
-	}
-
-	<-c.cancelCtx.Done()
-	// 清理
-	c.finalizer()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go c.doStart(&wg)
+	wg.Wait()
 }
 
 // Stop 停止连接
@@ -235,6 +222,28 @@ func (c *Connection) UpdateActivity() {
 // SetHeartBeat 设置心跳检测器
 func (c *Connection) SetHeartBeat(checker niface.IHeartBeatChecker) {
 	c.heartbeatChecker = checker
+}
+
+// doStart 启动连接
+func (c *Connection) doStart(wg *sync.WaitGroup) {
+	c.cancelCtx, c.cancelFunc = context.WithCancel(context.Background())
+	wg.Done()
+	nlog.Info("Connection Start", nlog.Int("ConnID", c.connID))
+
+	// 调用连接创建时的 Hook 函数
+	c.callOnConnStart()
+
+	// 启动心跳检测
+	if c.heartbeatChecker != nil {
+		// 启动心跳检测
+		c.heartbeatChecker.Start()
+		// 更新连接活动时间
+		c.UpdateActivity()
+	}
+
+	<-c.cancelCtx.Done()
+	// 清理
+	c.finalizer()
 }
 
 // finalizer 清理器

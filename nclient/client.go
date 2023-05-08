@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 10:49:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-08 00:39:47
+ * @LastEditTime: 2023-05-09 02:58:09
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nclient/client.go
  * @Description:
  *
@@ -203,7 +203,7 @@ func (c *Client) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	// 创建一个 Client 客户端特性的连接
 	c.conn = nconn.NewClientConn(c, conn, c.maxHeartbeat)
 	// 启动连接
-	go c.conn.Start()
+	c.conn.Start()
 	return
 }
 
@@ -221,15 +221,30 @@ func (c *Client) OnTick() (delay time.Duration, action gnet.Action) {
 // OnTraffic 在本地套接字从对等方接收数据时触发。
 func (c *Client) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 	for {
-		msg, err := c.packet.UnPack(conn)
+		// 获取包头长度(字节数)
+		headLen := c.packet.GetHeadLen()
+		// 读消息头
+		headBuf, _ := conn.Peek(headLen)
+		// 拆包头
+		msg, err := c.packet.UnPackHead(headBuf)
 		if err == npack.ErrIncompletePacket {
 			break
 		}
 		if err != nil {
-			nlog.Error("Client OnTraffic Unpack Error", nlog.Err(err))
-			return
+			nlog.Error("Client OnTraffic UnPackHead Error", nlog.Uint16("MsgID", msg.GetMsgID()), nlog.Int("DataLen", msg.GetDataLen()), nlog.Err(err))
+			return gnet.Close
 		}
-		nlog.Debug("Client OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()))
+		// 读取整个消息数据
+		msgLen := headLen + msg.GetDataLen()
+		if conn.InboundBuffered() < msgLen {
+			break
+		}
+		msgBuf, _ := conn.Peek(msgLen)
+		_, _ = conn.Discard(msgLen)
+		// 拆包体
+		c.packet.UnPackBody(msgBuf, msg)
+		nlog.Debug("Client OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()), nlog.Int("DataLen", msg.GetDataLen()))
+
 		// 更新连接活动时间
 		c.conn.UpdateActivity()
 		// 得到当前客户端请求的 Request 数据

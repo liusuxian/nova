@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:49:39
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-12 18:29:18
+ * @LastEditTime: 2023-05-09 02:16:28
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/npack/defaultpack.go
  * @Description:
  *
@@ -13,7 +13,6 @@ package npack
 import (
 	"encoding/binary"
 	"github.com/liusuxian/nova/niface"
-	"github.com/panjf2000/gnet/v2"
 	"github.com/pkg/errors"
 )
 
@@ -24,8 +23,8 @@ type defaultPack struct {
 }
 
 const (
-	msgIdSize   int = 2 // 消息ID长度 uint16(2字节)
-	msgBodySize int = 4 // 消息体长度 uint32(4字节)
+	msgIdLen   int = 2 // 消息ID长度 uint16(2字节)
+	msgBodyLen int = 4 // 消息体长度 uint32(4字节)
 )
 
 // newDefaultPack 创建默认封包拆包实例
@@ -36,16 +35,16 @@ func newDefaultPack(endian, maxPacketSize int) (packet niface.IDataPack) {
 	}
 }
 
-// GetHeadLen 获取包头长度
+// GetHeadLen 获取包头长度(字节数)
 func (p *defaultPack) GetHeadLen() (headLen int) {
-	return msgIdSize + msgBodySize
+	return msgIdLen + msgBodyLen
 }
 
 // Pack 封包
 func (p *defaultPack) Pack(msg niface.IMessage) (data []byte) {
 	// 创建消息包的缓冲区
-	bodyOffset := msgIdSize + msgBodySize
-	msgLen := bodyOffset + msg.GetDataLen()
+	headLen := p.GetHeadLen()
+	msgLen := headLen + msg.GetDataLen()
 	data = make([]byte, msgLen)
 	// 获取字节存储次序
 	var endianOrder binary.ByteOrder
@@ -60,24 +59,21 @@ func (p *defaultPack) Pack(msg niface.IMessage) (data []byte) {
 		// 默认小端
 		endianOrder = binary.LittleEndian
 	}
-	// 写消息ID
-	msgIdBytes := make([]byte, msgIdSize)
+	// 写消息 ID
+	msgIdBytes := make([]byte, msgIdLen)
 	endianOrder.PutUint16(msgIdBytes, msg.GetMsgID())
 	copy(data, msgIdBytes)
 	// 写消息体长度
-	endianOrder.PutUint32(data[msgIdSize:bodyOffset], uint32(msg.GetDataLen()))
+	endianOrder.PutUint32(data[msgIdLen:headLen], uint32(msg.GetDataLen()))
 	// 写消息内容
-	copy(data[bodyOffset:msgLen], msg.GetData())
+	copy(data[headLen:], msg.GetData())
 	return
 }
 
-// UnPack 拆包
-func (p *defaultPack) UnPack(conn gnet.Conn) (msg niface.IMessage, err error) {
-	// 读消息头
-	var buf []byte
-	bodyOffset := msgIdSize + msgBodySize
-	buf, _ = conn.Peek(bodyOffset)
-	if len(buf) < bodyOffset {
+// 拆包头
+func (p *defaultPack) UnPackHead(headBuf []byte) (msg niface.IMessage, err error) {
+	headLen := p.GetHeadLen()
+	if len(headBuf) < headLen {
 		err = ErrIncompletePacket
 		return
 	}
@@ -94,24 +90,27 @@ func (p *defaultPack) UnPack(conn gnet.Conn) (msg niface.IMessage, err error) {
 		// 默认小端
 		endianOrder = binary.LittleEndian
 	}
-	// 读取并判断消息体长度是否超出我们允许的最大包长度
-	msgBodyLen := int(endianOrder.Uint32(buf[msgIdSize:bodyOffset]))
-	if p.maxPacketSize > 0 && msgBodyLen > p.maxPacketSize {
+	// 读消息 ID
+	msgID := endianOrder.Uint16(headBuf[:msgIdLen])
+	// 读消息体长度
+	bodyLen := int(endianOrder.Uint32(headBuf[msgIdLen:]))
+	// 创建 Message 消息包
+	msg = NewMsgPackage(msgID, nil)
+	// 设置消息体长度
+	msg.SetDataLen(bodyLen)
+	// 判断消息体长度是否超出我们允许的最大包长度
+	if p.maxPacketSize > 0 && bodyLen > p.maxPacketSize {
 		err = errors.New("too large msg data received")
 		return
 	}
-	// 读取整个消息数据
-	msgLen := bodyOffset + msgBodyLen
-	if conn.InboundBuffered() < msgLen {
-		err = ErrIncompletePacket
-		return
-	}
-	buf, _ = conn.Peek(msgLen)
-	_, _ = conn.Discard(msgLen)
-	// 创建 Message 消息包
-	msgID := endianOrder.Uint16(buf[:msgIdSize])
-	msgData := make([]byte, msgBodyLen)
-	copy(msgData, buf[bodyOffset:msgLen])
-	msg = NewMsgPackage(msgID, msgData)
 	return
+}
+
+// UnPackBody 拆包体
+func (p *defaultPack) UnPackBody(msgBuf []byte, msg niface.IMessage) {
+	// 读消息内容
+	msgData := make([]byte, msg.GetDataLen())
+	copy(msgData, msgBuf[p.GetHeadLen():])
+	// 设置消息内容
+	msg.SetData(msgData)
 }
