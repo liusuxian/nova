@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:23:48
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-09 02:52:35
+ * @LastEditTime: 2023-05-09 03:05:04
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nconn/connection.go
  * @Description:
  *
@@ -227,8 +227,6 @@ func (c *Connection) SetHeartBeat(checker niface.IHeartBeatChecker) {
 // doStart 启动连接
 func (c *Connection) doStart(wg *sync.WaitGroup) {
 	c.cancelCtx, c.cancelFunc = context.WithCancel(context.Background())
-	wg.Done()
-	nlog.Info("Connection Start", nlog.Int("ConnID", c.connID))
 
 	// 调用连接创建时的 Hook 函数
 	c.callOnConnStart()
@@ -240,6 +238,9 @@ func (c *Connection) doStart(wg *sync.WaitGroup) {
 		// 更新连接活动时间
 		c.UpdateActivity()
 	}
+
+	wg.Done()
+	nlog.Info("Connection Start", nlog.Int("ConnID", c.connID))
 
 	<-c.cancelCtx.Done()
 	// 清理
