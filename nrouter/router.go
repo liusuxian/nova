@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 15:22:54
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-07 23:53:38
+ * @LastEditTime: 2023-05-10 00:12:00
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrouter/router.go
  * @Description:
  *
@@ -17,6 +17,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"reflect"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -94,13 +95,21 @@ func (r *Router) PrintRouters() {
 	if routerNum == 0 {
 		return
 	}
+	msgIDList := make([]uint16, 0, routerNum)
+	for k := range r.apis {
+		msgIDList = append(msgIDList, k)
+	}
+	sort.Slice(msgIDList, func(i, j int) bool {
+		return msgIDList[i] < msgIDList[j]
+	})
 	// 组装打印数据
 	printData := make([][]string, 0, routerNum)
-	for msgID, handlers := range r.apis {
+	for _, msgID := range msgIDList {
 		rowData := make([]string, 0, 3)
 		// msgID
 		rowData = append(rowData, strconv.Itoa(int(msgID)))
 		// router handler
+		handlers := r.apis[msgID]
 		handlerData := make([]string, 0, len(handlers))
 		// file
 		fileData := make([]string, 0, len(handlers))
