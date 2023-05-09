@@ -13,6 +13,7 @@ package main
 import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/heartbeat"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/redisdb"
+	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/router"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/serveroverload"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/unmarshalmsg"
 	"github.com/liusuxian/nova/niface"
@@ -44,6 +45,8 @@ func main() {
 	serveroverload.SetServerOverload(s)
 	// 设置当前 Server 的心跳检测器
 	heartbeat.SetHeartBeat(s, true)
+	// 启动路由
+	router.StartRouter(s)
 	// 添加解析消息拦截器
 	unmarshalmsg.AddInterceptor(s)
 	go func() {

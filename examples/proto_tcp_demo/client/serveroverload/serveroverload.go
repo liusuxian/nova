@@ -34,7 +34,6 @@ func SetServerOverload(c niface.IClient) {
 			}
 			return buf
 		},
-		MsgID:          uint16(pb.MsgID_SERVER_OVERLOAD),
-		RouterHandlers: []niface.RouterHandler{ServerOverloadHandler},
+		MsgID: uint16(pb.MsgID_SERVER_OVERLOAD),
 	})
 }

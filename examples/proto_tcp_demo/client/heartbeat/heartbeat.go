@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 17:18:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-08 00:51:00
+ * @LastEditTime: 2023-05-09 21:03:18
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/heartbeat/heartbeat.go
  * @Description:
  *
@@ -48,7 +48,6 @@ func SetHeartBeat(c niface.IClient, initiate bool) {
 			}
 			return buf
 		},
-		MsgID:          uint16(pb.MsgID_HEARTBEAT),
-		RouterHandlers: []niface.RouterHandler{HeartBeatHandler, ReplyHeartBeatHandler},
+		MsgID: uint16(pb.MsgID_HEARTBEAT),
 	})
 }

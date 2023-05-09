@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-09 02:34:02
+ * @LastEditTime: 2023-05-09 21:36:27
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/client.go
  * @Description:
  *
@@ -13,6 +13,7 @@ package main
 import (
 	"context"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/heartbeat"
+	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/router"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/serveroverload"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/unmarshalmsg"
 	"github.com/liusuxian/nova/nclient"
@@ -40,8 +41,10 @@ func main() {
 			serveroverload.SetServerOverload(c)
 			// 设置当前 Client 的心跳检测器
 			heartbeat.SetHeartBeat(c, false)
+			// 启动路由
+			r := router.StartRouter(c)
 			// 添加解析消息拦截器
-			unmarshalmsg.AddInterceptor(c)
+			unmarshalmsg.AddInterceptor(c, r)
 			// 启动 Client
 			c.Start()
 			// 停止 Client
