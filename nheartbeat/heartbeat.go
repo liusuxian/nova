@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 17:44:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-08 00:36:41
+ * @LastEditTime: 2023-05-09 19:47:07
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nheartbeat/heartbeat.go
  * @Description:
  *
@@ -24,14 +24,8 @@ type HeartBeatChecker struct {
 	makeMsg          niface.HeartBeatMsgFunc // 用户自定义的心跳检测消息处理方法
 	onRemoteNotAlive niface.OnRemoteNotAlive // 用户自定义的远程连接不存活时的处理方法
 	msgID            uint16                  // 用户自定义的心跳检测消息ID
-	handlers         []niface.RouterHandler  // 用户自定义的心跳检测消息的业务处理器集合
 	conn             niface.IConnection      // 绑定的连接
 	initiate         bool                    // 发起心跳
-}
-
-// HeartBeatDefaultHandler 默认的心跳消息业务处理器
-func HeartBeatDefaultHandler(request niface.IRequest) {
-	nlog.Debug("Receive Heartbeat", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("Data", request.GetData()))
 }
 
 // NewHeartBeatChecker 创建心跳检测器
@@ -42,7 +36,6 @@ func NewHeartBeatChecker(interval time.Duration, initiate bool) (checker niface.
 		makeMsg:          makeMsgDefaultFunc,
 		onRemoteNotAlive: onRemoteNotAliveDefaultFunc,
 		msgID:            niface.HeartBeatDefaultMsgID,
-		handlers:         []niface.RouterHandler{HeartBeatDefaultHandler},
 		conn:             nil,
 		initiate:         initiate,
 	}
@@ -73,14 +66,6 @@ func (hbc *HeartBeatChecker) SetOnRemoteNotAlive(f niface.OnRemoteNotAlive) {
 	}
 }
 
-// BindRouter 绑定心跳检测消息的业务处理器集合
-func (hbc *HeartBeatChecker) BindRouter(msgID uint16, handlers ...niface.RouterHandler) {
-	if msgID != niface.HeartBeatDefaultMsgID && len(handlers) > 0 {
-		hbc.msgID = msgID
-		hbc.handlers = handlers
-	}
-}
-
 // BindConn 绑定连接
 func (hbc *HeartBeatChecker) BindConn(conn niface.IConnection) {
 	hbc.conn = conn
@@ -96,11 +81,17 @@ func (hbc *HeartBeatChecker) Clone() (checker niface.IHeartBeatChecker) {
 		makeMsg:          hbc.makeMsg,
 		onRemoteNotAlive: hbc.onRemoteNotAlive,
 		msgID:            hbc.msgID,
-		handlers:         hbc.handlers,
 		conn:             nil,
 		initiate:         hbc.initiate,
 	}
 	return heartbeat
+}
+
+// SetMsgID 设置心跳检测消息ID
+func (hbc *HeartBeatChecker) SetMsgID(msgID uint16) {
+	if msgID != niface.HeartBeatDefaultMsgID {
+		hbc.msgID = msgID
+	}
 }
 
 // GetMsgID 获取心跳检测消息ID
@@ -111,11 +102,6 @@ func (hbc *HeartBeatChecker) GetMsgID() (msgID uint16) {
 // GetMessage 获取心跳检测消息
 func (hbc *HeartBeatChecker) GetMessage() (msg niface.IMessage) {
 	return npack.NewMsgPackage(hbc.msgID, hbc.makeMsg())
-}
-
-// GetHandlers 获取心跳检测消息的业务处理器集合
-func (hbc *HeartBeatChecker) GetHandlers() (handlers []niface.RouterHandler) {
-	return hbc.handlers
 }
 
 // start 启动心跳检测

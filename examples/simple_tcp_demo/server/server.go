@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 18:10:57
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-07 22:44:46
+ * @LastEditTime: 2023-05-09 20:11:49
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/server/server.go
  * @Description:
  *
@@ -11,6 +11,7 @@
 package main
 
 import (
+	"github.com/liusuxian/nova/examples/simple_tcp_demo/server/heartbeat"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nserver"
 	"os"
@@ -31,6 +32,8 @@ func main() {
 	s.SetServerOverload()
 	// 设置当前 Server 的心跳检测器
 	s.SetHeartBeat(true)
+	// 添加业务处理器集合
+	s.AddRouter(s.GetHeartBeat().GetMsgID(), heartbeat.HeartBeatHandler)
 	go func() {
 		// 创建一个通道，用于接收信号
 		sc := make(chan os.Signal, 1)

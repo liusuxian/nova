@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-09 15:09:50
+ * @LastEditTime: 2023-05-09 20:02:31
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -164,14 +164,19 @@ func (s *Server) GetMsgHandler() (handler niface.IMsgHandle) {
 
 // SetServerOverload 设置当前 Server 的服务器人数超载检测器
 func (s *Server) SetServerOverload(option ...*niface.ServerOverloadOption) {
-	checker := nserveroverload.NewServerOverloadChecker(false)
+	checker := nserveroverload.NewServerOverloadChecker()
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
 		checker.SetServerOverloadMsgFunc(opt.MakeMsg)
-		checker.BindRouter(opt.MsgID, opt.RouterHandlers...)
+		checker.SetMsgID(opt.MsgID)
 	}
 	s.serverOverloadChecker = checker
+}
+
+// GetServerOverload 获取当前 Server 的服务器人数超载检测器
+func (s *Server) GetServerOverload() (checker niface.IServerOverloadChecker) {
+	return s.serverOverloadChecker
 }
 
 // SetHeartBeat 设置当前 Server 的心跳检测器
@@ -184,10 +189,8 @@ func (s *Server) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) 
 		opt := option[0]
 		checker.SetHeartBeatMsgFunc(opt.MakeMsg)
 		checker.SetOnRemoteNotAlive(opt.OnRemoteNotAlive)
-		checker.BindRouter(opt.MsgID, opt.RouterHandlers...)
+		checker.SetMsgID(opt.MsgID)
 	}
-	// 添加心跳检测的路由
-	s.AddRouter(checker.GetMsgID(), checker.GetHandlers()...)
 	s.heartbeatChecker = checker
 }
 

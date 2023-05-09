@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:01:01
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-08 23:21:46
+ * @LastEditTime: 2023-05-09 20:33:13
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nmsghandler/msghandler.go
  * @Description:
  *
@@ -114,12 +114,10 @@ func (mh *MsgHandle) Intercept(chain niface.IChain) (resp niface.IcResp) {
 	if request != nil {
 		switch iRequest := request.(type) {
 		case niface.IRequest:
-			if iRequest.GetResponse() != nil {
-				if mh.workerPool != nil {
-					mh.SubmitToWorkerPool(iRequest)
-				} else {
-					go mh.doMsgHandler(iRequest)
-				}
+			if mh.workerPool != nil {
+				mh.SubmitToWorkerPool(iRequest)
+			} else {
+				go mh.doMsgHandler(iRequest)
 			}
 		}
 	}

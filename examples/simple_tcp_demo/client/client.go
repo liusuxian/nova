@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-14 20:34:11
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-08 00:43:35
+ * @LastEditTime: 2023-05-09 20:36:28
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/simple_tcp_demo/client/client.go
  * @Description:
  *
@@ -12,6 +12,8 @@ package main
 
 import (
 	"context"
+	"github.com/liusuxian/nova/examples/simple_tcp_demo/client/heartbeat"
+	"github.com/liusuxian/nova/examples/simple_tcp_demo/client/serveroverload"
 	"github.com/liusuxian/nova/nclient"
 	"github.com/liusuxian/nova/nlog"
 	"os"
@@ -36,7 +38,10 @@ func main() {
 			// 设置当前 Client 的服务器人数超载检测器
 			c.SetServerOverload()
 			// 设置当前 Client 的心跳检测器
-			c.SetHeartBeat(true)
+			c.SetHeartBeat(false)
+			// 添加业务处理器集合
+			c.AddRouter(c.GetServerOverload().GetMsgID(), serveroverload.ServerOverloadHandler)
+			c.AddRouter(c.GetHeartBeat().GetMsgID(), heartbeat.HeartBeatHandler)
 			// 启动 Client
 			c.Start()
 			// 停止 Client

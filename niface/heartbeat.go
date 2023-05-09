@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-30 18:27:46
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-07 22:19:28
+ * @LastEditTime: 2023-05-09 19:43:25
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/heartbeat.go
  * @Description:
  *
@@ -12,16 +12,15 @@ package niface
 
 // IHeartBeatChecker 心跳检测器接口
 type IHeartBeatChecker interface {
-	Start()                                             // 启动心跳检测
-	Stop()                                              // 停止心跳检测
-	SetHeartBeatMsgFunc(f HeartBeatMsgFunc)             // 设置心跳检测消息处理方法
-	SetOnRemoteNotAlive(f OnRemoteNotAlive)             // 设置远程连接不存活时的处理方法
-	BindRouter(msgID uint16, handlers ...RouterHandler) // 绑定心跳检测消息的业务处理器集合
-	BindConn(conn IConnection)                          // 绑定连接
-	Clone() (checker IHeartBeatChecker)                 // 克隆心跳检测器
-	GetMsgID() (msgID uint16)                           // 获取心跳检测消息ID
-	GetMessage() (msg IMessage)                         // 获取心跳检测消息
-	GetHandlers() (handlers []RouterHandler)            // 获取心跳检测消息的业务处理器集合
+	Start()                                 // 启动心跳检测
+	Stop()                                  // 停止心跳检测
+	SetHeartBeatMsgFunc(f HeartBeatMsgFunc) // 设置心跳检测消息处理方法
+	SetOnRemoteNotAlive(f OnRemoteNotAlive) // 设置远程连接不存活时的处理方法
+	BindConn(conn IConnection)              // 绑定连接
+	Clone() (checker IHeartBeatChecker)     // 克隆心跳检测器
+	SetMsgID(msgID uint16)                  // 设置心跳检测消息ID
+	GetMsgID() (msgID uint16)               // 获取心跳检测消息ID
+	GetMessage() (msg IMessage)             // 获取心跳检测消息
 }
 
 // HeartBeatMsgFunc 用户自定义的心跳检测消息处理方法
@@ -35,7 +34,6 @@ type HeartBeatOption struct {
 	MakeMsg          HeartBeatMsgFunc // 用户自定义的心跳检测消息处理方法
 	OnRemoteNotAlive OnRemoteNotAlive // 用户自定义的远程连接不存活时的处理方法
 	MsgID            uint16           // 用户自定义的心跳检测消息ID
-	RouterHandlers   []RouterHandler  // 用户自定义的心跳检测消息的业务处理器集合
 }
 
 const (
