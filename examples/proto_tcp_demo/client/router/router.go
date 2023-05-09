@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 20:58:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-09 21:32:18
+ * @LastEditTime: 2023-05-10 01:40:30
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/router/router.go
  * @Description:
  *
@@ -12,6 +12,7 @@ package router
 
 import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/heartbeat"
+	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/login"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/serveroverload"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/proto/pb"
 	"github.com/liusuxian/nova/niface"
@@ -30,8 +31,9 @@ func StartRouter(c niface.IClient) (r *Router) {
 		msgMap: make(map[uint16]func() proto.Message),
 	}
 	// 添加业务处理器集合
-	r.addRouter(pb.MsgID_SERVER_OVERLOAD, func() proto.Message { return new(pb.ServerOverload) }, serveroverload.ServerOverloadHandler)             // 服务器人数超载
-	r.addRouter(pb.MsgID_HEARTBEAT, func() proto.Message { return new(pb.Heartbeat) }, heartbeat.HeartBeatHandler, heartbeat.ReplyHeartBeatHandler) // 心跳
+	r.addRouter(pb.MsgID_SERVER_OVERLOAD, func() proto.Message { return new(pb.ServerOverload) }, serveroverload.ServerOverloadHandler)                                     // 服务器人数超载
+	r.addRouter(pb.MsgID_HEARTBEAT, func() proto.Message { return new(pb.Heartbeat) }, heartbeat.HeartBeatHandler, heartbeat.ReplyHeartBeatHandler, heartbeat.LoginHandler) // 心跳
+	r.addRouter(pb.MsgID_LOGIN, func() proto.Message { return new(pb.LoginResponse) }, login.LoginHandler)                                                                  // 登录
 	return
 }
 

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 17:18:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-09 21:03:18
+ * @LastEditTime: 2023-05-10 01:48:33
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/heartbeat/heartbeat.go
  * @Description:
  *
@@ -38,13 +38,30 @@ func ReplyHeartBeatHandler(request niface.IRequest) {
 	}
 }
 
+// LoginHandler 登录
+func LoginHandler(request niface.IRequest) {
+	loginMsg, err := proto.Marshal(&pb.LoginRequest{
+		Mode:  uint32(pb.LoginMode_VISITOR),
+		Uid:   7,
+		Token: "eyJpZCI6NywidGltZSI6MTY4MzQ2OTk4N30=.4adee61bd4c47b6c73542d25a354b784",
+	})
+	if err != nil {
+		nlog.Error("Marshal Login Msg Error", nlog.Err(err))
+		return
+	}
+	if err := request.GetConnection().SendMsg(uint16(pb.MsgID_LOGIN), loginMsg); err != nil {
+		nlog.Error("Send Login Error", nlog.Err(err))
+		return
+	}
+}
+
 // SetHeartBeat 设置当前 Client 的心跳检测器
 func SetHeartBeat(c niface.IClient, initiate bool) {
 	c.SetHeartBeat(initiate, &niface.HeartBeatOption{
 		MakeMsg: func() []byte {
 			buf, err := proto.Marshal(&pb.Heartbeat{Timestamp: time.Now().Unix()})
 			if err != nil {
-				nlog.Fatal("Marshal Heartbeat Msg Error", nlog.Err(err))
+				nlog.Error("Marshal Heartbeat Msg Error", nlog.Err(err))
 			}
 			return buf
 		},
