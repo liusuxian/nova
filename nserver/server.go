@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:21:18
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-09 02:57:17
+ * @LastEditTime: 2023-05-09 15:09:50
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
  * @Description:
  *
@@ -250,10 +250,10 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 // OnShutdown 在引擎被关闭时触发，它在所有事件循环和连接关闭后立即调用。
 func (s *Server) OnShutdown(eng gnet.Engine) {
 	nlog.Info("Server OnShutdown")
-	// 停止 Worker 工作池
-	s.msgHandler.StopWorkerPool()
 	// 调用 Server 停止时的 Hook 函数
 	s.callOnStop()
+	// 停止 Worker 工作池
+	s.msgHandler.StopWorkerPool()
 }
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
