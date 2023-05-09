@@ -33,3 +33,9 @@ logger:
       maxAge: 7 # 日志保留时间（单位:天）
       compress: false # 是否压缩日志
       stdout: true # 是否输出到控制台
+
+# Redis 配置
+redis:
+  addr: "127.0.0.1:6379"
+  password: ""
+  db: 0

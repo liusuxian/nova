@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-08 21:22:13
+ * @LastEditTime: 2023-05-09 14:57:49
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/server.go
  * @Description:
  *
@@ -12,8 +12,10 @@ package main
 
 import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/heartbeat"
+	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/redisdb"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/serveroverload"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/unmarshalmsg"
+	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nserver"
 	"os"
@@ -30,6 +32,14 @@ func main() {
 		nserver.WithReusePort(true),
 		nserver.WithLockOSThread(true),
 	)
+	// 设置当前 Server 启动时的 Hook 函数
+	s.SetOnStart(func(s niface.IServer) {
+		redisdb.Start()
+	})
+	// 设置当前 Server 停止时的 Hook 函数
+	s.SetOnStop(func(s niface.IServer) {
+		redisdb.Close()
+	})
 	// 设置当前 Server 的服务器人数超载检测器
 	serveroverload.SetServerOverload(s)
 	// 设置当前 Server 的心跳检测器
