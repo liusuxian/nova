@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:06:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-07 15:07:14
+ * @LastEditTime: 2023-05-09 23:53:50
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrequest/request.go
  * @Description:
  *
@@ -10,11 +10,15 @@
  */
 package nrequest
 
-import "github.com/liusuxian/nova/niface"
+import (
+	"context"
+	"github.com/liusuxian/nova/niface"
+)
 
 // Request 请求结构
 type Request struct {
 	niface.BaseRequest                        // 基础请求
+	ctx                context.Context        // 请求的 Context
 	conn               niface.IConnection     // 已经和客户端建立好的连接
 	msg                niface.IMessage        // 客户端请求的数据
 	icResp             niface.IcResp          // 拦截器返回的数据
@@ -25,9 +29,15 @@ type Request struct {
 // NewRequest 创建请求
 func NewRequest(conn niface.IConnection, msg niface.IMessage) (req *Request) {
 	req = new(Request)
+	req.ctx = context.Background()
 	req.conn = conn
 	req.msg = msg
 	return
+}
+
+// GetCtx 获取请求的 Context
+func (r *Request) GetCtx() (ctx context.Context) {
+	return r.ctx
 }
 
 // GetConnection 获取请求连接信息

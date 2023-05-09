@@ -2,13 +2,15 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-08 21:35:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-07 15:07:26
+ * @LastEditTime: 2023-05-09 23:55:39
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/request.go
  * @Description:
  *
  * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
  */
 package niface
+
+import "context"
 
 // IFuncRequest 函数消息接口
 type IFuncRequest interface {
@@ -17,6 +19,7 @@ type IFuncRequest interface {
 
 // IRequest 请求接口
 type IRequest interface {
+	GetCtx() (ctx context.Context)       // 获取请求的 Context
 	GetConnection() (conn IConnection)   // 获取请求连接信息
 	GetMsgID() (msgID uint16)            // 获取请求的消息 ID
 	GetData() (data []byte)              // 获取请求消息的数据
