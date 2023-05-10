@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 20:43:47
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-09 21:17:03
+ * @LastEditTime: 2023-05-10 14:05:20
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/router/router.go
  * @Description:
  *
@@ -12,6 +12,7 @@ package router
 
 import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/heartbeat"
+	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/login"
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/server/proto/pb"
 	"github.com/liusuxian/nova/niface"
 	"google.golang.org/protobuf/proto"
@@ -35,6 +36,7 @@ func StartRouter(s niface.IServer) {
 	instance.s = s
 	// 添加业务处理器集合
 	addRouter(pb.MsgID_HEARTBEAT, func() proto.Message { return new(pb.Heartbeat) }, heartbeat.HeartBeatHandler) // 心跳
+	addRouter(pb.MsgID_LOGIN, func() proto.Message { return new(pb.LoginRequest) }, login.LoginHandler)          // 登录
 }
 
 // GetMessage 获取 proto 消息实例

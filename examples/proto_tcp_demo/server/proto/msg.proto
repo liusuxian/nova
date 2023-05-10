@@ -28,12 +28,17 @@ enum UserSex {
 
 // 玩家信息
 message UserInfo {
-  uint32 uid = 1;      // uid
-  string nickname = 2; // 昵称
-  uint32 sex = 3;      // 性别 0:未知 1:男性 2:女性
-  string avatar = 4;   // 头像
-  uint32 mobile = 5;   // 手机号
-  uint32 from_id = 6;  // 投放渠道ID
+  uint32 uid = 1;           // uid
+  string nickname = 2;      // 昵称
+  uint32 sex = 3;           // 性别 0:未知 1:男性 2:女性
+  string avatar = 4;        // 头像
+  string mobile = 5;        // 手机号
+  uint32 from_id = 6;       // 投放渠道ID
+  string lastlogin_at = 7;  // 最近一次登录时间
+  uint32 reg_from_task = 8; // 用户在第几期注册
+  string id_no = 9;         // 用户身份证号码
+  uint32 is_realname = 10;  // 是否实名 0: 否 1: 是
+  string created_at = 11;   // 注册时间
 }
 
 // 登录请求

@@ -10,7 +10,10 @@
  */
 package nconv
 
-import "time"
+import (
+	"google.golang.org/protobuf/proto"
+	"time"
+)
 
 // ToBool 将 any 转换为 bool 类型
 func ToBool(i any) (v bool) {
@@ -309,4 +312,10 @@ func ToDurationSlice(i any) (v []time.Duration) {
 // ToStruct 将 any 转换为 struct/[]struct 类型
 func ToStruct(input, output any, opts ...DecoderConfigOption) {
 	_ = ToStructE(input, output, opts...)
+}
+
+// ProtoMsgToMap 将 protobuf 消息转换为 Map 类型
+func ProtoMsgToMap(msg proto.Message) (m map[string]any) {
+	m, _ = ProtoMsgToMapE(msg)
+	return
 }

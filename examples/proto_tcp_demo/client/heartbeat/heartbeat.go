@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 17:18:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-10 01:48:33
+ * @LastEditTime: 2023-05-10 14:01:37
  * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/heartbeat/heartbeat.go
  * @Description:
  *
@@ -42,8 +42,8 @@ func ReplyHeartBeatHandler(request niface.IRequest) {
 func LoginHandler(request niface.IRequest) {
 	loginMsg, err := proto.Marshal(&pb.LoginRequest{
 		Mode:  uint32(pb.LoginMode_VISITOR),
-		Uid:   7,
-		Token: "eyJpZCI6NywidGltZSI6MTY4MzQ2OTk4N30=.4adee61bd4c47b6c73542d25a354b784",
+		Uid:   8,
+		Token: "eyJpZCI6OCwidGltZSI6MTY4MzY4OTAwM30=.6fb749f16570e415b7936c636e0c759a",
 	})
 	if err != nil {
 		nlog.Error("Marshal Login Msg Error", nlog.Err(err))
