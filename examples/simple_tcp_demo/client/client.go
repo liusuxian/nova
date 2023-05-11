@@ -29,7 +29,7 @@ func main() {
 			// 创建 Client
 			c := nclient.NewClient(
 				"tcp",
-				"127.0.0.1:8066",
+				"127.0.0.1:8099",
 				nclient.WithLockOSThread(true),
 				nclient.WithHeartbeat(time.Duration(10000)*time.Millisecond),
 				nclient.WithMaxHeartbeat(time.Duration(15000)*time.Millisecond),

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-10 22:43:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:04:12
+ * @LastEditTime: 2023-05-11 23:08:03
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -31,7 +31,7 @@ func main() {
 			// 创建 Client
 			c := nclient.NewClient(
 				"tcp",
-				"127.0.0.1:8066",
+				"127.0.0.1:8099",
 				nclient.WithLockOSThread(true),
 				nclient.WithHeartbeat(time.Duration(10000)*time.Millisecond),
 				nclient.WithMaxHeartbeat(time.Duration(15000)*time.Millisecond),
