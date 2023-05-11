@@ -2,11 +2,10 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-10 14:03:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-10 19:54:17
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/server/login/login.go
+ * @LastEditTime: 2023-05-11 14:06:59
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package login
 

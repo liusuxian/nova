@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-03-21 22:19:14
+ * @Date: 2023-05-10 22:43:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-10 01:47:47
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/client.go
+ * @LastEditTime: 2023-05-11 14:04:12
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package main
 

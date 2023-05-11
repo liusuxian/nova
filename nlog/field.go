@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-03-31 15:14:26
+ * @Date: 2023-04-03 00:46:17
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-03-31 16:17:47
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nlog/field.go
+ * @LastEditTime: 2023-05-11 14:17:48
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package nlog
 

@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-04-16 02:26:46
+ * @Date: 2023-04-18 17:05:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-05 17:17:48
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_int.go
+ * @LastEditTime: 2023-05-11 14:46:32
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package nconv
 

@@ -2,11 +2,10 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-03 20:28:07
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-06 18:37:10
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/interceptor.go
+ * @LastEditTime: 2023-05-11 14:15:30
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package niface
 

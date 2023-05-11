@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-03-31 14:21:18
+ * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-09 20:02:31
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nserver/server.go
+ * @LastEditTime: 2023-05-11 11:50:44
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package nserver
 

@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-04-04 11:38:10
+ * @Date: 2023-04-06 19:05:04
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-05 22:56:45
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/redis.go
+ * @LastEditTime: 2023-05-11 14:16:29
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package niface
 

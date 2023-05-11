@@ -1,3 +1,12 @@
+/*
+ * @Author: liusuxian 382185882@qq.com
+ * @Date: 2023-03-22 15:49:31
+ * @LastEditors: liusuxian 382185882@qq.com
+ * @LastEditTime: 2023-05-11 14:11:06
+ * @Description:
+ *
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
+ */
 package nclient
 
 import (

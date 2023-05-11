@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-03-27 22:38:10
+ * @Date: 2023-04-10 00:20:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 13:55:08
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nslice/slice_test.go
+ * @LastEditTime: 2023-05-11 14:24:50
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package nslice_test
 

@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-04-19 11:58:36
+ * @Date: 2023-04-28 16:01:30
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-06 14:17:15
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/slice_uint_test.go
+ * @LastEditTime: 2023-05-11 14:47:16
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package nconv_test
 

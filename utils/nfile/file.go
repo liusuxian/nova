@@ -2,11 +2,10 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-02-19 21:04:58
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-05 22:49:35
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nfile/file.go
+ * @LastEditTime: 2023-05-11 14:24:11
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package nfile
 

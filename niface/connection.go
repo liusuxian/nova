@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-03-08 20:17:18
+ * @Date: 2023-05-09 00:52:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-09 02:51:02
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/niface/connection.go
+ * @LastEditTime: 2023-05-11 14:13:07
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package niface
 

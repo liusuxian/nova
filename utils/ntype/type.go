@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-04-10 12:38:44
+ * @Date: 2023-04-14 12:30:57
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 12:38:48
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/ntype/type.go
+ * @LastEditTime: 2023-05-11 14:25:59
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package ntype
 

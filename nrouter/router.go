@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-03-08 15:22:54
+ * @Date: 2023-05-09 21:44:12
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-10 00:12:00
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/nrouter/router.go
+ * @LastEditTime: 2023-05-11 14:22:17
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package nrouter
 

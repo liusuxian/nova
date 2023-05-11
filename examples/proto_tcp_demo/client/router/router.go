@@ -2,11 +2,10 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 20:58:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-10 01:40:30
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/examples/proto_tcp_demo/client/router/router.go
+ * @LastEditTime: 2023-05-11 14:03:34
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package router
 

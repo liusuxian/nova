@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-04-04 17:16:37
+ * @Date: 2023-04-10 00:00:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-10 00:10:14
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/internal/reflection/reflection_test.go
+ * @LastEditTime: 2023-05-11 14:10:10
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package reflection_test
 

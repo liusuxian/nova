@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-04-15 13:23:47
+ * @Date: 2023-04-18 17:32:08
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-05 17:08:19
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/struct.go
+ * @LastEditTime: 2023-05-11 14:50:06
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package nconv
 

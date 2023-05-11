@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-04-01 23:27:01
+ * @Date: 2023-04-10 00:19:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-04-02 01:14:51
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nrandom/random_test.go
+ * @LastEditTime: 2023-05-11 14:24:27
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package nrandom_test
 

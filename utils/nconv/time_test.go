@@ -1,12 +1,11 @@
 /*
  * @Author: liusuxian 382185882@qq.com
- * @Date: 2023-05-05 17:56:55
+ * @Date: 2023-05-05 18:40:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-06 14:16:48
- * @FilePath: /playlet-server/Users/liusuxian/Desktop/project-code/golang-project/nova/utils/nconv/time_test.go
+ * @LastEditTime: 2023-05-11 14:50:30
  * @Description:
  *
- * Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
+ * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package nconv_test
 
