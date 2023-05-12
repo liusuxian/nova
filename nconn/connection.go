@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:11:58
+ * @LastEditTime: 2023-05-12 13:08:53
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -133,10 +133,15 @@ func (c *Connection) LocalAddr() (addr net.Addr) {
 }
 
 // Send 将数据发送给远程的对端
-func (c *Connection) Send(data []byte, callback ...gnet.AsyncCallback) (err error) {
+func (c *Connection) Send(f niface.MsgDataFunc, callback ...gnet.AsyncCallback) (err error) {
 	// 判断当前连接的关闭状态
 	if c.isClosed {
 		err = errors.New("connection closed when send data")
+		return
+	}
+	// 获取发送的数据
+	var data []byte
+	if data, err = f(); err != nil {
 		return
 	}
 	// 异步发送给客户端
@@ -149,10 +154,15 @@ func (c *Connection) Send(data []byte, callback ...gnet.AsyncCallback) (err erro
 }
 
 // SendMsg 将 Message 数据发送给远程的对端
-func (c *Connection) SendMsg(msgID uint16, data []byte, callback ...gnet.AsyncCallback) (err error) {
+func (c *Connection) SendMsg(msgID uint16, f niface.MsgDataFunc, callback ...gnet.AsyncCallback) (err error) {
 	// 判断当前连接的关闭状态
 	if c.isClosed {
 		err = errors.New("connection closed when send msg")
+		return
+	}
+	// 获取发送的数据
+	var data []byte
+	if data, err = f(); err != nil {
 		return
 	}
 	// 封包

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-03 21:03:53
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:17:28
+ * @LastEditTime: 2023-05-12 13:32:16
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -77,7 +77,7 @@ func (c *Chain) ProceedWithIMessage(msg niface.IMessage, response niface.IcReq) 
 	}
 
 	// 设置解析完后的序列化数据
-	iRequest.SetResponse(response)
+	iRequest.SetSerializedData(response)
 
 	return c.Proceed(iRequest)
 }

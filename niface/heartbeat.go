@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-30 18:27:46
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:15:18
+ * @LastEditTime: 2023-05-12 13:49:21
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -19,11 +19,11 @@ type IHeartBeatChecker interface {
 	Clone() (checker IHeartBeatChecker)     // 克隆心跳检测器
 	SetMsgID(msgID uint16)                  // 设置心跳检测消息ID
 	GetMsgID() (msgID uint16)               // 获取心跳检测消息ID
-	GetMessage() (msg IMessage)             // 获取心跳检测消息
+	GetMessage() (msg IMessage, err error)  // 获取心跳检测消息
 }
 
 // HeartBeatMsgFunc 用户自定义的心跳检测消息处理方法
-type HeartBeatMsgFunc func() (buf []byte)
+type HeartBeatMsgFunc = MsgDataFunc
 
 // OnRemoteNotAlive 用户自定义的远程连接不存活时的处理方法
 type OnRemoteNotAlive func(conn IConnection)

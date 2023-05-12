@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 11:50:44
+ * @LastEditTime: 2023-05-12 12:49:19
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -234,7 +234,12 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	// 服务器人数超载检测
 	if s.serverOverloadChecker != nil {
 		if s.serverOverloadChecker.Check(s, s.serverConf.MaxConn) {
-			out = s.packet.Pack(s.serverOverloadChecker.GetMessage())
+			serverOverloadMsg, err := s.serverOverloadChecker.GetMessage()
+			if err != nil {
+				nlog.Error("Get ServerOverloadMsg Error", nlog.Uint16("MsgID", s.serverOverloadChecker.GetMsgID()), nlog.Err(err))
+				return nil, gnet.Close
+			}
+			out = s.packet.Pack(serverOverloadMsg)
 			// 踢连接
 			go s.doKickConn(conn)
 			return
@@ -244,8 +249,13 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	serverConn := nconn.NewServerConn(s, conn, time.Duration(s.serverConf.MaxHeartbeat)*time.Millisecond)
 	// 启动连接
 	serverConn.Start()
-	// 发送心跳
-	out = s.packet.Pack(s.heartbeatChecker.GetMessage())
+	// 立即发送心跳
+	heartbeatMsg, err := s.heartbeatChecker.GetMessage()
+	if err != nil {
+		nlog.Error("Get heartbeatMsg Error", nlog.Uint16("MsgID", s.heartbeatChecker.GetMsgID()), nlog.Err(err))
+		return nil, gnet.Close
+	}
+	out = s.packet.Pack(heartbeatMsg)
 	return
 }
 

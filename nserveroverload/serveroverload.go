@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-01 17:52:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:22:55
+ * @LastEditTime: 2023-05-12 12:41:36
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -54,11 +54,17 @@ func (soc *ServerOverloadChecker) GetMsgID() (msgID uint16) {
 }
 
 // GetMessage 获取服务器人数超载消息
-func (soc *ServerOverloadChecker) GetMessage() (msg niface.IMessage) {
-	return npack.NewMsgPackage(soc.msgID, soc.makeMsg())
+func (soc *ServerOverloadChecker) GetMessage() (msg niface.IMessage, err error) {
+	var buf []byte
+	if buf, err = soc.makeMsg(); err != nil {
+		return
+	}
+
+	msg = npack.NewMsgPackage(soc.msgID, buf)
+	return
 }
 
 // makeMsgDefaultFunc 默认的服务器人数超载消息处理方法
-func makeMsgDefaultFunc() (buf []byte) {
-	return []byte("server overload")
+func makeMsgDefaultFunc() (buf []byte, err error) {
+	return []byte("server overload"), nil
 }
