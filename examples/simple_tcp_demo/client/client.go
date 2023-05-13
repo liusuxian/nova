@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-02 22:35:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:09:26
+ * @LastEditTime: 2023-05-12 19:18:24
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -14,6 +14,7 @@ import (
 	"github.com/liusuxian/nova/examples/simple_tcp_demo/client/heartbeat"
 	"github.com/liusuxian/nova/examples/simple_tcp_demo/client/serveroverload"
 	"github.com/liusuxian/nova/nclient"
+	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"os"
 	"os/signal"
@@ -39,8 +40,8 @@ func main() {
 			// 设置当前 Client 的心跳检测器
 			c.SetHeartBeat(false)
 			// 添加业务处理器集合
-			c.AddRouter(c.GetServerOverload().GetMsgID(), serveroverload.ServerOverloadHandler)
-			c.AddRouter(c.GetHeartBeat().GetMsgID(), heartbeat.HeartBeatHandler)
+			c.AddRouter(niface.ServerOverloadDefaultMsgID, serveroverload.ServerOverloadHandler)
+			c.AddRouter(niface.HeartBeatDefaultMsgID, heartbeat.HeartBeatHandler)
 			// 启动 Client
 			c.Start()
 			// 停止 Client

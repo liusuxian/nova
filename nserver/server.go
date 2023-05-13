@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 12:49:19
+ * @LastEditTime: 2023-05-14 01:04:35
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -234,14 +234,13 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	// 服务器人数超载检测
 	if s.serverOverloadChecker != nil {
 		if s.serverOverloadChecker.Check(s, s.serverConf.MaxConn) {
+			// 立即发送服务器人数超载消息
 			serverOverloadMsg, err := s.serverOverloadChecker.GetMessage()
 			if err != nil {
-				nlog.Error("Get ServerOverloadMsg Error", nlog.Uint16("MsgID", s.serverOverloadChecker.GetMsgID()), nlog.Err(err))
+				nlog.Error("Get ServerOverloadMsg Error", nlog.Err(err))
 				return nil, gnet.Close
 			}
 			out = s.packet.Pack(serverOverloadMsg)
-			// 踢连接
-			go s.doKickConn(conn)
 			return
 		}
 	}
@@ -249,13 +248,6 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	serverConn := nconn.NewServerConn(s, conn, time.Duration(s.serverConf.MaxHeartbeat)*time.Millisecond)
 	// 启动连接
 	serverConn.Start()
-	// 立即发送心跳
-	heartbeatMsg, err := s.heartbeatChecker.GetMessage()
-	if err != nil {
-		nlog.Error("Get heartbeatMsg Error", nlog.Uint16("MsgID", s.heartbeatChecker.GetMsgID()), nlog.Err(err))
-		return nil, gnet.Close
-	}
-	out = s.packet.Pack(heartbeatMsg)
 	return
 }
 
@@ -300,10 +292,10 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		// 拆包体
 		s.packet.UnPackBody(msgBuf, msg)
 		nlog.Debug("Server OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()), nlog.Int("DataLen", msg.GetDataLen()))
-
+		// 通过 ConnID 获取连接
 		iConn, err := s.connMgr.GetConn(conn.Fd())
 		if err != nil {
-			return gnet.Close
+			return
 		}
 		// 更新连接活动时间
 		iConn.UpdateActivity()
@@ -313,12 +305,6 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		s.msgHandler.Execute(request)
 	}
 	return
-}
-
-// doKickConn 踢连接
-func (s *Server) doKickConn(conn gnet.Conn) {
-	<-time.After(10 * time.Millisecond)
-	_ = conn.Close()
 }
 
 // callOnStart 调用 Server 启动时的 Hook 函数

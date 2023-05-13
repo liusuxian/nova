@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-03 01:01:50
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 13:48:05
+ * @LastEditTime: 2023-05-13 19:38:19
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -12,7 +12,6 @@ package nheartbeat
 import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
-	"github.com/liusuxian/nova/npack"
 	"time"
 )
 
@@ -43,6 +42,12 @@ func NewHeartBeatChecker(interval time.Duration, initiate bool) (checker niface.
 
 // Start 启动心跳检测
 func (hbc *HeartBeatChecker) Start() {
+	// 发送心跳消息
+	if err := hbc.sendHeartBeatMsg(); err != nil {
+		_ = hbc.conn.GetConnection().Close()
+		return
+	}
+	// 启动心跳检测
 	go hbc.start()
 }
 
@@ -93,22 +98,6 @@ func (hbc *HeartBeatChecker) SetMsgID(msgID uint16) {
 	}
 }
 
-// GetMsgID 获取心跳检测消息ID
-func (hbc *HeartBeatChecker) GetMsgID() (msgID uint16) {
-	return hbc.msgID
-}
-
-// GetMessage 获取心跳检测消息
-func (hbc *HeartBeatChecker) GetMessage() (msg niface.IMessage, err error) {
-	var buf []byte
-	if buf, err = hbc.makeMsg(); err != nil {
-		return
-	}
-
-	msg = npack.NewMsgPackage(hbc.msgID, buf)
-	return
-}
-
 // start 启动心跳检测
 func (hbc *HeartBeatChecker) start() {
 	ticker := time.NewTicker(hbc.interval)
@@ -131,17 +120,20 @@ func (hbc *HeartBeatChecker) check() {
 	if !hbc.conn.IsAlive() {
 		hbc.onRemoteNotAlive(hbc.conn)
 	} else {
-		hbc.sendHeartBeatMsg(hbc.conn)
+		hbc.sendHeartBeatMsg()
 	}
 }
 
 // sendHeartBeatMsg 发送心跳消息
-func (hbc *HeartBeatChecker) sendHeartBeatMsg(conn niface.IConnection) {
+func (hbc *HeartBeatChecker) sendHeartBeatMsg() (err error) {
 	if hbc.initiate {
-		if err := conn.SendMsg(hbc.msgID, hbc.makeMsg); err != nil {
+		if err = hbc.conn.SendMsg(hbc.msgID, hbc.makeMsg); err != nil {
 			nlog.Error("Send HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
+			return
 		}
 	}
+
+	return
 }
 
 // makeMsgDefaultFunc 默认的心跳检测消息处理方法

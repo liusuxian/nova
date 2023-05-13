@@ -48,11 +48,6 @@ func (soc *ServerOverloadChecker) SetMsgID(msgID uint16) {
 	}
 }
 
-// GetMsgID 获取服务器人数超载消息ID
-func (soc *ServerOverloadChecker) GetMsgID() (msgID uint16) {
-	return soc.msgID
-}
-
 // GetMessage 获取服务器人数超载消息
 func (soc *ServerOverloadChecker) GetMessage() (msg niface.IMessage, err error) {
 	var buf []byte

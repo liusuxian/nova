@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-30 18:27:46
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 13:49:21
+ * @LastEditTime: 2023-05-13 19:38:46
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -18,8 +18,6 @@ type IHeartBeatChecker interface {
 	BindConn(conn IConnection)              // 绑定连接
 	Clone() (checker IHeartBeatChecker)     // 克隆心跳检测器
 	SetMsgID(msgID uint16)                  // 设置心跳检测消息ID
-	GetMsgID() (msgID uint16)               // 获取心跳检测消息ID
-	GetMessage() (msg IMessage, err error)  // 获取心跳检测消息
 }
 
 // HeartBeatMsgFunc 用户自定义的心跳检测消息处理方法

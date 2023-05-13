@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 13:08:53
+ * @LastEditTime: 2023-05-14 00:51:43
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -96,10 +96,7 @@ func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Dura
 
 // Start 启动连接
 func (c *Connection) Start() {
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go c.doStart(&wg)
-	wg.Wait()
+	go c.start()
 }
 
 // Stop 停止连接
@@ -233,9 +230,10 @@ func (c *Connection) SetHeartBeat(checker niface.IHeartBeatChecker) {
 	c.heartbeatChecker = checker
 }
 
-// doStart 启动连接
-func (c *Connection) doStart(wg *sync.WaitGroup) {
+// start 启动连接
+func (c *Connection) start() {
 	c.cancelCtx, c.cancelFunc = context.WithCancel(context.Background())
+	nlog.Info("Connection Start", nlog.Int("ConnID", c.connID))
 
 	// 调用连接创建时的 Hook 函数
 	c.callOnConnStart()
@@ -247,9 +245,6 @@ func (c *Connection) doStart(wg *sync.WaitGroup) {
 		// 更新连接活动时间
 		c.UpdateActivity()
 	}
-
-	wg.Done()
-	nlog.Info("Connection Start", nlog.Int("ConnID", c.connID))
 
 	<-c.cancelCtx.Done()
 	// 清理

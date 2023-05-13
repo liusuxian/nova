@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-01 17:25:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 11:16:13
+ * @LastEditTime: 2023-05-12 19:16:56
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -14,7 +14,6 @@ type IServerOverloadChecker interface {
 	Check(server IServer, maxConn int) (isOverload bool) // 服务器人数超载检测
 	SetServerOverloadMsgFunc(f ServerOverloadMsgFunc)    // 设置服务器人数超载消息处理方法
 	SetMsgID(msgID uint16)                               // 设置服务器人数超载消息ID
-	GetMsgID() (msgID uint16)                            // 获取服务器人数超载消息ID
 	GetMessage() (msg IMessage, err error)               // 获取服务器人数超载消息
 }
 
