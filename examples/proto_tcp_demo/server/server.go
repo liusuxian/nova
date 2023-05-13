@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:08:39
+ * @LastEditTime: 2023-05-14 01:08:11
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -31,6 +31,7 @@ func main() {
 		nserver.WithReuseAddr(true),
 		nserver.WithReusePort(true),
 		nserver.WithLockOSThread(true),
+		nserver.WithTCPKeepAlive(time.Second*30),
 	)
 	// 设置当前 Server 启动时的 Hook 函数
 	s.SetOnStart(func(s niface.IServer) {
