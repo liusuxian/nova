@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-04 14:22:21
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:40:32
+ * @LastEditTime: 2023-05-14 02:16:46
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -28,15 +28,15 @@ type PersonNoTag struct {
 }
 
 type AddressTag struct {
-	Street string `json:"street" dc:"street"`
-	City   string `json:"city" dc:"city"`
+	Street string `json:"street" struct:"street1" dc:"street"`
+	City   string `json:"city" struct:"city1" dc:"city"`
 }
 
 type PersonTag struct {
-	Name    string      `json:"name" dc:"name"`
-	Age     int         `json:"age" dc:"age"`
-	Address *AddressTag `json:"address" dc:"address"`
-	sex     int         `json:"sex" dc:"sex"`
+	Name    string      `json:"name" struct:"name1" dc:"name"`
+	Age     int         `json:"age" struct:"age1" dc:"age"`
+	Address *AddressTag `json:"address" struct:"address1" dc:"address"`
+	sex     int         `json:"sex" struct:"sex1" dc:"sex"`
 }
 
 func TestToStringMapE(t *testing.T) {
@@ -80,5 +80,12 @@ func TestToStringMapE(t *testing.T) {
 	errLog(t, err)
 	if assert.NoError(err) {
 		assert.Equal(map[string]any{"name": "lsx", "age": 18, "address": map[string]any{"city": "hz", "street": "hz-123"}}, actualObj)
+	}
+	actualObj, err = nconv.ToStringMapE(&PersonTag{Name: "lsx", Age: 18, Address: &AddressTag{Street: "hz-123", City: "hz"}, sex: 1}, func(dc *nconv.DecoderConfig) {
+		dc.TagName = "struct"
+	}) // *struct
+	errLog(t, err)
+	if assert.NoError(err) {
+		assert.Equal(map[string]any{"name1": "lsx", "age1": 18, "address1": map[string]any{"city1": "hz", "street1": "hz-123"}}, actualObj)
 	}
 }

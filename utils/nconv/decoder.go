@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-10 18:51:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:38:43
+ * @LastEditTime: 2023-05-14 02:17:15
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -11,47 +11,14 @@ package nconv
 
 import "github.com/mitchellh/mapstructure"
 
-// DecoderConfigOption 解码配置选项
-type DecoderConfigOption func(*mapstructure.DecoderConfig)
+// DecoderConfig 解码配置
+type DecoderConfig = mapstructure.DecoderConfig
 
-// WithDecoderConfigOption
-func WithDecoderConfigOption(config *mapstructure.DecoderConfig) DecoderConfigOption {
-	return func(c *mapstructure.DecoderConfig) {
-		if config.DecodeHook != nil {
-			c.DecodeHook = config.DecodeHook
-		}
-		if c.ErrorUnused != config.ErrorUnused {
-			c.ErrorUnused = config.ErrorUnused
-		}
-		if c.ErrorUnset != config.ErrorUnset {
-			c.ErrorUnset = config.ErrorUnset
-		}
-		if c.ZeroFields != config.ZeroFields {
-			c.ZeroFields = config.ZeroFields
-		}
-		if c.WeaklyTypedInput != config.WeaklyTypedInput {
-			c.WeaklyTypedInput = config.WeaklyTypedInput
-		}
-		if c.Squash != config.Squash {
-			c.Squash = config.Squash
-		}
-		if config.Metadata != nil {
-			c.Metadata = config.Metadata
-		}
-		if config.TagName != "" && c.TagName != config.TagName {
-			c.TagName = config.TagName
-		}
-		if c.IgnoreUntaggedFields != config.IgnoreUntaggedFields {
-			c.IgnoreUntaggedFields = config.IgnoreUntaggedFields
-		}
-		if config.MatchName != nil {
-			c.MatchName = config.MatchName
-		}
-	}
-}
+// DecoderConfigOption 解码配置选项
+type DecoderConfigOption func(*DecoderConfig)
 
 // decode 解码
-func decode(input any, config *mapstructure.DecoderConfig) (err error) {
+func decode(input any, config *DecoderConfig) (err error) {
 	decoder, err := mapstructure.NewDecoder(config)
 	if err != nil {
 		return err

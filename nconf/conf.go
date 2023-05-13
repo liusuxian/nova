@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-12 18:19:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:11:39
+ * @LastEditTime: 2023-05-14 02:40:20
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -14,6 +14,7 @@ import (
 	"github.com/liusuxian/nova/utils/nconv"
 	"github.com/liusuxian/nova/utils/nenv"
 	"github.com/liusuxian/nova/utils/nfile"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	_ "github.com/spf13/viper/remote"
@@ -21,6 +22,12 @@ import (
 	"time"
 	"unicode"
 )
+
+// DecoderConfig 解码配置
+type DecoderConfig = mapstructure.DecoderConfig
+
+// DecoderConfigOption 解码配置选项
+type DecoderConfigOption func(*DecoderConfig)
 
 // Config 配置结构
 type Config struct {
@@ -254,18 +261,30 @@ func (c *Config) Sub(key string) (conf *Config) {
 }
 
 // Struct 将配置解析为结构体，确保标签正确设置该结构的字段
-func (c *Config) Struct(rawVal any, opts ...viper.DecoderConfigOption) (err error) {
-	return c.v.Unmarshal(rawVal, opts...)
+func (c *Config) Struct(rawVal any, opts ...DecoderConfigOption) (err error) {
+	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
+	for _, opt := range opts {
+		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+	}
+	return c.v.Unmarshal(rawVal, newOpts...)
 }
 
 // StructExact 将配置解析为结构体，如果在目标结构体中字段不存在则报错
-func (c *Config) StructExact(rawVal any, opts ...viper.DecoderConfigOption) (err error) {
-	return c.v.UnmarshalExact(rawVal, opts...)
+func (c *Config) StructExact(rawVal any, opts ...DecoderConfigOption) (err error) {
+	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
+	for _, opt := range opts {
+		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+	}
+	return c.v.UnmarshalExact(rawVal, newOpts...)
 }
 
 // StructKey 接收一个键并将其解析到结构体中
-func (c *Config) StructKey(key string, rawVal any, opts ...viper.DecoderConfigOption) (err error) {
-	return c.v.UnmarshalKey(key, rawVal, opts...)
+func (c *Config) StructKey(key string, rawVal any, opts ...DecoderConfigOption) (err error) {
+	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
+	for _, opt := range opts {
+		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+	}
+	return c.v.UnmarshalKey(key, rawVal, newOpts...)
 }
 
 // WatchConfig 监视配置文件的变化
@@ -499,23 +518,42 @@ func Sub(key string) (conf *Config) {
 }
 
 // Struct 将配置解析为结构体，确保标签正确设置该结构的字段
-func Struct(rawVal any, opts ...viper.DecoderConfigOption) (err error) {
-	return defaultConfig.v.Unmarshal(rawVal, opts...)
+func Struct(rawVal any, opts ...DecoderConfigOption) (err error) {
+	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
+	for _, opt := range opts {
+		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+	}
+	return defaultConfig.v.Unmarshal(rawVal, newOpts...)
 }
 
 // StructExact 将配置解析为结构体，如果在目标结构体中字段不存在则报错
-func StructExact(rawVal any, opts ...viper.DecoderConfigOption) (err error) {
-	return defaultConfig.v.UnmarshalExact(rawVal, opts...)
+func StructExact(rawVal any, opts ...DecoderConfigOption) (err error) {
+	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
+	for _, opt := range opts {
+		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+	}
+	return defaultConfig.v.UnmarshalExact(rawVal, newOpts...)
 }
 
 // StructKey 接收一个键并将其解析到结构体中
-func StructKey(key string, rawVal any, opts ...viper.DecoderConfigOption) (err error) {
-	return defaultConfig.v.UnmarshalKey(key, rawVal, opts...)
+func StructKey(key string, rawVal any, opts ...DecoderConfigOption) (err error) {
+	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
+	for _, opt := range opts {
+		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+	}
+	return defaultConfig.v.UnmarshalKey(key, rawVal, newOpts...)
 }
 
 // WatchConfig 监视配置文件的变化
 func WatchConfig() {
 	defaultConfig.v.WatchConfig()
+}
+
+// convertDecoderConfigOption 将 DecoderConfigOption 转换为 viper.DecoderConfigOption
+func convertDecoderConfigOption(opt DecoderConfigOption) (option viper.DecoderConfigOption) {
+	return func(dc *mapstructure.DecoderConfig) {
+		opt(dc)
+	}
 }
 
 // parseSizeInBytes 将像1GB或12MB这样的字符串转换为无符号整数字节数

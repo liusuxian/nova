@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:11:21
+ * @LastEditTime: 2023-05-14 03:01:26
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -47,6 +47,13 @@ type LogDetailConfig struct {
 	Stdout     bool   // 是否输出到控制台
 }
 
+// TestCfg 测试配置
+type TestCfg struct {
+	ID        int64  `json:"id" dc:"id"`
+	MoneyReal int64  `json:"money_real" dc:"money_real"`
+	TotalTime uint32 `json:"total_time" dc:"total_time"`
+}
+
 func TestConfig(t *testing.T) {
 	var err error
 	serverConf := ServerConfig{}
@@ -62,6 +69,26 @@ func TestConfig(t *testing.T) {
 		return
 	}
 	t.Logf("logConfig: %+v\n", logConfig)
+
+	var localCfg *nconf.Config
+	if localCfg, err = nconf.NewConfig("config/test.json"); err != nil {
+		t.Log("NewConfig Error:", err)
+		return
+	}
+	testCfg1 := TestCfg{}
+	if err = localCfg.StructKey("test", &testCfg1); err != nil {
+		t.Log("StructKey TestCfg1 Error:", err)
+		return
+	}
+	t.Logf("testCfg1: %+v\n", testCfg1)
+	testCfg2 := TestCfg{}
+	if err = localCfg.StructKey("test", &testCfg2, func(dc *nconf.DecoderConfig) {
+		dc.TagName = "json"
+	}); err != nil {
+		t.Log("StructKey TestCfg2 Error:", err)
+		return
+	}
+	t.Logf("testCfg2: %+v\n", testCfg2)
 
 	var cfg *nconf.Config
 	if cfg, err = nconf.NewRemoteConfig("consul", "127.0.0.1:8500", "config/test", "json"); err != nil {

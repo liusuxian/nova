@@ -1,0 +1,7 @@
+{
+  "test": {
+    "id": 100,
+    "money_real": 1000,
+    "total_time": 10000
+  }
+}
