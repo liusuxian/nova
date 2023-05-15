@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-12 18:19:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 19:48:10
+ * @LastEditTime: 2023-05-16 02:05:32
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -32,8 +32,14 @@ type DecoderConfigOption func(dc *DecoderConfig)
 // Event 事件
 type Event = fsnotify.Event
 
-// EventFunc 事件通知方法
-type EventFunc func(e Event)
+// 操作
+const (
+	Create = fsnotify.Create
+	Write  = fsnotify.Write
+	Remove = fsnotify.Remove
+	Rename = fsnotify.Rename
+	Chmod  = fsnotify.Chmod
+)
 
 // Config 配置结构
 type Config struct {
@@ -252,7 +258,7 @@ func (c *Config) IsSet(key string) (val bool) {
 }
 
 // OnConfigChange 设置当配置文件更改时调用的事件处理程序
-func (c *Config) OnConfigChange(run EventFunc) {
+func (c *Config) OnConfigChange(run func(e Event)) {
 	c.v.OnConfigChange(run)
 }
 
@@ -509,7 +515,7 @@ func IsSet(key string) (val bool) {
 }
 
 // OnConfigChange 设置当配置文件更改时调用的事件处理程序
-func OnConfigChange(run EventFunc) {
+func OnConfigChange(run func(e Event)) {
 	defaultConfig.v.OnConfigChange(run)
 }
 
