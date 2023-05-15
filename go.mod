@@ -8,7 +8,7 @@ require (
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/orcaman/concurrent-map/v2 v2.0.1
-	github.com/panjf2000/ants/v2 v2.7.3
+	github.com/panjf2000/ants/v2 v2.7.4
 	github.com/panjf2000/gnet/v2 v2.2.7
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.0.4
