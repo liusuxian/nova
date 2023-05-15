@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-03 00:32:05
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:18:21
+ * @LastEditTime: 2023-05-15 16:19:22
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -280,38 +280,38 @@ func Write(p []byte, withoutLogType ...int) (err error) {
 }
 
 // Debug
-func Debug(msg string, nFields ...nField) {
-	logger.zapLogger.Debug(msg, getFields(nFields...)...)
+func Debug(msg string, fields ...logField) {
+	logger.zapLogger.Debug(msg, fields...)
 }
 
 // Info
-func Info(msg string, nFields ...nField) {
-	logger.zapLogger.Info(msg, getFields(nFields...)...)
+func Info(msg string, fields ...logField) {
+	logger.zapLogger.Info(msg, fields...)
 }
 
 // Warn
-func Warn(msg string, nFields ...nField) {
-	logger.zapLogger.Warn(msg, getFields(nFields...)...)
+func Warn(msg string, fields ...logField) {
+	logger.zapLogger.Warn(msg, fields...)
 }
 
 // Error
-func Error(msg string, nFields ...nField) {
-	logger.zapLogger.Error(msg, getFields(nFields...)...)
+func Error(msg string, fields ...logField) {
+	logger.zapLogger.Error(msg, fields...)
 }
 
 // DPanic
-func DPanic(msg string, nFields ...nField) {
-	logger.zapLogger.DPanic(msg, getFields(nFields...)...)
+func DPanic(msg string, fields ...logField) {
+	logger.zapLogger.DPanic(msg, fields...)
 }
 
 // Panic
-func Panic(msg string, nFields ...nField) {
-	logger.zapLogger.Panic(msg, getFields(nFields...)...)
+func Panic(msg string, fields ...logField) {
+	logger.zapLogger.Panic(msg, fields...)
 }
 
 // Fatal
-func Fatal(msg string, nFields ...nField) {
-	logger.zapLogger.Fatal(msg, getFields(nFields...)...)
+func Fatal(msg string, fields ...logField) {
+	logger.zapLogger.Fatal(msg, fields...)
 }
 
 // Level
@@ -322,13 +322,4 @@ func Level() zapcore.Level {
 // LevelEnabled
 func LevelEnabled(lvl zapcore.Level) bool {
 	return logger.zapLogger.Level().Enabled(lvl)
-}
-
-// getFields 获取 zapcore.Field 列表
-func getFields(nFields ...nField) (zFields []zapcore.Field) {
-	zFields = make([]zapcore.Field, 0, len(nFields))
-	for _, f := range nFields {
-		zFields = append(zFields, f.field)
-	}
-	return
 }
