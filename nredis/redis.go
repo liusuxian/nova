@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 02:58:43
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 12:32:20
+ * @LastEditTime: 2023-05-15 13:35:35
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -21,17 +21,17 @@ import (
 	"strings"
 )
 
+// ClientConfig redis 客户端配置
+type ClientConfig = redis.Options
+
+// ClientConfigOption redis 客户端配置选项
+type ClientConfigOption func(cc *ClientConfig)
+
 // RedisClient redis 客户端结构
 type RedisClient struct {
 	redis        *redis.Client     // redis 客户端
 	luaScriptMap map[string]string // lua 脚本
 }
-
-// ClientConfig redis 客户端配置
-type ClientConfig = redis.Options
-
-// ClientConfigOption redis 客户端配置选项
-type ClientConfigOption func(*ClientConfig)
 
 // NewClient 创建 redis 客户端
 func NewClient(opts ...ClientConfigOption) (client niface.IRedisClient) {

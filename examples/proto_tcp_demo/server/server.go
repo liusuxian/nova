@@ -26,13 +26,13 @@ import (
 
 func main() {
 	// 创建 Server
-	s := nserver.NewServer(
-		nserver.WithMulticore(true),
-		nserver.WithReuseAddr(true),
-		nserver.WithReusePort(true),
-		nserver.WithLockOSThread(true),
-		nserver.WithTCPKeepAlive(time.Second*30),
-	)
+	s := nserver.NewServer(func(sc *nserver.ServerConfig) {
+		sc.Multicore = true
+		sc.ReuseAddr = true
+		sc.ReusePort = true
+		sc.LockOSThread = true
+		sc.TCPKeepAlive = time.Second * 30
+	})
 	// 设置当前 Server 启动时的 Hook 函数
 	s.SetOnStart(func(s niface.IServer) {
 		redisdb.Start()

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-14 03:01:26
+ * @LastEditTime: 2023-05-15 15:31:54
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -19,8 +19,8 @@ type ServerConfig struct {
 	Name           string // 服务器应用名称，默认"Nova"
 	Network        string // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
 	Port           int    // 服务器监听端口
-	Heartbeat      int    // 心跳发送间隔时间（单位:毫秒，一定要小于 maxHeartbeat 配置），默认 3000
-	MaxHeartbeat   int    // 最长心跳检测间隔时间（单位:毫秒，一定要大于 heartbeat 配置），默认 5000
+	HeartBeat      int    // 心跳发送间隔时间（单位:毫秒，一定要小于 MaxHeartBeat 配置），默认 3000
+	MaxHeartBeat   int    // 最长心跳检测间隔时间（单位:毫秒，一定要大于 HeartBeat 配置），默认 5000
 	MaxConn        int    // 允许的客户端连接最大数量，默认 3
 	WorkerPoolSize int    // 工作任务池最大工作 Goroutine 数量，默认 10
 	MaxPacketSize  int    // 数据包的最大值（单位:字节），默认 4096

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-10 22:43:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 14:53:34
+ * @LastEditTime: 2023-05-15 16:00:53
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -17,6 +17,7 @@ import (
 	"github.com/liusuxian/nova/examples/proto_tcp_demo/client/unmarshalmsg"
 	"github.com/liusuxian/nova/nclient"
 	"github.com/liusuxian/nova/nlog"
+	"github.com/liusuxian/nova/npack"
 	"os"
 	"os/signal"
 	"syscall"
@@ -29,13 +30,16 @@ func main() {
 	for i := 0; i < clientNum; i++ {
 		go func(ctx context.Context) {
 			// 创建 Client
-			c := nclient.NewClient(
-				"tcp",
-				"127.0.0.1:8099",
-				nclient.WithLockOSThread(true),
-				nclient.WithHeartbeat(time.Duration(10000)*time.Millisecond),
-				nclient.WithMaxHeartbeat(time.Duration(15000)*time.Millisecond),
-			)
+			c := nclient.NewClient(func(cc *nclient.ClientConfig) {
+				cc.LockOSThread = true
+				cc.Network = "tcp"
+				cc.Addr = "127.0.0.1:8099"
+				cc.HeartBeat = time.Duration(10000) * time.Millisecond
+				cc.MaxHeartBeat = time.Duration(15000) * time.Millisecond
+				cc.PacketMethod = npack.DefaultPacketMethod
+				cc.Endian = npack.LittleEndian
+				cc.MaxPacketSize = 4096
+			})
 			// 设置当前 Client 的服务器人数超载检测器
 			serveroverload.SetServerOverload(c)
 			// 设置当前 Client 的心跳检测器

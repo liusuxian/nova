@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-10 18:51:03
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-14 02:17:15
+ * @LastEditTime: 2023-05-15 12:48:20
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -15,7 +15,7 @@ import "github.com/mitchellh/mapstructure"
 type DecoderConfig = mapstructure.DecoderConfig
 
 // DecoderConfigOption 解码配置选项
-type DecoderConfigOption func(*DecoderConfig)
+type DecoderConfigOption func(dc *DecoderConfig)
 
 // decode 解码
 func decode(input any, config *DecoderConfig) (err error) {

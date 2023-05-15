@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-30 18:27:46
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-13 19:38:46
+ * @LastEditTime: 2023-05-15 13:47:46
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -21,7 +21,7 @@ type IHeartBeatChecker interface {
 }
 
 // HeartBeatMsgFunc 用户自定义的心跳检测消息处理方法
-type HeartBeatMsgFunc = MsgDataFunc
+type HeartBeatMsgFunc func() (buf []byte, err error)
 
 // OnRemoteNotAlive 用户自定义的远程连接不存活时的处理方法
 type OnRemoteNotAlive func(conn IConnection)

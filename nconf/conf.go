@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-12 18:19:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-14 02:40:20
+ * @LastEditTime: 2023-05-15 15:58:16
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -27,7 +27,7 @@ import (
 type DecoderConfig = mapstructure.DecoderConfig
 
 // DecoderConfigOption 解码配置选项
-type DecoderConfigOption func(*DecoderConfig)
+type DecoderConfigOption func(dc *DecoderConfig)
 
 // Config 配置结构
 type Config struct {
@@ -264,7 +264,7 @@ func (c *Config) Sub(key string) (conf *Config) {
 func (c *Config) Struct(rawVal any, opts ...DecoderConfigOption) (err error) {
 	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
 	for _, opt := range opts {
-		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+		newOpts = append(newOpts, viper.DecoderConfigOption(opt))
 	}
 	return c.v.Unmarshal(rawVal, newOpts...)
 }
@@ -273,7 +273,7 @@ func (c *Config) Struct(rawVal any, opts ...DecoderConfigOption) (err error) {
 func (c *Config) StructExact(rawVal any, opts ...DecoderConfigOption) (err error) {
 	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
 	for _, opt := range opts {
-		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+		newOpts = append(newOpts, viper.DecoderConfigOption(opt))
 	}
 	return c.v.UnmarshalExact(rawVal, newOpts...)
 }
@@ -282,7 +282,7 @@ func (c *Config) StructExact(rawVal any, opts ...DecoderConfigOption) (err error
 func (c *Config) StructKey(key string, rawVal any, opts ...DecoderConfigOption) (err error) {
 	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
 	for _, opt := range opts {
-		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+		newOpts = append(newOpts, viper.DecoderConfigOption(opt))
 	}
 	return c.v.UnmarshalKey(key, rawVal, newOpts...)
 }
@@ -326,8 +326,8 @@ func init() {
 	// 设置默认值
 	// 服务器配置
 	SetDefault("server.name", "Nova")        // 服务器应用名称，默认"Nova"
-	SetDefault("server.heartbeat", 3000)     // 心跳发送间隔时间（单位:毫秒，一定要小于 maxHeartbeat 配置），默认 3000
-	SetDefault("server.maxHeartbeat", 5000)  // 最长心跳检测间隔时间（单位:毫秒，一定要大于 heartbeat 配置），默认 5000
+	SetDefault("server.heartBeat", 3000)     // 心跳发送间隔时间（单位:毫秒，一定要小于 maxHeartBeat 配置），默认 3000
+	SetDefault("server.maxHeartBeat", 5000)  // 最长心跳检测间隔时间（单位:毫秒，一定要大于 heartBeat 配置），默认 5000
 	SetDefault("server.maxConn", 3)          // 允许的客户端连接最大数量，默认 3
 	SetDefault("server.workerPoolSize", 10)  // 工作任务池最大工作 Goroutine 数量，默认 10
 	SetDefault("server.maxPacketSize", 4096) // 数据包的最大值（单位:字节），默认 4096
@@ -521,7 +521,7 @@ func Sub(key string) (conf *Config) {
 func Struct(rawVal any, opts ...DecoderConfigOption) (err error) {
 	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
 	for _, opt := range opts {
-		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+		newOpts = append(newOpts, viper.DecoderConfigOption(opt))
 	}
 	return defaultConfig.v.Unmarshal(rawVal, newOpts...)
 }
@@ -530,7 +530,7 @@ func Struct(rawVal any, opts ...DecoderConfigOption) (err error) {
 func StructExact(rawVal any, opts ...DecoderConfigOption) (err error) {
 	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
 	for _, opt := range opts {
-		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+		newOpts = append(newOpts, viper.DecoderConfigOption(opt))
 	}
 	return defaultConfig.v.UnmarshalExact(rawVal, newOpts...)
 }
@@ -539,7 +539,7 @@ func StructExact(rawVal any, opts ...DecoderConfigOption) (err error) {
 func StructKey(key string, rawVal any, opts ...DecoderConfigOption) (err error) {
 	newOpts := make([]viper.DecoderConfigOption, 0, len(opts))
 	for _, opt := range opts {
-		newOpts = append(newOpts, convertDecoderConfigOption(opt))
+		newOpts = append(newOpts, viper.DecoderConfigOption(opt))
 	}
 	return defaultConfig.v.UnmarshalKey(key, rawVal, newOpts...)
 }
@@ -547,13 +547,6 @@ func StructKey(key string, rawVal any, opts ...DecoderConfigOption) (err error) 
 // WatchConfig 监视配置文件的变化
 func WatchConfig() {
 	defaultConfig.v.WatchConfig()
-}
-
-// convertDecoderConfigOption 将 DecoderConfigOption 转换为 viper.DecoderConfigOption
-func convertDecoderConfigOption(opt DecoderConfigOption) (option viper.DecoderConfigOption) {
-	return func(dc *mapstructure.DecoderConfig) {
-		opt(dc)
-	}
 }
 
 // parseSizeInBytes 将像1GB或12MB这样的字符串转换为无符号整数字节数

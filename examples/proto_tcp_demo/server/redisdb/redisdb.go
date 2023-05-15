@@ -24,10 +24,10 @@ var redis *Redis
 
 // Start 启动 redis
 func Start() {
-	client := nredis.NewClient(&nredis.Options{
-		Addr:     nconf.GetString("redis.addr"),
-		Password: nconf.GetString("redis.password"),
-		DB:       nconf.GetInt("redis.db"),
+	client := nredis.NewClient(func(cc *nredis.ClientConfig) {
+		cc.Addr = nconf.GetString("redis.addr")
+		cc.Password = nconf.GetString("redis.password")
+		cc.DB = nconf.GetInt("redis.db")
 	})
 	redis = &Redis{client}
 	nlog.Info("Redis Start")

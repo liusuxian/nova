@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:10:54
+ * @LastEditTime: 2023-05-15 15:37:42
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -26,42 +26,52 @@ import (
 type Client struct {
 	gnet.BuiltinEventEngine
 	client                *gnet.Client                  // gnet 客户端
-	options               gnet.Options                  // 客户端 gnet 启动选项
-	network               string                        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
-	addr                  string                        // 服务器地址
+	clientConf            *ClientConfig                 // 客户端配置
 	conn                  niface.IConnection            // Client 连接
 	msgHandler            niface.IMsgHandle             // 当前 Client 绑定的消息处理模块
 	onConnStart           func(conn niface.IConnection) // 当前 Client 的连接创建时的 Hook 函数
 	onConnStop            func(conn niface.IConnection) // 当前 Client 的连接断开时的 Hook 函数
-	packetMethod          int                           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容
-	endian                int                           // 字节存储次序，1: 小端 2: 大端
-	maxPacketSize         int                           // 数据包的最大值（单位:字节）
 	packet                niface.IDataPack              // 当前 Client 绑定的数据协议封包方式
 	serverOverloadChecker niface.IServerOverloadChecker // 服务器人数超载检测器
-	heartbeat             time.Duration                 // 心跳发送间隔时间
-	maxHeartbeat          time.Duration                 // 最长心跳检测间隔时间
 	heartbeatChecker      niface.IHeartBeatChecker      // 心跳检测器
 }
 
+// ClientConfig 客户端配置
+type ClientConfig struct {
+	gnet.Options                // 客户端 gnet 启动选项
+	Network       string        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
+	Addr          string        // 服务器地址
+	HeartBeat     time.Duration // 心跳发送间隔时间
+	MaxHeartBeat  time.Duration // 最长心跳检测间隔时间
+	PacketMethod  int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容
+	Endian        int           // 字节存储次序，1: 小端 2: 大端
+	MaxPacketSize int           // 数据包的最大值（单位:字节）
+}
+
+// ClientConfigOption 客户端配置选项
+type ClientConfigOption func(cc *ClientConfig)
+
+// TCP套接字选项的类型。用于设置 TCP 连接的 NoDelay 选项，该选项表示是否禁用 Nagle 算法。启用 NoDelay 选项可以降低延迟，但会增加网络负载
+const (
+	TCPNoDelay = gnet.TCPNoDelay // 不启用
+	TCPDelay   = gnet.TCPDelay   // 启用
+)
+
 // NewClient 创建 Client
-func NewClient(network, addr string, opts ...Option) (client niface.IClient) {
+func NewClient(opts ...ClientConfigOption) (client niface.IClient) {
 	// 初始化 Client 属性
 	c := &Client{
-		network:       network,
-		addr:          addr,
-		msgHandler:    nmsghandler.NewMsgHandle(0),
-		packetMethod:  npack.DefaultPacketMethod,
-		endian:        npack.LittleEndian,
-		maxPacketSize: 4096,
+		clientConf: &ClientConfig{},
+		msgHandler: nmsghandler.NewMsgHandle(0),
 	}
-	// 处理服务选项
+	// 处理客户端配置选项
 	for _, opt := range opts {
-		opt(c)
+		opt(c.clientConf)
 	}
 	// 处理数据协议封包方式
-	c.packet = npack.NewPack(c.packetMethod, c.endian, c.maxPacketSize)
+	c.packet = npack.NewPack(c.clientConf.PacketMethod, c.clientConf.Endian, c.clientConf.MaxPacketSize)
 	// 创建 Client
-	cli, err := gnet.NewClient(c, gnet.WithOptions(c.options))
+	cli, err := gnet.NewClient(c, gnet.WithOptions(c.clientConf.Options))
 	if err != nil {
 		nlog.Fatal("New Client Error", nlog.Err(err))
 	}
@@ -156,7 +166,7 @@ func (c *Client) GetServerOverload() (checker niface.IServerOverloadChecker) {
 
 // SetHeartBeat 设置当前 Client 的心跳检测器
 func (c *Client) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
-	checker := nheartbeat.NewHeartBeatChecker(c.heartbeat, initiate)
+	checker := nheartbeat.NewHeartBeatChecker(c.clientConf.HeartBeat, initiate)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
@@ -179,9 +189,9 @@ func (c *Client) AddInterceptor(interceptor niface.IInterceptor) {
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
-	nlog.Info("Client OnBoot", nlog.String("Network", c.network), nlog.String("Addr", c.addr), nlog.Reflect("options", c.options))
+	nlog.Info("Client OnBoot", nlog.Reflect("ClientConf", c.clientConf))
 	// 连接服务器
-	if _, err := c.client.Dial(c.network, c.addr); err != nil {
+	if _, err := c.client.Dial(c.clientConf.Network, c.clientConf.Addr); err != nil {
 		nlog.Fatal("Client OnBoot Error", nlog.Err(err))
 	}
 	// 打印所有路由
@@ -201,7 +211,7 @@ func (c *Client) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
 func (c *Client) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	nlog.Info("Client OnOpen", nlog.Int("connID", conn.Fd()))
 	// 创建一个 Client 客户端特性的连接
-	c.conn = nconn.NewClientConn(c, conn, c.maxHeartbeat)
+	c.conn = nconn.NewClientConn(c, conn, c.clientConf.MaxHeartBeat)
 	// 启动连接
 	c.conn.Start()
 	return

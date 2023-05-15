@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:06:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 14:52:15
+ * @LastEditTime: 2023-05-15 14:07:52
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -12,7 +12,6 @@ package nrequest
 import (
 	"context"
 	"github.com/liusuxian/nova/niface"
-	"github.com/panjf2000/gnet/v2"
 )
 
 // Request 请求结构
@@ -86,16 +85,16 @@ func (r *Request) RouterNext() {
 }
 
 // Resp 将数据返回给远程的对端
-func (r *Request) Resp(f niface.MsgDataFunc, callback ...gnet.AsyncCallback) (err error) {
+func (r *Request) Resp(f niface.MsgDataFunc, callback ...niface.SendCallback) (err error) {
 	return r.conn.Send(f, callback...)
 }
 
 // RespMsg 将 Message 数据返回给远程的对端（与请求共用消息ID）
-func (r *Request) RespMsg(f niface.MsgDataFunc, callback ...gnet.AsyncCallback) (err error) {
+func (r *Request) RespMsg(f niface.MsgDataFunc, callback ...niface.SendCallback) (err error) {
 	return r.RespMsgWithId(r.msg.GetMsgID(), f, callback...)
 }
 
 // RespMsgWithId 将 Message 数据返回给远程的对端（与请求可不共用消息ID）
-func (r *Request) RespMsgWithId(msgID uint16, f niface.MsgDataFunc, callback ...gnet.AsyncCallback) (err error) {
+func (r *Request) RespMsgWithId(msgID uint16, f niface.MsgDataFunc, callback ...niface.SendCallback) (err error) {
 	return r.conn.SendMsg(msgID, f, callback...)
 }

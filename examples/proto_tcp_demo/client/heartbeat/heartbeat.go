@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-10 00:16:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 14:51:39
+ * @LastEditTime: 2023-05-15 16:01:43
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -22,7 +22,7 @@ import (
 func HeartBeatHandler(request niface.IRequest) {
 	// 获取解析完后的序列化数据
 	reqMsg := request.GetSerializedData().(*pb.Heartbeat)
-	nlog.Debug("Receive Heartbeat", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.Any("ReqMsg", nconv.ProtoMsgToMap(reqMsg)))
+	nlog.Debug("Receive HeartBeat", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.Any("ReqMsg", nconv.ProtoMsgToMap(reqMsg)))
 }
 
 // ReplyHeartBeatHandler 心跳消息回复
@@ -30,7 +30,7 @@ func ReplyHeartBeatHandler(request niface.IRequest) {
 	if err := request.RespMsg(func() (buf []byte, err error) {
 		return proto.Marshal(&pb.Heartbeat{Timestamp: time.Now().Unix()})
 	}); err != nil {
-		nlog.Error("Reply Heartbeat Msg Error", nlog.Err(err))
+		nlog.Error("Reply HeartBeat Msg Error", nlog.Err(err))
 		return
 	}
 }
@@ -40,8 +40,8 @@ func LoginHandler(request niface.IRequest) {
 	if err := request.RespMsgWithId(uint16(pb.MsgID_LOGIN), func() (buf []byte, err error) {
 		return proto.Marshal(&pb.LoginRequest{
 			Mode:  uint32(pb.LoginMode_VISITOR),
-			Uid:   8,
-			Token: "eyJpZCI6OCwidGltZSI6MTY4MzY4OTAwM30=.6fb749f16570e415b7936c636e0c759a",
+			Uid:   7,
+			Token: "eyJpZCI6NywidGltZSI6MTY4Mzk3Njk3M30=.13d568716963b0dc4a5d7786abff4cc1",
 		})
 	}); err != nil {
 		nlog.Error("Send Login Msg Error", nlog.Err(err))

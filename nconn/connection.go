@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-14 00:51:43
+ * @LastEditTime: 2023-05-15 15:00:37
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -23,7 +23,7 @@ import (
 
 // Connection 连接结构
 type Connection struct {
-	conn             gnet.Conn                     // 当前连接的 Socket 套接字
+	conn             niface.Conn                   // 当前连接的 Socket 套接字
 	connID           int                           // 当前连接的 ID，也可以称作为 SessionID，ID 全局唯一
 	msgHandler       niface.IMsgHandle             // 消息管理和对应处理方法的消息管理模块
 	cancelCtx        context.Context               // 当前连接的 Cancel Context
@@ -42,7 +42,7 @@ type Connection struct {
 }
 
 // NewServerConn 创建一个 Server 服务端特性的连接
-func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Duration) (c *Connection) {
+func NewServerConn(server niface.IServer, conn niface.Conn, maxHeartbeat time.Duration) (c *Connection) {
 	// 初始化 Connection 属性
 	c = &Connection{
 		conn:             conn,
@@ -70,7 +70,7 @@ func NewServerConn(server niface.IServer, conn gnet.Conn, maxHeartbeat time.Dura
 }
 
 // NewClientConn 创建一个 Client 客户端特性的连接
-func NewClientConn(client niface.IClient, conn gnet.Conn, maxHeartbeat time.Duration) (c *Connection) {
+func NewClientConn(client niface.IClient, conn niface.Conn, maxHeartbeat time.Duration) (c *Connection) {
 	// 初始化 Connection 属性
 	c = &Connection{
 		conn:             conn,
@@ -110,7 +110,7 @@ func (c *Connection) GetCancelCtx() (ctx context.Context) {
 }
 
 // GetConnection 从当前连接获取原始的 gnet.Conn
-func (c *Connection) GetConnection() (conn gnet.Conn) {
+func (c *Connection) GetConnection() (conn niface.Conn) {
 	return c.conn
 }
 
@@ -130,7 +130,7 @@ func (c *Connection) LocalAddr() (addr net.Addr) {
 }
 
 // Send 将数据发送给远程的对端
-func (c *Connection) Send(f niface.MsgDataFunc, callback ...gnet.AsyncCallback) (err error) {
+func (c *Connection) Send(f niface.MsgDataFunc, callback ...niface.SendCallback) (err error) {
 	// 判断当前连接的关闭状态
 	if c.isClosed {
 		err = errors.New("connection closed when send data")
@@ -143,7 +143,7 @@ func (c *Connection) Send(f niface.MsgDataFunc, callback ...gnet.AsyncCallback) 
 	}
 	// 异步发送给客户端
 	if len(callback) > 0 {
-		err = c.conn.AsyncWrite(data, callback[0])
+		err = c.conn.AsyncWrite(data, gnet.AsyncCallback(callback[0]))
 	} else {
 		err = c.conn.AsyncWrite(data, nil)
 	}
@@ -151,7 +151,7 @@ func (c *Connection) Send(f niface.MsgDataFunc, callback ...gnet.AsyncCallback) 
 }
 
 // SendMsg 将 Message 数据发送给远程的对端
-func (c *Connection) SendMsg(msgID uint16, f niface.MsgDataFunc, callback ...gnet.AsyncCallback) (err error) {
+func (c *Connection) SendMsg(msgID uint16, f niface.MsgDataFunc, callback ...niface.SendCallback) (err error) {
 	// 判断当前连接的关闭状态
 	if c.isClosed {
 		err = errors.New("connection closed when send msg")
@@ -166,7 +166,7 @@ func (c *Connection) SendMsg(msgID uint16, f niface.MsgDataFunc, callback ...gne
 	buf := c.packet.Pack(npack.NewMsgPackage(msgID, data))
 	// 异步发送给客户端
 	if len(callback) > 0 {
-		err = c.conn.AsyncWrite(buf, callback[0])
+		err = c.conn.AsyncWrite(buf, gnet.AsyncCallback(callback[0]))
 	} else {
 		err = c.conn.AsyncWrite(buf, nil)
 	}

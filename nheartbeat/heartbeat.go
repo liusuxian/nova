@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-03 01:01:50
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-13 19:38:19
+ * @LastEditTime: 2023-05-15 15:01:43
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -127,7 +127,7 @@ func (hbc *HeartBeatChecker) check() {
 // sendHeartBeatMsg 发送心跳消息
 func (hbc *HeartBeatChecker) sendHeartBeatMsg() (err error) {
 	if hbc.initiate {
-		if err = hbc.conn.SendMsg(hbc.msgID, hbc.makeMsg); err != nil {
+		if err = hbc.conn.SendMsg(hbc.msgID, niface.MsgDataFunc(hbc.makeMsg)); err != nil {
 			nlog.Error("Send HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
 			return
 		}

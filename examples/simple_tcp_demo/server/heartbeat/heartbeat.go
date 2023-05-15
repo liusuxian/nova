@@ -16,5 +16,5 @@ import (
 
 // HeartBeatHandler 心跳消息
 func HeartBeatHandler(request niface.IRequest) {
-	nlog.Debug("Receive Heartbeat", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("ReqMsg", request.GetData()))
+	nlog.Debug("Receive HeartBeat", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.ByteString("ReqMsg", request.GetData()))
 }

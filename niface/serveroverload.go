@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-01 17:25:52
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 19:16:56
+ * @LastEditTime: 2023-05-15 13:48:36
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -18,7 +18,7 @@ type IServerOverloadChecker interface {
 }
 
 // ServerOverloadMsgFunc 用户自定义的服务器人数超载消息处理方法
-type ServerOverloadMsgFunc = MsgDataFunc
+type ServerOverloadMsgFunc func() (buf []byte, err error)
 
 // ServerOverloadOption 服务器人数超载检测选项
 type ServerOverloadOption struct {

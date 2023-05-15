@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-14 01:04:35
+ * @LastEditTime: 2023-05-15 15:34:51
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -29,8 +29,7 @@ import (
 type Server struct {
 	gnet.BuiltinEventEngine
 	eng                   gnet.Engine
-	options               gnet.Options                  // 服务器 gnet 启动选项
-	serverConf            ServerConfig                  // 服务器配置
+	serverConf            *ServerConfig                 // 服务器配置
 	addr                  string                        // 服务器绑定的地址
 	msgHandler            niface.IMsgHandle             // 当前 Server 绑定的消息处理模块
 	connMgr               niface.IConnManager           // 当前 Server 的连接管理模块
@@ -45,11 +44,12 @@ type Server struct {
 
 // ServerConfig 服务器配置
 type ServerConfig struct {
+	gnet.Options          // 服务器 gnet 启动选项
 	Name           string // 服务器应用名称，默认"Nova"
 	Network        string // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
 	Port           int    // 服务器监听端口
-	Heartbeat      int    // 心跳发送间隔时间（单位:毫秒，一定要小于 maxHeartbeat 配置），默认 3000
-	MaxHeartbeat   int    // 最长心跳检测间隔时间（单位:毫秒，一定要大于 heartbeat 配置），默认 5000
+	HeartBeat      int    // 心跳发送间隔时间（单位:毫秒，一定要小于 MaxHeartBeat 配置），默认 3000
+	MaxHeartBeat   int    // 最长心跳检测间隔时间（单位:毫秒，一定要大于 HeartBeat 配置），默认 5000
 	MaxConn        int    // 允许的客户端连接最大数量，默认 3
 	WorkerPoolSize int    // 工作任务池最大工作 Goroutine 数量，默认 10
 	MaxPacketSize  int    // 数据包的最大值（单位:字节），默认 4096
@@ -57,11 +57,27 @@ type ServerConfig struct {
 	Endian         int    // 字节存储次序，1: 小端 2: 大端，默认 1
 }
 
+// ServerConfigOption 服务器配置选项
+type ServerConfigOption func(sc *ServerConfig)
+
+// 表示负载均衡算法的类型
+const (
+	RoundRobin       = gnet.RoundRobin       // 算法通过轮询事件循环列表将下一个被接受的连接分配到事件循环中
+	LeastConnections = gnet.LeastConnections // 算法会将下一个被接受的连接分配到当前活跃连接数最少的事件循环中
+	SourceAddrHash   = gnet.SourceAddrHash   // 算法通过哈希远程地址将下一个被接受的连接分配给事件循环
+)
+
+// TCP套接字选项的类型。用于设置 TCP 连接的 NoDelay 选项，该选项表示是否禁用 Nagle 算法。启用 NoDelay 选项可以降低延迟，但会增加网络负载
+const (
+	TCPNoDelay = gnet.TCPNoDelay // 不启用
+	TCPDelay   = gnet.TCPDelay   // 启用
+)
+
 // NewServer 创建 Server
-func NewServer(opts ...Option) (server niface.IServer) {
+func NewServer(opts ...ServerConfigOption) (server niface.IServer) {
 	// 获取服务器配置
-	serCfg := ServerConfig{}
-	if err := nconf.StructKey("server", &serCfg); err != nil {
+	serCfg := &ServerConfig{}
+	if err := nconf.StructKey("server", serCfg); err != nil {
 		nlog.Fatal("New Server Error", nlog.Err(err))
 	}
 	// 初始化 Server 属性
@@ -72,16 +88,16 @@ func NewServer(opts ...Option) (server niface.IServer) {
 		connMgr:    nconn.NewConnManager(),
 		packet:     npack.NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
 	}
-	// 处理服务选项
+	// 处理服务器配置选项
 	for _, opt := range opts {
-		opt(s)
+		opt(s.serverConf)
 	}
 	return s
 }
 
 // Start 启动 Server
 func (s *Server) Start() {
-	if err := gnet.Run(s, s.addr, gnet.WithOptions(s.options)); err != nil {
+	if err := gnet.Run(s, s.addr, gnet.WithOptions(s.serverConf.Options)); err != nil {
 		nlog.Fatal("Start Server Error", nlog.Err(err))
 	}
 }
@@ -181,7 +197,7 @@ func (s *Server) GetServerOverload() (checker niface.IServerOverloadChecker) {
 // SetHeartBeat 设置当前 Server 的心跳检测器
 func (s *Server) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
 	// 创建心跳检测器
-	interval := time.Duration(s.serverConf.Heartbeat) * time.Millisecond
+	interval := time.Duration(s.serverConf.HeartBeat) * time.Millisecond
 	checker := nheartbeat.NewHeartBeatChecker(interval, initiate)
 	// 用户自定义
 	if len(option) > 0 {
@@ -205,7 +221,7 @@ func (s *Server) AddInterceptor(interceptor niface.IInterceptor) {
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (s *Server) OnBoot(eng gnet.Engine) (action gnet.Action) {
-	nlog.Info("Server OnBoot", nlog.String("listening", s.addr), nlog.Reflect("ServerConf", s.serverConf), nlog.Reflect("options", s.options))
+	nlog.Info("Server OnBoot", nlog.String("listening", s.addr), nlog.Reflect("ServerConf", s.serverConf))
 	s.eng = eng
 	// 调用 Server 启动时的 Hook 函数
 	s.callOnStart()
@@ -245,7 +261,7 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 		}
 	}
 	// 创建一个 Server 服务端特性的连接
-	serverConn := nconn.NewServerConn(s, conn, time.Duration(s.serverConf.MaxHeartbeat)*time.Millisecond)
+	serverConn := nconn.NewServerConn(s, conn, time.Duration(s.serverConf.MaxHeartBeat)*time.Millisecond)
 	// 启动连接
 	serverConn.Start()
 	return

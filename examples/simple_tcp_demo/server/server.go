@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 23:24:34
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-14 00:52:17
+ * @LastEditTime: 2023-05-15 15:07:03
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -22,13 +22,13 @@ import (
 
 func main() {
 	// 创建 Server
-	s := nserver.NewServer(
-		nserver.WithMulticore(true),
-		nserver.WithReuseAddr(true),
-		nserver.WithReusePort(true),
-		nserver.WithLockOSThread(true),
-		nserver.WithTCPKeepAlive(time.Second*30),
-	)
+	s := nserver.NewServer(func(sc *nserver.ServerConfig) {
+		sc.Multicore = true
+		sc.ReuseAddr = true
+		sc.ReusePort = true
+		sc.LockOSThread = true
+		sc.TCPKeepAlive = time.Second * 30
+	})
 	// 设置当前 Server 的服务器人数超载检测器
 	s.SetServerOverload()
 	// 设置当前 Server 的心跳检测器
