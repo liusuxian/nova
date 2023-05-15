@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-12 18:19:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 15:58:16
+ * @LastEditTime: 2023-05-15 19:48:10
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -28,6 +28,12 @@ type DecoderConfig = mapstructure.DecoderConfig
 
 // DecoderConfigOption 解码配置选项
 type DecoderConfigOption func(dc *DecoderConfig)
+
+// Event 事件
+type Event = fsnotify.Event
+
+// EventFunc 事件通知方法
+type EventFunc func(e Event)
 
 // Config 配置结构
 type Config struct {
@@ -246,7 +252,7 @@ func (c *Config) IsSet(key string) (val bool) {
 }
 
 // OnConfigChange 设置当配置文件更改时调用的事件处理程序
-func (c *Config) OnConfigChange(run func(in fsnotify.Event)) {
+func (c *Config) OnConfigChange(run EventFunc) {
 	c.v.OnConfigChange(run)
 }
 
@@ -503,7 +509,7 @@ func IsSet(key string) (val bool) {
 }
 
 // OnConfigChange 设置当配置文件更改时调用的事件处理程序
-func OnConfigChange(run func(in fsnotify.Event)) {
+func OnConfigChange(run EventFunc) {
 	defaultConfig.v.OnConfigChange(run)
 }
 
