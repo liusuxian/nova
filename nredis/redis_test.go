@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-04 12:14:28
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:19:55
+ * @LastEditTime: 2023-05-15 12:35:14
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -26,10 +26,10 @@ type A struct {
 }
 
 func TestRedis(t *testing.T) {
-	client := nredis.NewClient(&nredis.Options{
-		Addr:     "127.0.0.1:6379",
-		Password: "",
-		DB:       2,
+	client := nredis.NewClient(func(cc *nredis.ClientConfig) {
+		cc.Addr = "127.0.0.1:6379"
+		cc.Password = ""
+		cc.DB = 2
 	})
 	defer client.Close()
 
