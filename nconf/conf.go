@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-12 18:19:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-16 02:05:32
+ * @LastEditTime: 2023-05-16 15:57:23
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -257,7 +257,7 @@ func (c *Config) IsSet(key string) (val bool) {
 	return c.v.IsSet(key)
 }
 
-// OnConfigChange 设置当配置文件更改时调用的事件处理程序
+// OnConfigChange 设置当配置文件更改时调用的事件处理程序(只能用于本地配置文件的变更监听)
 func (c *Config) OnConfigChange(run func(e Event)) {
 	c.v.OnConfigChange(run)
 }
@@ -304,12 +304,12 @@ func (c *Config) WatchConfig() {
 	c.v.WatchConfig()
 }
 
-// WatchRemoteConfig 监视远程配置文件的变化
+// WatchRemoteConfig 监视远程配置文件的变化(阻塞式)
 func (c *Config) WatchRemoteConfig() (err error) {
 	return c.v.WatchRemoteConfig()
 }
 
-// WatchRemoteConfigOnChannel 取消监视远程配置文件的变化
+// WatchRemoteConfigOnChannel 监视远程配置文件的变化(非阻塞式)
 func (c *Config) WatchRemoteConfigOnChannel() (err error) {
 	return c.v.WatchRemoteConfigOnChannel()
 }
@@ -514,7 +514,7 @@ func IsSet(key string) (val bool) {
 	return defaultConfig.v.IsSet(key)
 }
 
-// OnConfigChange 设置当配置文件更改时调用的事件处理程序
+// OnConfigChange 设置当配置文件更改时调用的事件处理程序(只能用于本地配置文件的变更监听)
 func OnConfigChange(run func(e Event)) {
 	defaultConfig.v.OnConfigChange(run)
 }
