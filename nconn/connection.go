@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 15:00:37
+ * @LastEditTime: 2023-05-16 10:33:05
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -96,12 +96,17 @@ func NewClientConn(client niface.IClient, conn niface.Conn, maxHeartbeat time.Du
 
 // Start 启动连接
 func (c *Connection) Start() {
-	go c.start()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go c.start(&wg)
+	wg.Wait()
 }
 
 // Stop 停止连接
 func (c *Connection) Stop() {
-	c.cancelFunc()
+	if c.cancelFunc != nil {
+		c.cancelFunc()
+	}
 }
 
 // GetCancelCtx 返回 Cancel Context，用于用户自定义的 Goroutine 获取连接退出状态
@@ -231,10 +236,8 @@ func (c *Connection) SetHeartBeat(checker niface.IHeartBeatChecker) {
 }
 
 // start 启动连接
-func (c *Connection) start() {
+func (c *Connection) start(wg *sync.WaitGroup) {
 	c.cancelCtx, c.cancelFunc = context.WithCancel(context.Background())
-	nlog.Info("Connection Start", nlog.Int("ConnID", c.connID))
-
 	// 调用连接创建时的 Hook 函数
 	c.callOnConnStart()
 
@@ -245,6 +248,9 @@ func (c *Connection) start() {
 		// 更新连接活动时间
 		c.UpdateActivity()
 	}
+
+	wg.Done()
+	nlog.Info("Connection Start", nlog.Int("ConnID", c.connID))
 
 	<-c.cancelCtx.Done()
 	// 清理
