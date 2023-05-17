@@ -10,4 +10,6 @@ enum MsgID {
   SERVER_OVERLOAD = 1; // 服务器人数超载
   HEARTBEAT = 2;       // 心跳
   LOGIN = 3;           // 登录
+  TOKEN_AUTH = 4;      // token 校验
+  GOODS_LIST = 5;      // 商城列表
 }

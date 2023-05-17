@@ -53,3 +53,8 @@ message LoginResponse {
   uint32 code = 1;        // 响应码，0:成功 >=1:错误码
   UserInfo user_info = 2; // 玩家信息
 }
+
+// token 校验
+message TokenAuth {
+  uint32 code = 1; // 响应码，0:成功 >=1:错误码
+}
