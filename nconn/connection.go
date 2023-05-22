@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-23 01:09:50
+ * @LastEditTime: 2023-05-23 02:17:50
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -18,6 +18,7 @@ import (
 	"github.com/panjf2000/gnet/v2"
 	"github.com/pkg/errors"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -30,7 +31,7 @@ type Connection struct {
 	cancelFunc       context.CancelFunc            // 当前连接的 Cancel Func
 	property         map[string]any                // 连接属性
 	propertyLock     *sync.Mutex                   // 连接属性的互斥锁
-	isClosed         bool                          // 当前连接的关闭状态
+	isClosed         int32                         // 当前连接的关闭状态
 	connManager      niface.IConnManager           // 当前连接属于哪个 Connection Manager
 	onConnStart      func(conn niface.IConnection) // 当前连接创建时的 Hook 函数
 	onConnStop       func(conn niface.IConnection) // 当前连接断开时的 Hook 函数
@@ -52,7 +53,7 @@ func NewServerConn(server niface.IServer, conn niface.Conn, maxHeartbeat time.Du
 		msgHandler:       server.GetMsgHandler(),
 		property:         nil,
 		propertyLock:     new(sync.Mutex),
-		isClosed:         false,
+		isClosed:         0,
 		connManager:      server.GetConnManager(),
 		onConnStart:      server.GetOnConnStart(),
 		onConnStop:       server.GetOnConnStop(),
@@ -82,7 +83,7 @@ func NewClientConn(client niface.IClient, conn niface.Conn, maxHeartbeat time.Du
 		msgHandler:       client.GetMsgHandler(),
 		property:         nil,
 		propertyLock:     new(sync.Mutex),
-		isClosed:         false,
+		isClosed:         0,
 		onConnStart:      client.GetOnConnStart(),
 		onConnStop:       client.GetOnConnStop(),
 		packet:           client.GetPacket(),
@@ -143,7 +144,8 @@ func (c *Connection) LocalAddr() (addr string) {
 // Send 将数据发送给远程的对端
 func (c *Connection) Send(f niface.MsgDataFunc, callback ...niface.SendCallback) (err error) {
 	// 判断当前连接的关闭状态
-	if c.isClosed {
+	isClosed := atomic.LoadInt32(&c.isClosed)
+	if isClosed == 1 {
 		err = nerr.ErrConnectionClosed
 		return
 	}
@@ -164,7 +166,8 @@ func (c *Connection) Send(f niface.MsgDataFunc, callback ...niface.SendCallback)
 // SendMsg 将 Message 数据发送给远程的对端
 func (c *Connection) SendMsg(msgID uint16, f niface.MsgDataFunc, callback ...niface.SendCallback) (err error) {
 	// 判断当前连接的关闭状态
-	if c.isClosed {
+	isClosed := atomic.LoadInt32(&c.isClosed)
+	if isClosed == 1 {
 		err = nerr.ErrConnectionClosed
 		return
 	}
@@ -218,7 +221,8 @@ func (c *Connection) RemoveProperty(key string) {
 
 // IsAlive 判断当前连接是否存活
 func (c *Connection) IsAlive() (isAlive bool) {
-	if c.isClosed {
+	isClosed := atomic.LoadInt32(&c.isClosed)
+	if isClosed == 1 {
 		return false
 	}
 	// 检查连接最后一次活动时间，如果超过心跳间隔，则认为连接已经死亡
@@ -268,7 +272,8 @@ func (c *Connection) finalizer() {
 	// 调用连接断开时的 Hook 函数
 	c.callOnConnStop()
 	// 如果当前连接已经关闭
-	if c.isClosed {
+	isClosed := atomic.LoadInt32(&c.isClosed)
+	if isClosed == 1 {
 		return
 	}
 	// 关闭链接绑定的心跳检测器
@@ -282,7 +287,7 @@ func (c *Connection) finalizer() {
 		c.connManager.RemoveConn(c.connID)
 	}
 	// 设置当前连接的关闭状态
-	c.isClosed = true
+	atomic.StoreInt32(&c.isClosed, 1)
 	nlog.Info("Connection Stop", nlog.Int("ConnID", c.connID))
 }
 
