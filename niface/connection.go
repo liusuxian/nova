@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 00:52:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 15:00:28
+ * @LastEditTime: 2023-05-23 01:11:30
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -12,7 +12,6 @@ package niface
 import (
 	"context"
 	"github.com/panjf2000/gnet/v2"
-	"net"
 )
 
 // IConnection 连接接口
@@ -22,8 +21,8 @@ type IConnection interface {
 	GetCancelCtx() (ctx context.Context)                                       // 返回 Cancel Context，用于用户自定义的 Goroutine 获取连接退出状态
 	GetConnection() (conn Conn)                                                // 从当前连接获取原始的 Conn
 	GetConnID() (connID int)                                                   // 获取当前 ConnID
-	RemoteAddr() (addr net.Addr)                                               // 获取当前连接远程地址信息
-	LocalAddr() (addr net.Addr)                                                // 获取当前连接本地地址信息
+	RemoteAddr() (addr string)                                                 // 获取当前连接远程地址信息
+	LocalAddr() (addr string)                                                  // 获取当前连接本地地址信息
 	Send(f MsgDataFunc, callback ...SendCallback) (err error)                  // 将数据发送给远程的对端
 	SendMsg(msgID uint16, f MsgDataFunc, callback ...SendCallback) (err error) // 将 Message 数据发送给远程的对端
 	SetProperty(key string, value any)                                         // 设置当前连接属性

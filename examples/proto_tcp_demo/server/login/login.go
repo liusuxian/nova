@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-10 14:03:38
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 14:20:12
+ * @LastEditTime: 2023-05-23 01:13:46
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -24,7 +24,7 @@ func LoginHandler(request niface.IRequest) {
 	// 获取解析完后的序列化数据
 	msgID := request.GetMsgID()
 	reqMsg := request.GetSerializedData().(*pb.LoginRequest)
-	nlog.Debug("Receive Login", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", msgID), nlog.Any("ReqMsg", nconv.ProtoMsgToMap(reqMsg)))
+	nlog.Debug("Receive Login", nlog.String("From", request.GetConnection().RemoteAddr()), nlog.Uint16("MsgID", msgID), nlog.Any("ReqMsg", nconv.ProtoMsgToMap(reqMsg)))
 	// 测试读取 redis
 	_, err := redisdb.Instance().Do(request.GetCtx(), "GET", "aaa")
 	if err != nil {

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-10 00:16:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 16:01:43
+ * @LastEditTime: 2023-05-23 01:12:57
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -22,7 +22,7 @@ import (
 func HeartBeatHandler(request niface.IRequest) {
 	// 获取解析完后的序列化数据
 	reqMsg := request.GetSerializedData().(*pb.Heartbeat)
-	nlog.Debug("Receive HeartBeat", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.Any("ReqMsg", nconv.ProtoMsgToMap(reqMsg)))
+	nlog.Debug("Receive HeartBeat", nlog.String("From", request.GetConnection().RemoteAddr()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.Any("ReqMsg", nconv.ProtoMsgToMap(reqMsg)))
 }
 
 // ReplyHeartBeatHandler 心跳消息回复

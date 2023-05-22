@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-02 16:20:06
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-12 14:31:59
+ * @LastEditTime: 2023-05-23 01:13:10
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -21,7 +21,7 @@ import (
 func ServerOverloadHandler(request niface.IRequest) {
 	// 获取解析完后的序列化数据
 	reqMsg := request.GetSerializedData().(*pb.ServerOverload)
-	nlog.Debug("Receive ServerOverload", nlog.String("From", request.GetConnection().RemoteAddr().String()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.Any("ReqMsg", nconv.ProtoMsgToMap(reqMsg)))
+	nlog.Debug("Receive ServerOverload", nlog.String("From", request.GetConnection().RemoteAddr()), nlog.Uint16("MsgID", request.GetMsgID()), nlog.Any("ReqMsg", nconv.ProtoMsgToMap(reqMsg)))
 }
 
 // SetServerOverload 设置当前 Client 的服务器人数超载检测器

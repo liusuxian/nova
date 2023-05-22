@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-22 20:49:41
+ * @LastEditTime: 2023-05-23 01:09:50
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -17,7 +17,6 @@ import (
 	"github.com/liusuxian/nova/npack"
 	"github.com/panjf2000/gnet/v2"
 	"github.com/pkg/errors"
-	"net"
 	"sync"
 	"time"
 )
@@ -40,6 +39,8 @@ type Connection struct {
 	lastActivityLock *sync.Mutex                   // 最后一次活动时间的互斥锁
 	maxHeartbeat     time.Duration                 // 最长心跳检测间隔时间
 	heartbeatChecker niface.IHeartBeatChecker      // 心跳检测器
+	remoteAddr       string                        // 当前连接的远程地址
+	localAddr        string                        // 当前连接的本地地址
 }
 
 // NewServerConn 创建一个 Server 服务端特性的连接
@@ -58,6 +59,8 @@ func NewServerConn(server niface.IServer, conn niface.Conn, maxHeartbeat time.Du
 		packet:           server.GetPacket(),
 		lastActivityLock: new(sync.Mutex),
 		maxHeartbeat:     maxHeartbeat,
+		remoteAddr:       conn.RemoteAddr().String(),
+		localAddr:        conn.LocalAddr().String(),
 	}
 	// 从当前 Server 克隆心跳检测器
 	heartbeatChecker := server.GetHeartBeat()
@@ -85,6 +88,8 @@ func NewClientConn(client niface.IClient, conn niface.Conn, maxHeartbeat time.Du
 		packet:           client.GetPacket(),
 		lastActivityLock: new(sync.Mutex),
 		maxHeartbeat:     maxHeartbeat,
+		remoteAddr:       conn.RemoteAddr().String(),
+		localAddr:        conn.LocalAddr().String(),
 	}
 	// 从当前 Client 克隆心跳检测器
 	heartbeatChecker := client.GetHeartBeat()
@@ -126,13 +131,13 @@ func (c *Connection) GetConnID() (connID int) {
 }
 
 // RemoteAddr 获取当前连接远程地址信息
-func (c *Connection) RemoteAddr() (addr net.Addr) {
-	return c.conn.RemoteAddr()
+func (c *Connection) RemoteAddr() (addr string) {
+	return c.remoteAddr
 }
 
 // LocalAddr 获取当前连接本地地址信息
-func (c *Connection) LocalAddr() (addr net.Addr) {
-	return c.conn.LocalAddr()
+func (c *Connection) LocalAddr() (addr string) {
+	return c.localAddr
 }
 
 // Send 将数据发送给远程的对端
