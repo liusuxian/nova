@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-10 22:43:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 16:00:53
+ * @LastEditTime: 2023-05-22 17:37:41
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -31,7 +31,6 @@ func main() {
 		go func(ctx context.Context) {
 			// 创建 Client
 			c := nclient.NewClient(func(cc *nclient.ClientConfig) {
-				cc.LockOSThread = true
 				cc.Network = "tcp"
 				cc.Addr = "127.0.0.1:8099"
 				cc.HeartBeat = time.Duration(10000) * time.Millisecond

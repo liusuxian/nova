@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-23 23:24:34
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 15:07:03
+ * @LastEditTime: 2023-05-22 17:36:26
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -16,6 +16,7 @@ import (
 	"github.com/liusuxian/nova/nserver"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 )
@@ -23,7 +24,7 @@ import (
 func main() {
 	// 创建 Server
 	s := nserver.NewServer(func(sc *nserver.ServerConfig) {
-		sc.Multicore = true
+		sc.NumEventLoop = runtime.NumCPU() * 4
 		sc.ReuseAddr = true
 		sc.ReusePort = true
 		sc.LockOSThread = true
