@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 15:34:51
+ * @LastEditTime: 2023-05-22 20:45:49
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"github.com/liusuxian/nova/nconf"
 	"github.com/liusuxian/nova/nconn"
+	"github.com/liusuxian/nova/nerr"
 	"github.com/liusuxian/nova/nheartbeat"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
@@ -291,7 +292,7 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		headBuf, _ := conn.Peek(headLen)
 		// 拆包头
 		msg, err := s.packet.UnPackHead(headBuf)
-		if err == npack.ErrIncompletePacket {
+		if err == nerr.ErrIncompletePacket {
 			break
 		}
 		if err != nil {

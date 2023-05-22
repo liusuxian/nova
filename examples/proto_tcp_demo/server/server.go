@@ -28,7 +28,7 @@ import (
 func main() {
 	// 创建 Server
 	s := nserver.NewServer(func(sc *nserver.ServerConfig) {
-		sc.NumEventLoop = runtime.NumCPU() * 4
+		sc.NumEventLoop = runtime.NumCPU() * 2
 		sc.ReuseAddr = true
 		sc.ReusePort = true
 		sc.LockOSThread = true

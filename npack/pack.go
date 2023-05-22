@@ -9,10 +9,7 @@
  */
 package npack
 
-import (
-	"github.com/liusuxian/nova/niface"
-	"github.com/pkg/errors"
-)
+import "github.com/liusuxian/nova/niface"
 
 const (
 	DefaultPacketMethod int = 1 // 默认封包拆包方式
@@ -21,9 +18,6 @@ const (
 	LittleEndian int = iota + 1 // 字节存储次序，小端
 	BigEndian                   // 字节存储次序，大端
 )
-
-// 自定义错误，不完整的包
-var ErrIncompletePacket = errors.New("incomplete packet")
 
 // NewPack 创建一个具体的封包拆包对象
 func NewPack(packetMethod, endian, maxPacketSize int) (dataPack niface.IDataPack) {

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-08 18:50:33
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:19:05
+ * @LastEditTime: 2023-05-22 20:44:37
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -11,8 +11,8 @@ package npack
 
 import (
 	"encoding/binary"
+	"github.com/liusuxian/nova/nerr"
 	"github.com/liusuxian/nova/niface"
-	"github.com/pkg/errors"
 )
 
 // defaultPack 默认封包拆包结构，消息ID(2字节)-消息体长度(4字节)-消息内容
@@ -73,7 +73,7 @@ func (p *defaultPack) Pack(msg niface.IMessage) (data []byte) {
 func (p *defaultPack) UnPackHead(headBuf []byte) (msg niface.IMessage, err error) {
 	headLen := p.GetHeadLen()
 	if len(headBuf) < headLen {
-		err = ErrIncompletePacket
+		err = nerr.ErrIncompletePacket
 		return
 	}
 	// 获取字节存储次序
@@ -99,7 +99,7 @@ func (p *defaultPack) UnPackHead(headBuf []byte) (msg niface.IMessage, err error
 	msg.SetDataLen(bodyLen)
 	// 判断消息体长度是否超出我们允许的最大包长度
 	if p.maxPacketSize > 0 && bodyLen > p.maxPacketSize {
-		err = errors.New("too large msg data received")
+		err = nerr.ErrTooLargeMsgReceived
 		return
 	}
 	return

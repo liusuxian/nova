@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-16 10:33:05
+ * @LastEditTime: 2023-05-22 20:49:41
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -11,6 +11,7 @@ package nconn
 
 import (
 	"context"
+	"github.com/liusuxian/nova/nerr"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/npack"
@@ -138,7 +139,7 @@ func (c *Connection) LocalAddr() (addr net.Addr) {
 func (c *Connection) Send(f niface.MsgDataFunc, callback ...niface.SendCallback) (err error) {
 	// 判断当前连接的关闭状态
 	if c.isClosed {
-		err = errors.New("connection closed when send data")
+		err = nerr.ErrConnectionClosed
 		return
 	}
 	// 获取发送的数据
@@ -159,7 +160,7 @@ func (c *Connection) Send(f niface.MsgDataFunc, callback ...niface.SendCallback)
 func (c *Connection) SendMsg(msgID uint16, f niface.MsgDataFunc, callback ...niface.SendCallback) (err error) {
 	// 判断当前连接的关闭状态
 	if c.isClosed {
-		err = errors.New("connection closed when send msg")
+		err = nerr.ErrConnectionClosed
 		return
 	}
 	// 获取发送的数据
