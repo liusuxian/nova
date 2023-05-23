@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-23 02:17:50
+ * @LastEditTime: 2023-05-23 17:37:48
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -16,7 +16,6 @@ import (
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/npack"
 	"github.com/panjf2000/gnet/v2"
-	"github.com/pkg/errors"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -205,7 +204,7 @@ func (c *Connection) GetProperty(key string) (value any, err error) {
 
 	var ok bool
 	if value, ok = c.property[key]; !ok {
-		err = errors.New("connection no property found")
+		err = nerr.ErrConnectionPropertyNotFound
 		return
 	}
 	return
@@ -247,6 +246,11 @@ func (c *Connection) SetHeartBeat(checker niface.IHeartBeatChecker) {
 
 // start 启动连接
 func (c *Connection) start(wg *sync.WaitGroup) {
+	defer func() {
+		if err := recover(); err != nil {
+			nlog.Error("Connection Start Error", nlog.Any("Panic", err))
+		}
+	}()
 	c.cancelCtx, c.cancelFunc = context.WithCancel(context.Background())
 	// 调用连接创建时的 Hook 函数
 	c.callOnConnStart()
