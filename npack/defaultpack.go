@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-08 18:50:33
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-22 20:44:37
+ * @LastEditTime: 2023-05-23 20:39:43
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -108,8 +108,7 @@ func (p *defaultPack) UnPackHead(headBuf []byte) (msg niface.IMessage, err error
 // UnPackBody 拆包体
 func (p *defaultPack) UnPackBody(msgBuf []byte, msg niface.IMessage) {
 	// 读消息内容
-	msgData := make([]byte, msg.GetDataLen())
-	copy(msgData, msgBuf[p.GetHeadLen():])
+	msgData := msgBuf[p.GetHeadLen():]
 	// 设置消息内容
 	msg.SetData(msgData)
 }

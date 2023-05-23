@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-21 22:19:14
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-22 17:38:08
+ * @LastEditTime: 2023-05-23 20:32:27
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -18,17 +18,21 @@ import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nserver"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
-	"runtime"
 	"syscall"
 	"time"
 )
 
 func main() {
+	go func() {
+		_ = http.ListenAndServe(":6060", nil)
+	}()
 	// 创建 Server
 	s := nserver.NewServer(func(sc *nserver.ServerConfig) {
-		sc.NumEventLoop = runtime.NumCPU() * 2
+		sc.Multicore = true
 		sc.ReuseAddr = true
 		sc.ReusePort = true
 		sc.LockOSThread = true

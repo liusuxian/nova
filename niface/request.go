@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-08 01:20:29
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 14:07:03
+ * @LastEditTime: 2023-05-23 20:02:28
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -34,6 +34,11 @@ type IRequest interface {
 
 // BaseRequest 基础请求结构
 type BaseRequest struct{}
+
+// GetCtx 获取请求的 Context
+func (br *BaseRequest) GetCtx() (ctx context.Context) {
+	return nil
+}
 
 // GetConnection 获取请求连接信息
 func (br *BaseRequest) GetConnection() (conn IConnection) {

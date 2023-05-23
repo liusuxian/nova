@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-22 20:45:49
+ * @LastEditTime: 2023-05-23 20:36:02
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -306,9 +306,6 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		}
 		msgBuf, _ := conn.Peek(msgLen)
 		_, _ = conn.Discard(msgLen)
-		// 拆包体
-		s.packet.UnPackBody(msgBuf, msg)
-		nlog.Debug("Server OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()), nlog.Int("DataLen", msg.GetDataLen()))
 		// 通过 ConnID 获取连接
 		iConn, err := s.connMgr.GetConn(conn.Fd())
 		if err != nil {
@@ -316,10 +313,19 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		}
 		// 更新连接活动时间
 		iConn.UpdateActivity()
-		// 得到当前客户端请求的 Request 数据
-		request := nrequest.NewRequest(iConn, msg)
-		// 处理请求消息
-		s.msgHandler.Execute(request)
+		// 拷贝整个消息数据
+		copyMsgBuf := make([]byte, len(msgBuf))
+		copy(copyMsgBuf, msgBuf)
+		// 将请求提交给 Worker 工作池处理
+		s.msgHandler.SubmitToWorkerPool(nrequest.NewRequestFunc(iConn, func() {
+			// 拆包体
+			s.packet.UnPackBody(copyMsgBuf, msg)
+			nlog.Debug("Server OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()), nlog.Int("DataLen", msg.GetDataLen()))
+			// 得到当前客户端请求的 Request 数据
+			request := nrequest.NewRequest(iConn, msg)
+			// 处理请求消息
+			s.msgHandler.Execute(request)
+		}))
 	}
 	return
 }

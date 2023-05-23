@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 14:06:02
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 14:07:52
+ * @LastEditTime: 2023-05-23 20:33:46
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -25,6 +25,13 @@ type Request struct {
 	index              int                    // 业务处理器集合索引
 }
 
+// RequestFunc 请求函数结构
+type RequestFunc struct {
+	niface.BaseRequest                    // 基础请求
+	conn               niface.IConnection // 已经和客户端建立好的连接
+	callFunc           func()             // 调用函数
+}
+
 // NewRequest 创建请求
 func NewRequest(conn niface.IConnection, msg niface.IMessage) (req *Request) {
 	req = new(Request)
@@ -32,6 +39,14 @@ func NewRequest(conn niface.IConnection, msg niface.IMessage) (req *Request) {
 	req.conn = conn
 	req.msg = msg
 	return
+}
+
+// NewRequestFunc 创建请求函数
+func NewRequestFunc(conn niface.IConnection, callFunc func()) (request niface.IRequest) {
+	req := new(RequestFunc)
+	req.conn = conn
+	req.callFunc = callFunc
+	return req
 }
 
 // GetCtx 获取请求的 Context
@@ -97,4 +112,16 @@ func (r *Request) RespMsg(f niface.MsgDataFunc, callback ...niface.SendCallback)
 // RespMsgWithId 将 Message 数据返回给远程的对端（与请求可不共用消息ID）
 func (r *Request) RespMsgWithId(msgID uint16, f niface.MsgDataFunc, callback ...niface.SendCallback) (err error) {
 	return r.conn.SendMsg(msgID, f, callback...)
+}
+
+// GetConnection 获取请求连接信息
+func (rf *RequestFunc) GetConnection() (conn niface.IConnection) {
+	return rf.conn
+}
+
+// CallFunc 调用函数
+func (rf *RequestFunc) CallFunc() {
+	if rf.callFunc != nil {
+		rf.callFunc()
+	}
 }
