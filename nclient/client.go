@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-22 20:46:19
+ * @LastEditTime: 2023-05-24 15:03:10
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -39,14 +39,15 @@ type Client struct {
 
 // ClientConfig 客户端配置
 type ClientConfig struct {
-	gnet.Options                // 客户端 gnet 启动选项
-	Network       string        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
-	Addr          string        // 服务器地址
-	HeartBeat     time.Duration // 心跳发送间隔时间
-	MaxHeartBeat  time.Duration // 最长心跳检测间隔时间
-	PacketMethod  int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容
-	Endian        int           // 字节存储次序，1: 小端 2: 大端
-	MaxPacketSize int           // 数据包的最大值（单位:字节）
+	gnet.Options                 // 客户端 gnet 启动选项
+	Network        string        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
+	Addr           string        // 服务器地址
+	HeartBeat      time.Duration // 心跳发送间隔时间
+	MaxHeartBeat   time.Duration // 最长心跳检测间隔时间
+	PacketMethod   int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容
+	Endian         int           // 字节存储次序，1: 小端 2: 大端
+	MaxPacketSize  int           // 数据包的最大值（单位:字节）
+	WorkerPoolSize int           // 工作任务池最大工作 Goroutine 数量
 }
 
 // ClientConfigOption 客户端配置选项
@@ -61,14 +62,13 @@ const (
 // NewClient 创建 Client
 func NewClient(opts ...ClientConfigOption) (client niface.IClient) {
 	// 初始化 Client 属性
-	c := &Client{
-		clientConf: &ClientConfig{},
-		msgHandler: nmsghandler.NewMsgHandle(0),
-	}
+	c := &Client{clientConf: &ClientConfig{}}
 	// 处理客户端配置选项
 	for _, opt := range opts {
 		opt(c.clientConf)
 	}
+	// 创建消息处理
+	c.msgHandler = nmsghandler.NewMsgHandle(c.clientConf.WorkerPoolSize)
 	// 处理数据协议封包方式
 	c.packet = npack.NewPack(c.clientConf.PacketMethod, c.clientConf.Endian, c.clientConf.MaxPacketSize)
 	// 创建 Client
@@ -195,6 +195,8 @@ func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
 	if _, err := c.client.Dial(c.clientConf.Network, c.clientConf.Addr); err != nil {
 		nlog.Fatal("Client OnBoot Error", nlog.Err(err))
 	}
+	// 启动 Worker 工作池
+	c.msgHandler.StartWorkerPool()
 	// 打印所有路由
 	c.msgHandler.PrintRouters()
 	return
@@ -221,6 +223,8 @@ func (c *Client) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 // OnShutdown 在引擎被关闭时触发，它在所有事件循环和连接关闭后立即调用。
 func (c *Client) OnShutdown(eng gnet.Engine) {
 	nlog.Info("Client OnShutdown")
+	// 停止 Worker 工作池
+	c.msgHandler.StopWorkerPool()
 }
 
 // OnTick 在引擎启动后立即触发，并在 delay 返回值指定的持续时间后再次触发。
@@ -252,16 +256,21 @@ func (c *Client) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		}
 		msgBuf, _ := conn.Peek(msgLen)
 		_, _ = conn.Discard(msgLen)
-		// 拆包体
-		c.packet.UnPackBody(msgBuf, msg)
-		nlog.Debug("Client OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()), nlog.Int("DataLen", msg.GetDataLen()))
-
 		// 更新连接活动时间
 		c.conn.UpdateActivity()
-		// 得到当前客户端请求的 Request 数据
-		request := nrequest.NewRequest(c.conn, msg)
-		// 处理请求消息
-		c.msgHandler.Execute(request)
+		// 拷贝整个消息数据
+		copyMsgBuf := make([]byte, len(msgBuf))
+		copy(copyMsgBuf, msgBuf)
+		// 将请求提交给 Worker 工作池处理
+		c.msgHandler.SubmitToWorkerPool(nrequest.NewRequestFunc(c.conn, func() {
+			// 拆包体
+			c.packet.UnPackBody(copyMsgBuf, msg)
+			nlog.Debug("Client OnTraffic", nlog.Int("connID", conn.Fd()), nlog.Uint16("MsgID", msg.GetMsgID()), nlog.Int("DataLen", msg.GetDataLen()))
+			// 得到当前客户端请求的 Request 数据
+			request := nrequest.NewRequest(c.conn, msg)
+			// 处理请求消息
+			c.msgHandler.Execute(request)
+		}))
 	}
 	return
 }

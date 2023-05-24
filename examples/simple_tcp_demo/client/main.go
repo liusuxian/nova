@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-02 22:35:35
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-22 17:37:08
+ * @LastEditTime: 2023-05-24 15:05:15
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -37,6 +37,7 @@ func main() {
 				cc.PacketMethod = npack.DefaultPacketMethod
 				cc.Endian = npack.LittleEndian
 				cc.MaxPacketSize = 4096
+				cc.WorkerPoolSize = 10
 			})
 			// 设置当前 Client 的服务器人数超载检测器
 			c.SetServerOverload()
