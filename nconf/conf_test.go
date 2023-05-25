@@ -12,20 +12,21 @@ package nconf_test
 import (
 	"github.com/liusuxian/nova/nconf"
 	"testing"
+	"time"
 )
 
 // ServerConfig 服务器配置
 type ServerConfig struct {
-	Name           string // 服务器应用名称，默认"Nova"
-	Network        string // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
-	Port           int    // 服务器监听端口
-	HeartBeat      int    // 心跳发送间隔时间（单位:毫秒，一定要小于 MaxHeartBeat 配置），默认 3000
-	MaxHeartBeat   int    // 最长心跳检测间隔时间（单位:毫秒，一定要大于 HeartBeat 配置），默认 5000
-	MaxConn        int    // 允许的客户端连接最大数量，默认 3
-	WorkerPoolSize int    // 工作任务池最大工作 Goroutine 数量，默认 10
-	MaxPacketSize  int    // 数据包的最大值（单位:字节），默认 4096
-	PacketMethod   int    // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
-	Endian         int    // 字节存储次序，1: 小端 2: 大端，默认 1
+	Name           string        // 服务器应用名称，默认"Nova"
+	Network        string        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
+	Port           int           // 服务器监听端口
+	HeartBeat      time.Duration // 心跳发送间隔时间（一定要小于 maxHeartBeat 配置），默认 10秒
+	MaxHeartBeat   time.Duration // 最长心跳检测间隔时间（一定要大于 heartBeat 配置），默认 15秒
+	MaxConn        int           // 允许的客户端连接最大数量，默认 3
+	WorkerPoolSize int           // 工作任务池最大工作 Goroutine 数量，默认 10
+	MaxPacketSize  int           // 数据包的最大值（单位:字节），默认 4096
+	PacketMethod   int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
+	Endian         int           // 字节存储次序，1: 小端 2: 大端，默认 1
 }
 
 // LogConfig 日志配置

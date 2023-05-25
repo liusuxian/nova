@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-12 18:19:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-16 15:57:23
+ * @LastEditTime: 2023-05-25 19:00:45
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -338,8 +338,8 @@ func init() {
 	// 设置默认值
 	// 服务器配置
 	SetDefault("server.name", "Nova")        // 服务器应用名称，默认"Nova"
-	SetDefault("server.heartBeat", 3000)     // 心跳发送间隔时间（单位:毫秒，一定要小于 maxHeartBeat 配置），默认 3000
-	SetDefault("server.maxHeartBeat", 5000)  // 最长心跳检测间隔时间（单位:毫秒，一定要大于 heartBeat 配置），默认 5000
+	SetDefault("server.heartBeat", "10s")    // 心跳发送间隔时间（一定要小于 maxHeartBeat 配置），默认 10秒
+	SetDefault("server.maxHeartBeat", "15s") // 最长心跳检测间隔时间（一定要大于 heartBeat 配置），默认 15秒
 	SetDefault("server.maxConn", 3)          // 允许的客户端连接最大数量，默认 3
 	SetDefault("server.workerPoolSize", 10)  // 工作任务池最大工作 Goroutine 数量，默认 10
 	SetDefault("server.maxPacketSize", 4096) // 数据包的最大值（单位:字节），默认 4096

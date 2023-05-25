@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-23 20:36:02
+ * @LastEditTime: 2023-05-25 19:06:02
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -45,17 +45,17 @@ type Server struct {
 
 // ServerConfig 服务器配置
 type ServerConfig struct {
-	gnet.Options          // 服务器 gnet 启动选项
-	Name           string // 服务器应用名称，默认"Nova"
-	Network        string // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
-	Port           int    // 服务器监听端口
-	HeartBeat      int    // 心跳发送间隔时间（单位:毫秒，一定要小于 MaxHeartBeat 配置），默认 3000
-	MaxHeartBeat   int    // 最长心跳检测间隔时间（单位:毫秒，一定要大于 HeartBeat 配置），默认 5000
-	MaxConn        int    // 允许的客户端连接最大数量，默认 3
-	WorkerPoolSize int    // 工作任务池最大工作 Goroutine 数量，默认 10
-	MaxPacketSize  int    // 数据包的最大值（单位:字节），默认 4096
-	PacketMethod   int    // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
-	Endian         int    // 字节存储次序，1: 小端 2: 大端，默认 1
+	gnet.Options                 // 服务器 gnet 启动选项
+	Name           string        // 服务器应用名称，默认"Nova"
+	Network        string        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
+	Port           int           // 服务器监听端口
+	HeartBeat      time.Duration // 心跳发送间隔时间（一定要小于 maxHeartBeat 配置），默认 10秒
+	MaxHeartBeat   time.Duration // 最长心跳检测间隔时间（一定要大于 heartBeat 配置），默认 15秒
+	MaxConn        int           // 允许的客户端连接最大数量，默认 3
+	WorkerPoolSize int           // 工作任务池最大工作 Goroutine 数量，默认 10
+	MaxPacketSize  int           // 数据包的最大值（单位:字节），默认 4096
+	PacketMethod   int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
+	Endian         int           // 字节存储次序，1: 小端 2: 大端，默认 1
 }
 
 // ServerConfigOption 服务器配置选项
@@ -198,8 +198,7 @@ func (s *Server) GetServerOverload() (checker niface.IServerOverloadChecker) {
 // SetHeartBeat 设置当前 Server 的心跳检测器
 func (s *Server) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
 	// 创建心跳检测器
-	interval := time.Duration(s.serverConf.HeartBeat) * time.Millisecond
-	checker := nheartbeat.NewHeartBeatChecker(interval, initiate)
+	checker := nheartbeat.NewHeartBeatChecker(s.serverConf.HeartBeat, initiate)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
@@ -262,7 +261,7 @@ func (s *Server) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 		}
 	}
 	// 创建一个 Server 服务端特性的连接
-	serverConn := nconn.NewServerConn(s, conn, time.Duration(s.serverConf.MaxHeartBeat)*time.Millisecond)
+	serverConn := nconn.NewServerConn(s, conn, s.serverConf.MaxHeartBeat)
 	// 启动连接
 	serverConn.Start()
 	return
