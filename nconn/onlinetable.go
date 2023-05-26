@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-26 17:48:15
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-26 18:13:11
+ * @LastEditTime: 2023-05-26 18:17:33
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -30,13 +30,13 @@ func NewOnlineTable() (ot *OnlineTable) {
 // Add 添加记录
 func (ot *OnlineTable) Add(key string, conn niface.IConnection) {
 	ot.connMap.Set(key, conn)
-	nlog.Debug("Add To OnlineTable", nlog.String("Key", key), nlog.Int("OnlineCount", ot.connMap.Count()))
+	nlog.Debug("Add To OnlineTable", nlog.String("Key", key), nlog.Int("OnlineCount", ot.OnlineCount()))
 }
 
 // Remove 删除记录
 func (ot *OnlineTable) Remove(key string) {
 	ot.connMap.Remove(key)
-	nlog.Debug("Remove From OnlineTable", nlog.String("Key", key), nlog.Int("OnlineCount", ot.connMap.Count()))
+	nlog.Debug("Remove From OnlineTable", nlog.String("Key", key), nlog.Int("OnlineCount", ot.OnlineCount()))
 }
 
 // Get 获取记录
@@ -51,4 +51,9 @@ func (ot *OnlineTable) Get(key string) (conn niface.IConnection, isOnline bool) 
 // GetAll 获取当前所有记录
 func (ot *OnlineTable) GetAll() (connMap map[string]niface.IConnection) {
 	return ot.connMap.Items()
+}
+
+// OnlineCount 在线数量
+func (ot *OnlineTable) OnlineCount() (count int) {
+	return ot.connMap.Count()
 }
