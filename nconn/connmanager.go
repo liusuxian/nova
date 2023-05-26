@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:41:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-26 18:09:30
+ * @LastEditTime: 2023-05-27 01:56:10
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -13,7 +13,6 @@ import (
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	cmap "github.com/orcaman/concurrent-map/v2"
-	"github.com/pkg/errors"
 	"strconv"
 )
 
@@ -44,13 +43,12 @@ func (cm *ConnManager) RemoveConn(connID int) {
 }
 
 // GetConn 通过 ConnID 获取连接
-func (cm *ConnManager) GetConn(connID int) (conn niface.IConnection, err error) {
+func (cm *ConnManager) GetConn(connID int) (conn niface.IConnection, isExist bool) {
 	key := strconv.FormatInt(int64(connID), 10)
 	if c, ok := cm.connMap.Get(key); ok {
-		return c, nil
+		return c, true
 	}
-	
-	return nil, errors.New("connection not found")
+	return nil, false
 }
 
 // GetAllConn 获取当前所有连接

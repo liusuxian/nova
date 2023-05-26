@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-25 19:06:02
+ * @LastEditTime: 2023-05-27 02:01:48
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -306,8 +306,8 @@ func (s *Server) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 		msgBuf, _ := conn.Peek(msgLen)
 		_, _ = conn.Discard(msgLen)
 		// 通过 ConnID 获取连接
-		iConn, err := s.connMgr.GetConn(conn.Fd())
-		if err != nil {
+		iConn, isExist := s.connMgr.GetConn(conn.Fd())
+		if !isExist {
 			return
 		}
 		// 更新连接活动时间
