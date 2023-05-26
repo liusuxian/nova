@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:41:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:12:12
+ * @LastEditTime: 2023-05-26 18:09:30
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -49,6 +49,7 @@ func (cm *ConnManager) GetConn(connID int) (conn niface.IConnection, err error) 
 	if c, ok := cm.connMap.Get(key); ok {
 		return c, nil
 	}
+	
 	return nil, errors.New("connection not found")
 }
 
