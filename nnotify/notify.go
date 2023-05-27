@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-27 01:28:36
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-27 02:09:25
+ * @LastEditTime: 2023-05-27 22:44:53
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -23,7 +23,7 @@ type Notify struct {
 }
 
 // NewNotify 创建通知管理
-func NewNotify() (n *Notify) {
+func NewNotify() (n niface.INotify) {
 	return &Notify{
 		connMap: cmap.New[niface.IConnection](),
 	}
