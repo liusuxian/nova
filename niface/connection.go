@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 00:52:56
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-23 01:11:30
+ * @LastEditTime: 2023-05-28 19:29:49
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -26,7 +26,7 @@ type IConnection interface {
 	Send(f MsgDataFunc, callback ...SendCallback) (err error)                  // 将数据发送给远程的对端
 	SendMsg(msgID uint16, f MsgDataFunc, callback ...SendCallback) (err error) // 将 Message 数据发送给远程的对端
 	SetProperty(key string, value any)                                         // 设置当前连接属性
-	GetProperty(key string) (value any, err error)                             // 获取当前连接属性
+	GetProperty(key string) (value any, isExist bool)                          // 获取当前连接属性
 	RemoveProperty(key string)                                                 // 移除当前连接属性
 	IsAlive() (isAlive bool)                                                   // 判断当前连接是否存活
 	UpdateActivity()                                                           // 更新连接活动时间

@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-23 17:37:48
+ * @LastEditTime: 2023-05-28 19:31:28
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -198,13 +198,11 @@ func (c *Connection) SetProperty(key string, value any) {
 }
 
 // GetProperty 获取当前连接属性
-func (c *Connection) GetProperty(key string) (value any, err error) {
+func (c *Connection) GetProperty(key string) (value any, isExist bool) {
 	c.propertyLock.Lock()
 	defer c.propertyLock.Unlock()
 
-	var ok bool
-	if value, ok = c.property[key]; !ok {
-		err = nerr.ErrConnectionPropertyNotFound
+	if value, isExist = c.property[key]; isExist {
 		return
 	}
 	return
