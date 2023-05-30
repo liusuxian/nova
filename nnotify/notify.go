@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-27 01:28:36
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-31 01:00:50
+ * @LastEditTime: 2023-05-31 01:29:55
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -67,10 +67,16 @@ func (n *Notify) GetNotifyConn(id uint32) (conn niface.IConnection, isExist bool
 }
 
 // Notify 通知连接
-func (n *Notify) Notify(id uint32, msgID uint16, f niface.MsgDataFunc, callback ...niface.SendCallback) {
+func (n *Notify) Notify(id uint32, msgID uint16, f niface.MsgDataFunc, offlineMsg niface.IOfflineMsg, callback ...niface.SendCallback) {
 	// 获取连接
 	conn, isExist := n.GetNotifyConn(id)
 	if !isExist {
+		if offlineMsg != nil {
+			if err := offlineMsg.Save(); err != nil {
+				nlog.Error("Save Offline Msg Error", nlog.Err(err))
+				return
+			}
+		}
 		return
 	}
 	// 将 Message 数据发送给远程的对端
