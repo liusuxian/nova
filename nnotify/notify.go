@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-27 01:28:36
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-27 22:44:53
+ * @LastEditTime: 2023-05-31 01:00:50
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -58,6 +58,9 @@ func (n *Notify) RemoveNotifyID(id uint32) {
 func (n *Notify) GetNotifyConn(id uint32) (conn niface.IConnection, isExist bool) {
 	key := strconv.FormatInt(int64(id), 10)
 	if c, ok := n.connMap.Get(key); ok {
+		if c == nil {
+			return nil, false
+		}
 		return c, true
 	}
 	return nil, false
@@ -82,6 +85,9 @@ func (n *Notify) NotifyAll(msgID uint16, f niface.MsgDataFunc, callback ...nifac
 	items := n.connMap.Items()
 	// 循环发送
 	for _, conn := range items {
+		if conn == nil {
+			continue
+		}
 		// 将 Message 数据发送给远程的对端
 		if err := conn.SendMsg(msgID, f, callback...); err != nil && err != nerr.ErrConnectionClosed {
 			nlog.Error("NotifyAll Error", nlog.Err(err))
