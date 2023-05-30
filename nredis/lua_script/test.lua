@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 local result = redis.call('SET', KEYS[1], ARGV[1])
 if not result then
   return result
