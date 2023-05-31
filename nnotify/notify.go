@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-27 01:28:36
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-31 15:37:40
+ * @LastEditTime: 2023-05-31 16:44:33
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -10,6 +10,7 @@
 package nnotify
 
 import (
+	"context"
 	"github.com/liusuxian/nova/nerr"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
@@ -96,13 +97,13 @@ func (n *Notify) NotifyAll(msgID uint16, f niface.MsgDataFunc, callback ...nifac
 }
 
 // NotifySaveOfflineMsg 通知连接，当连接不存在或处于关闭状态时保存离线消息
-func (n *Notify) NotifySaveOfflineMsg(id uint32, msgID uint16, f niface.MsgDataFunc, offlineMsg niface.IOfflineMsg, callback ...niface.SendCallback) {
+func (n *Notify) NotifySaveOfflineMsg(ctx context.Context, id uint32, msgID uint16, f niface.MsgDataFunc, offlineMsg niface.IOfflineMsg, callback ...niface.SendCallback) {
 	// 获取连接
 	conn, isExist := n.GetNotifyConn(id)
 	if !isExist {
 		if offlineMsg != nil {
 			// 保存离线消息
-			if err := offlineMsg.Save(id, msgID, f); err != nil {
+			if err := offlineMsg.Save(ctx, id, msgID, f); err != nil {
 				nlog.Error("Save Offline Msg Error", nlog.Err(err))
 				return
 			}
