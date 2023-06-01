@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-03 01:01:50
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 15:01:43
+ * @LastEditTime: 2023-06-01 13:02:13
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -10,6 +10,7 @@
 package nheartbeat
 
 import (
+	"github.com/liusuxian/nova/nerr"
 	"github.com/liusuxian/nova/niface"
 	"github.com/liusuxian/nova/nlog"
 	"time"
@@ -44,7 +45,9 @@ func NewHeartBeatChecker(interval time.Duration, initiate bool) (checker niface.
 func (hbc *HeartBeatChecker) Start() {
 	// 发送心跳消息
 	if err := hbc.sendHeartBeatMsg(); err != nil {
-		_ = hbc.conn.GetConnection().Close()
+		if hbc.conn != nil {
+			_ = hbc.conn.GetConnection().Close()
+		}
 		return
 	}
 	// 启动心跳检测
@@ -128,7 +131,9 @@ func (hbc *HeartBeatChecker) check() {
 func (hbc *HeartBeatChecker) sendHeartBeatMsg() (err error) {
 	if hbc.initiate {
 		if err = hbc.conn.SendMsg(hbc.msgID, niface.MsgDataFunc(hbc.makeMsg)); err != nil {
-			nlog.Error("Send HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
+			if err != nerr.ErrConnectionClosed {
+				nlog.Error("Send HeartBeatMsg Error", nlog.Uint16("MsgID", hbc.msgID), nlog.Err(err))
+			}
 			return
 		}
 	}

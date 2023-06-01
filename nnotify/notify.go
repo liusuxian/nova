@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-27 01:28:36
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-31 16:44:33
+ * @LastEditTime: 2023-06-01 13:12:09
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -76,7 +76,7 @@ func (n *Notify) Notify(id uint32, msgID uint16, f niface.MsgDataFunc, callback 
 	}
 	// 将 Message 数据发送给远程的对端
 	if err := conn.SendMsg(msgID, f, callback...); err != nil && err != nerr.ErrConnectionClosed {
-		nlog.Error("Notify Error", nlog.Err(err))
+		nlog.Error("Notify Error", nlog.Uint32("Id", id), nlog.Uint16("MsgID", msgID), nlog.Err(err))
 		return
 	}
 }
@@ -91,7 +91,7 @@ func (n *Notify) NotifyAll(msgID uint16, f niface.MsgDataFunc, callback ...nifac
 		}
 		// 将 Message 数据发送给远程的对端
 		if err := conn.SendMsg(msgID, f, callback...); err != nil && err != nerr.ErrConnectionClosed {
-			nlog.Error("NotifyAll Error", nlog.Err(err))
+			nlog.Error("NotifyAll Error", nlog.Uint16("MsgID", msgID), nlog.Err(err))
 		}
 	}
 }
@@ -105,14 +105,22 @@ func (n *Notify) NotifySaveOfflineMsg(ctx context.Context, id uint32, msgID uint
 			// 保存离线消息
 			if err := offlineMsg.Save(ctx, id, msgID, f); err != nil {
 				nlog.Error("Save Offline Msg Error", nlog.Err(err))
-				return
 			}
 		}
 		return
 	}
 	// 将 Message 数据发送给远程的对端
-	if err := conn.SendMsg(msgID, f, callback...); err != nil && err != nerr.ErrConnectionClosed {
-		nlog.Error("Notify Error", nlog.Err(err))
+	if err := conn.SendMsg(msgID, f, callback...); err != nil {
+		if err == nerr.ErrConnectionClosed {
+			if offlineMsg != nil {
+				// 保存离线消息
+				if err := offlineMsg.Save(ctx, id, msgID, f); err != nil {
+					nlog.Error("Save Offline Msg Error", nlog.Err(err))
+				}
+			}
+		} else {
+			nlog.Error("NotifySaveOfflineMsg Error", nlog.Uint32("Id", id), nlog.Uint16("MsgID", msgID), nlog.Err(err))
+		}
 		return
 	}
 }

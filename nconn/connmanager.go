@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-31 13:41:09
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-27 01:56:10
+ * @LastEditTime: 2023-06-01 13:04:55
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -46,6 +46,9 @@ func (cm *ConnManager) RemoveConn(connID int) {
 func (cm *ConnManager) GetConn(connID int) (conn niface.IConnection, isExist bool) {
 	key := strconv.FormatInt(int64(connID), 10)
 	if c, ok := cm.connMap.Get(key); ok {
+		if c == nil {
+			return nil, false
+		}
 		return c, true
 	}
 	return nil, false
