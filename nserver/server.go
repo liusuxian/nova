@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-27 02:01:48
+ * @LastEditTime: 2023-06-06 15:50:54
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -21,6 +21,7 @@ import (
 	"github.com/liusuxian/nova/nmsghandler"
 	"github.com/liusuxian/nova/npack"
 	"github.com/liusuxian/nova/nrequest"
+	"github.com/liusuxian/nova/nrouter"
 	"github.com/liusuxian/nova/nserveroverload"
 	"github.com/panjf2000/gnet/v2"
 	"time"
@@ -93,6 +94,8 @@ func NewServer(opts ...ServerConfigOption) (server niface.IServer) {
 	for _, opt := range opts {
 		opt(s.serverConf)
 	}
+	// 添加全局组件
+	s.Use(nrouter.RouterRecover) // 路由 Recover 处理器
 	return s
 }
 

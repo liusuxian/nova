@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 21:44:12
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:22:17
+ * @LastEditTime: 2023-06-06 16:01:51
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -154,4 +154,14 @@ func (gr *GroupRouter) AddHandler(msgID uint16, handlers ...niface.RouterHandler
 	copy(newHandlers, gr.handlers)
 	copy(newHandlers[len(gr.handlers):], handlers)
 	gr.router.AddHandler(msgID, newHandlers...)
+}
+
+// RouterRecover 路由 Recover 处理器
+func RouterRecover(request niface.IRequest) {
+	defer func() {
+		if err := recover(); err != nil {
+			nlog.Error("Handler Panic", nlog.Uint16("MsgID", request.GetMsgID()), nlog.Any("Panic", err))
+		}
+	}()
+	request.RouterNext()
 }
