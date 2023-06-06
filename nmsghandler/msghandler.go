@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-02 21:03:44
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-11 14:18:47
+ * @LastEditTime: 2023-06-06 19:59:13
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -19,18 +19,20 @@ import (
 
 // MsgHandle 消息处理回调结构
 type MsgHandle struct {
-	workerPool     *ants.Pool                 // Worker 工作池
-	workerPoolSize int                        // Worker 池的最大 Worker 数量
-	builder        *ninterceptor.ChainBuilder // 责任链构造器
-	router         *nrouter.Router            // 路由
+	workerPool             *ants.Pool                 // Worker 工作池
+	workerPoolSize         int                        // Worker 池的最大 Worker 数量
+	workerPoolSizeOverflow int                        // 当处理任务超过工作任务池的容量时，增加的 Goroutine 数量
+	builder                *ninterceptor.ChainBuilder // 责任链构造器
+	router                 *nrouter.Router            // 路由
 }
 
 // NewMsgHandle 创建消息处理
-func NewMsgHandle(workerPoolSize int) (handler *MsgHandle) {
+func NewMsgHandle(workerPoolSize, workerPoolSizeOverflow int) (handler *MsgHandle) {
 	handler = &MsgHandle{
-		workerPoolSize: workerPoolSize,
-		builder:        ninterceptor.NewChainBuilder(),
-		router:         nrouter.NewRouter(),
+		workerPoolSize:         workerPoolSize,
+		workerPoolSizeOverflow: workerPoolSizeOverflow,
+		builder:                ninterceptor.NewChainBuilder(),
+		router:                 nrouter.NewRouter(),
 	}
 	// 此处必须把 msghandler 添加到责任链中，并且是责任链最后一环
 	handler.builder.Tail(handler)
@@ -62,7 +64,7 @@ func (mh *MsgHandle) PrintRouters() {
 // StartWorkerPool 启动 Worker 工作池
 func (mh *MsgHandle) StartWorkerPool() {
 	if mh.workerPool == nil && mh.workerPoolSize > 0 {
-		workerPool, err := ants.NewPool(mh.workerPoolSize)
+		workerPool, err := ants.NewPool(mh.workerPoolSize, ants.WithNonblocking(true))
 		if err != nil {
 			nlog.Fatal("StartWorkerPool Fatal", nlog.Err(err))
 		}
@@ -84,13 +86,29 @@ func (mh *MsgHandle) SubmitToWorkerPool(request niface.IRequest) {
 	if mh.workerPool != nil && request != nil {
 		switch iRequest := request.(type) {
 		case niface.IFuncRequest:
-			mh.workerPool.Submit(func() {
-				mh.doFuncHandler(iRequest)
-			})
+			if err := mh.workerPool.Submit(func() { mh.doFuncHandler(iRequest) }); err != nil {
+				switch err {
+				case ants.ErrPoolOverload:
+					nlog.Warn("SubmitToWorkerPool IFuncRequest", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
+					mh.workerPool.Tune(mh.workerPool.Cap() + mh.workerPoolSizeOverflow)
+					mh.SubmitToWorkerPool(request)
+				default:
+					nlog.Error("SubmitToWorkerPool IFuncRequest Error", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
+					go mh.doFuncHandler(iRequest)
+				}
+			}
 		case niface.IRequest:
-			mh.workerPool.Submit(func() {
-				mh.doMsgHandler(iRequest)
-			})
+			if err := mh.workerPool.Submit(func() { mh.doMsgHandler(iRequest) }); err != nil {
+				switch err {
+				case ants.ErrPoolOverload:
+					nlog.Warn("SubmitToWorkerPool IRequest", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
+					mh.workerPool.Tune(mh.workerPool.Cap() + mh.workerPoolSizeOverflow)
+					mh.SubmitToWorkerPool(request)
+				default:
+					nlog.Error("SubmitToWorkerPool IRequest Error", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
+					go mh.doMsgHandler(iRequest)
+				}
+			}
 		}
 	}
 }

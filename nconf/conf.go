@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-12 18:19:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-25 19:00:45
+ * @LastEditTime: 2023-06-06 19:42:27
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -337,14 +337,15 @@ func init() {
 	}
 	// 设置默认值
 	// 服务器配置
-	SetDefault("server.name", "Nova")        // 服务器应用名称，默认"Nova"
-	SetDefault("server.heartBeat", "10s")    // 心跳发送间隔时间（一定要小于 maxHeartBeat 配置），默认 10秒
-	SetDefault("server.maxHeartBeat", "15s") // 最长心跳检测间隔时间（一定要大于 heartBeat 配置），默认 15秒
-	SetDefault("server.maxConn", 3)          // 允许的客户端连接最大数量，默认 3
-	SetDefault("server.workerPoolSize", 10)  // 工作任务池最大工作 Goroutine 数量，默认 10
-	SetDefault("server.maxPacketSize", 4096) // 数据包的最大值（单位:字节），默认 4096
-	SetDefault("server.packetMethod", 1)     // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
-	SetDefault("server.endian", 1)           // 字节存储次序，1: 小端 2: 大端，默认 1
+	SetDefault("server.name", "Nova")              // 服务器应用名称，默认"Nova"
+	SetDefault("server.heartBeat", "10s")          // 心跳发送间隔时间（一定要小于 maxHeartBeat 配置），默认 10秒
+	SetDefault("server.maxHeartBeat", "15s")       // 最长心跳检测间隔时间（一定要大于 heartBeat 配置），默认 15秒
+	SetDefault("server.maxConn", 3)                // 允许的客户端连接最大数量，默认 3
+	SetDefault("server.workerPoolSize", 10)        // 工作任务池最大工作 Goroutine 数量，默认 10
+	SetDefault("server.workerPoolSizeOverflow", 5) // 当处理任务超过工作任务池的容量时，增加的 Goroutine 数量，默认 5
+	SetDefault("server.maxPacketSize", 4096)       // 数据包的最大值（单位:字节），默认 4096
+	SetDefault("server.packetMethod", 1)           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
+	SetDefault("server.endian", 1)                 // 字节存储次序，1: 小端 2: 大端，默认 1
 	// 日志配置
 	SetDefault("logger.path", "logs")             // 输出日志文件路径
 	SetDefault("logger.details.type", 0)          // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO、WARN 级别 2:打印 ERROR、DPANIC、PANIC、FATAL 级别，默认0

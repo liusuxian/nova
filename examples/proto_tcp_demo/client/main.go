@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-10 22:43:26
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-24 15:05:35
+ * @LastEditTime: 2023-06-06 21:53:44
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -20,17 +20,19 @@ import (
 	"github.com/liusuxian/nova/npack"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 )
 
 func main() {
 	cancelCtx, cancelFunc := context.WithCancel(context.Background())
+	var clientLock sync.Mutex
 	clientNum := 4
 	for i := 0; i < clientNum; i++ {
 		go func(ctx context.Context) {
 			// 创建 Client
-			c := nclient.NewClient(func(cc *nclient.ClientConfig) {
+			c := nclient.NewClient(&clientLock, func(cc *nclient.ClientConfig) {
 				cc.Network = "tcp"
 				cc.Addr = "127.0.0.1:8099"
 				cc.HeartBeat = time.Duration(10000) * time.Millisecond
@@ -39,6 +41,7 @@ func main() {
 				cc.Endian = npack.LittleEndian
 				cc.MaxPacketSize = 4096
 				cc.WorkerPoolSize = 10
+				cc.WorkerPoolSizeOverflow = 5
 			})
 			// 设置当前 Client 的服务器人数超载检测器
 			serveroverload.SetServerOverload(c)

@@ -7,6 +7,7 @@ server:
   maxHeartBeat: "15s" # 最长心跳检测间隔时间（一定要大于 heartBeat 配置），默认 15秒
   maxConn: 3 # 允许的客户端连接最大数量，默认 3
   workerPoolSize: 10 # 工作任务池最大工作 Goroutine 数量，默认 10
+  workerPoolSizeOverflow: 5 # 当处理任务超过工作任务池的容量时，增加的 Goroutine 数量，默认 5
   maxPacketSize: 4096 # 数据包的最大值（单位:字节），默认 4096
   packetMethod: 1 # 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
   endian: 1 # 字节存储次序，1: 小端 2: 大端，默认 1

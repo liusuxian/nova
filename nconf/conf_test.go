@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 15:31:54
+ * @LastEditTime: 2023-06-06 19:45:10
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -17,16 +17,17 @@ import (
 
 // ServerConfig 服务器配置
 type ServerConfig struct {
-	Name           string        // 服务器应用名称，默认"Nova"
-	Network        string        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
-	Port           int           // 服务器监听端口
-	HeartBeat      time.Duration // 心跳发送间隔时间（一定要小于 maxHeartBeat 配置），默认 10秒
-	MaxHeartBeat   time.Duration // 最长心跳检测间隔时间（一定要大于 heartBeat 配置），默认 15秒
-	MaxConn        int           // 允许的客户端连接最大数量，默认 3
-	WorkerPoolSize int           // 工作任务池最大工作 Goroutine 数量，默认 10
-	MaxPacketSize  int           // 数据包的最大值（单位:字节），默认 4096
-	PacketMethod   int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
-	Endian         int           // 字节存储次序，1: 小端 2: 大端，默认 1
+	Name                   string        // 服务器应用名称，默认"Nova"
+	Network                string        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
+	Port                   int           // 服务器监听端口
+	HeartBeat              time.Duration // 心跳发送间隔时间（一定要小于 maxHeartBeat 配置），默认 10秒
+	MaxHeartBeat           time.Duration // 最长心跳检测间隔时间（一定要大于 heartBeat 配置），默认 15秒
+	MaxConn                int           // 允许的客户端连接最大数量，默认 3
+	WorkerPoolSize         int           // 工作任务池最大工作 Goroutine 数量，默认 10
+	WorkerPoolSizeOverflow int           // 当处理任务超过工作任务池的容量时，增加的 Goroutine 数量，默认 5
+	MaxPacketSize          int           // 数据包的最大值（单位:字节），默认 4096
+	PacketMethod           int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
+	Endian                 int           // 字节存储次序，1: 小端 2: 大端，默认 1
 }
 
 // LogConfig 日志配置

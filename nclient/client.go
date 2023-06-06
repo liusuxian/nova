@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-24 15:03:10
+ * @LastEditTime: 2023-06-06 21:52:46
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -20,6 +20,7 @@ import (
 	"github.com/liusuxian/nova/nrequest"
 	"github.com/liusuxian/nova/nserveroverload"
 	"github.com/panjf2000/gnet/v2"
+	"sync"
 	"time"
 )
 
@@ -39,15 +40,16 @@ type Client struct {
 
 // ClientConfig 客户端配置
 type ClientConfig struct {
-	gnet.Options                 // 客户端 gnet 启动选项
-	Network        string        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
-	Addr           string        // 服务器地址
-	HeartBeat      time.Duration // 心跳发送间隔时间
-	MaxHeartBeat   time.Duration // 最长心跳检测间隔时间
-	PacketMethod   int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容
-	Endian         int           // 字节存储次序，1: 小端 2: 大端
-	MaxPacketSize  int           // 数据包的最大值（单位:字节）
-	WorkerPoolSize int           // 工作任务池最大工作 Goroutine 数量
+	gnet.Options                         // 客户端 gnet 启动选项
+	Network                string        // 服务器网络协议 tcp、tcp4、tcp6、udp、udp4、udp6、unix
+	Addr                   string        // 服务器地址
+	HeartBeat              time.Duration // 心跳发送间隔时间
+	MaxHeartBeat           time.Duration // 最长心跳检测间隔时间
+	PacketMethod           int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容
+	Endian                 int           // 字节存储次序，1: 小端 2: 大端
+	MaxPacketSize          int           // 数据包的最大值（单位:字节）
+	WorkerPoolSize         int           // 工作任务池最大工作 Goroutine 数量
+	WorkerPoolSizeOverflow int           // 当处理任务超过工作任务池的容量时，增加的 Goroutine 数量
 }
 
 // ClientConfigOption 客户端配置选项
@@ -60,7 +62,7 @@ const (
 )
 
 // NewClient 创建 Client
-func NewClient(opts ...ClientConfigOption) (client niface.IClient) {
+func NewClient(lock *sync.Mutex, opts ...ClientConfigOption) (client niface.IClient) {
 	// 初始化 Client 属性
 	c := &Client{clientConf: &ClientConfig{}}
 	// 处理客户端配置选项
@@ -68,11 +70,13 @@ func NewClient(opts ...ClientConfigOption) (client niface.IClient) {
 		opt(c.clientConf)
 	}
 	// 创建消息处理
-	c.msgHandler = nmsghandler.NewMsgHandle(c.clientConf.WorkerPoolSize)
+	c.msgHandler = nmsghandler.NewMsgHandle(c.clientConf.WorkerPoolSize, c.clientConf.WorkerPoolSizeOverflow)
 	// 处理数据协议封包方式
 	c.packet = npack.NewPack(c.clientConf.PacketMethod, c.clientConf.Endian, c.clientConf.MaxPacketSize)
 	// 创建 Client
+	lock.Lock()
 	cli, err := gnet.NewClient(c, gnet.WithOptions(c.clientConf.Options))
+	lock.Unlock()
 	if err != nil {
 		nlog.Fatal("New Client Error", nlog.Err(err))
 	}
