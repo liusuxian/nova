@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-06-06 21:52:46
+ * @LastEditTime: 2023-06-16 17:48:27
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -61,8 +61,10 @@ const (
 	TCPDelay   = gnet.TCPDelay   // 启用
 )
 
+var clientLock sync.Mutex
+
 // NewClient 创建 Client
-func NewClient(lock *sync.Mutex, opts ...ClientConfigOption) (client niface.IClient) {
+func NewClient(opts ...ClientConfigOption) (client niface.IClient) {
 	// 初始化 Client 属性
 	c := &Client{clientConf: &ClientConfig{}}
 	// 处理客户端配置选项
@@ -74,9 +76,9 @@ func NewClient(lock *sync.Mutex, opts ...ClientConfigOption) (client niface.ICli
 	// 处理数据协议封包方式
 	c.packet = npack.NewPack(c.clientConf.PacketMethod, c.clientConf.Endian, c.clientConf.MaxPacketSize)
 	// 创建 Client
-	lock.Lock()
+	clientLock.Lock()
+	defer clientLock.Unlock()
 	cli, err := gnet.NewClient(c, gnet.WithOptions(c.clientConf.Options))
-	lock.Unlock()
 	if err != nil {
 		nlog.Fatal("New Client Error", nlog.Err(err))
 	}
