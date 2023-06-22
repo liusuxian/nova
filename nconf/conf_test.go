@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-03-13 11:04:59
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-06-22 11:23:50
+ * @LastEditTime: 2023-06-22 14:12:37
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -39,7 +39,7 @@ type LogConfig struct {
 
 // LogDetailConfig 日志详细配置
 type LogDetailConfig struct {
-	Type       int    // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO、WARN 级别 2:打印 ERROR、DPANIC、PANIC、FATAL 级别，默认0
+	Type       int    // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO 级别 2:打印 WARN、ERROR、DPANIC、PANIC、FATAL 级别，默认0
 	Level      int    // 日志打印级别 0:DEBUG 1:INFO 2:WARN 3:ERROR 4:DPANIC、5:PANIC、6:FATAL，默认0
 	Format     int    // 输出日志格式 0:logfmt 1:json，默认1
 	Filename   string // 输出日志文件名称

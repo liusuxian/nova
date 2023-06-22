@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-12 18:19:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-06-22 11:24:00
+ * @LastEditTime: 2023-06-22 14:12:45
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -349,7 +349,7 @@ func init() {
 	SetDefault("server.slowThreshold", "200ms")    // 处理请求或执行操作时的慢速阈值
 	// 日志配置
 	SetDefault("logger.path", "logs")             // 输出日志文件路径
-	SetDefault("logger.details.type", 0)          // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO、WARN 级别 2:打印 ERROR、DPANIC、PANIC、FATAL 级别，默认0
+	SetDefault("logger.details.type", 0)          // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO 级别 2:打印 WARN、ERROR、DPANIC、PANIC、FATAL 级别，默认0
 	SetDefault("logger.details.level", 0)         // 日志打印级别 0:DEBUG 1:INFO 2:WARN 3:ERROR 4:DPANIC、5:PANIC、6:FATAL，默认0
 	SetDefault("logger.details.format", 1)        // 输出日志格式 0:logfmt 1:json，默认1
 	SetDefault("logger.details.filename", "nova") // 输出日志文件名称
