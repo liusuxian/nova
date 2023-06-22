@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-02 21:03:44
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-06-16 17:46:26
+ * @LastEditTime: 2023-06-22 12:06:55
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -15,6 +15,7 @@ import (
 	"github.com/liusuxian/nova/nlog"
 	"github.com/liusuxian/nova/nrouter"
 	"github.com/panjf2000/ants/v2"
+	"time"
 )
 
 // MsgHandle 消息处理回调结构
@@ -22,15 +23,17 @@ type MsgHandle struct {
 	workerPool             *ants.Pool                 // Worker 工作池
 	workerPoolSize         int                        // Worker 池的最大 Worker 数量
 	workerPoolSizeOverflow int                        // 当处理任务超过工作任务池的容量时，增加的 Goroutine 数量
+	slowThreshold          time.Duration              // 处理请求或执行操作时的慢速阈值
 	builder                *ninterceptor.ChainBuilder // 责任链构造器
 	router                 *nrouter.Router            // 路由
 }
 
 // NewMsgHandle 创建消息处理
-func NewMsgHandle(workerPoolSize, workerPoolSizeOverflow int) (handler *MsgHandle) {
+func NewMsgHandle(workerPoolSize, workerPoolSizeOverflow int, slowThreshold time.Duration) (handler *MsgHandle) {
 	handler = &MsgHandle{
 		workerPoolSize:         workerPoolSize,
 		workerPoolSizeOverflow: workerPoolSizeOverflow,
+		slowThreshold:          slowThreshold,
 		builder:                ninterceptor.NewChainBuilder(),
 		router:                 nrouter.NewRouter(),
 	}
@@ -86,29 +89,9 @@ func (mh *MsgHandle) SubmitToWorkerPool(request niface.IRequest) {
 	if mh.workerPool != nil && request != nil {
 		switch iRequest := request.(type) {
 		case niface.IFuncRequest:
-			if err := mh.workerPool.Submit(func() { mh.doFuncHandler(iRequest) }); err != nil {
-				switch err {
-				case ants.ErrPoolOverload:
-					nlog.Warn("SubmitToWorkerPool IFuncRequest", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
-					mh.workerPool.Tune(mh.workerPool.Cap() + mh.workerPoolSizeOverflow)
-					mh.SubmitToWorkerPool(request)
-				default:
-					nlog.Error("SubmitToWorkerPool IFuncRequest Error", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
-					go mh.doFuncHandler(iRequest)
-				}
-			}
+			mh.doSubmitFuncRequestToWorkerPool(iRequest)
 		case niface.IRequest:
-			if err := mh.workerPool.Submit(func() { mh.doMsgHandler(iRequest) }); err != nil {
-				switch err {
-				case ants.ErrPoolOverload:
-					nlog.Warn("SubmitToWorkerPool IRequest", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
-					mh.workerPool.Tune(mh.workerPool.Cap() + mh.workerPoolSizeOverflow)
-					mh.SubmitToWorkerPool(request)
-				default:
-					nlog.Error("SubmitToWorkerPool IRequest Error", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
-					go mh.doMsgHandler(iRequest)
-				}
-			}
+			mh.doSubmitRequestToWorkerPool(iRequest)
 		}
 	}
 }
@@ -145,8 +128,12 @@ func (mh *MsgHandle) Intercept(chain niface.IChain) (resp niface.IcResp) {
 // doMsgHandler 处理消息
 func (mh *MsgHandle) doMsgHandler(request niface.IRequest) {
 	defer func() {
+		handleTime := request.GetHandleTime()
 		if err := recover(); err != nil {
-			nlog.Error("doMsgHandler Panic", nlog.Any("Panic", err))
+			nlog.Error("MsgHandler Panic", nlog.Duration("HandleTime", handleTime), nlog.Any("Panic", err))
+		}
+		if handleTime > mh.slowThreshold && mh.slowThreshold != 0 {
+			nlog.Warn("SLOW MsgHandler", nlog.Duration("HandleTime", handleTime))
 		}
 	}()
 
@@ -164,10 +151,44 @@ func (mh *MsgHandle) doMsgHandler(request niface.IRequest) {
 // doFuncHandler 执行函数式请求
 func (mh *MsgHandle) doFuncHandler(request niface.IFuncRequest) {
 	defer func() {
+		handleTime := request.GetHandleTime()
 		if err := recover(); err != nil {
-			nlog.Error("doFuncHandler Panic", nlog.Any("Panic", err))
+			nlog.Error("FuncHandler Panic", nlog.Duration("HandleTime", handleTime), nlog.Any("Panic", err))
+		}
+		if handleTime > mh.slowThreshold && mh.slowThreshold != 0 {
+			nlog.Warn("SLOW FuncHandler", nlog.Duration("HandleTime", handleTime))
 		}
 	}()
 	// 执行函数式请求
 	request.CallFunc()
+}
+
+// doSubmitFuncRequestToWorkerPool 将请求提交给 Worker 工作池处理
+func (mh *MsgHandle) doSubmitFuncRequestToWorkerPool(request niface.IFuncRequest) {
+	if err := mh.workerPool.Submit(func() { mh.doFuncHandler(request) }); err != nil {
+		switch err {
+		case ants.ErrPoolOverload:
+			nlog.Warn("doSubmitFuncRequestToWorkerPool", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
+			mh.workerPool.Tune(mh.workerPool.Cap() + mh.workerPoolSizeOverflow)
+			mh.doSubmitFuncRequestToWorkerPool(request)
+		default:
+			nlog.Error("doSubmitFuncRequestToWorkerPool Error", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
+			go mh.doFuncHandler(request)
+		}
+	}
+}
+
+// doSubmitRequestToWorkerPool 将请求提交给 Worker 工作池处理
+func (mh *MsgHandle) doSubmitRequestToWorkerPool(request niface.IRequest) {
+	if err := mh.workerPool.Submit(func() { mh.doMsgHandler(request) }); err != nil {
+		switch err {
+		case ants.ErrPoolOverload:
+			nlog.Warn("doSubmitRequestToWorkerPool", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
+			mh.workerPool.Tune(mh.workerPool.Cap() + mh.workerPoolSizeOverflow)
+			mh.doSubmitRequestToWorkerPool(request)
+		default:
+			nlog.Error("doSubmitRequestToWorkerPool Error", nlog.Int("WorkerPoolSize", mh.workerPool.Cap()), nlog.Err(err))
+			go mh.doMsgHandler(request)
+		}
+	}
 }

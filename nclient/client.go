@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-06-16 17:48:27
+ * @LastEditTime: 2023-06-22 11:57:54
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -28,7 +28,7 @@ import (
 type Client struct {
 	gnet.BuiltinEventEngine
 	client                *gnet.Client                  // gnet 客户端
-	clientConf            *ClientConfig                 // 客户端配置
+	conf                  *ClientConfig                 // 客户端配置
 	conn                  niface.IConnection            // Client 连接
 	msgHandler            niface.IMsgHandle             // 当前 Client 绑定的消息处理模块
 	onConnStart           func(conn niface.IConnection) // 当前 Client 的连接创建时的 Hook 函数
@@ -47,6 +47,7 @@ type ClientConfig struct {
 	MaxHeartBeat           time.Duration // 最长心跳检测间隔时间
 	PacketMethod           int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容
 	Endian                 int           // 字节存储次序，1: 小端 2: 大端
+	SlowThreshold          time.Duration // 处理请求或执行操作时的慢速阈值
 	MaxPacketSize          int           // 数据包的最大值（单位:字节）
 	WorkerPoolSize         int           // 工作任务池最大工作 Goroutine 数量
 	WorkerPoolSizeOverflow int           // 当处理任务超过工作任务池的容量时，增加的 Goroutine 数量
@@ -66,19 +67,19 @@ var clientLock sync.Mutex
 // NewClient 创建 Client
 func NewClient(opts ...ClientConfigOption) (client niface.IClient) {
 	// 初始化 Client 属性
-	c := &Client{clientConf: &ClientConfig{}}
+	c := &Client{conf: &ClientConfig{}}
 	// 处理客户端配置选项
 	for _, opt := range opts {
-		opt(c.clientConf)
+		opt(c.conf)
 	}
 	// 创建消息处理
-	c.msgHandler = nmsghandler.NewMsgHandle(c.clientConf.WorkerPoolSize, c.clientConf.WorkerPoolSizeOverflow)
+	c.msgHandler = nmsghandler.NewMsgHandle(c.conf.WorkerPoolSize, c.conf.WorkerPoolSizeOverflow, c.conf.SlowThreshold)
 	// 处理数据协议封包方式
-	c.packet = npack.NewPack(c.clientConf.PacketMethod, c.clientConf.Endian, c.clientConf.MaxPacketSize)
+	c.packet = npack.NewPack(c.conf.PacketMethod, c.conf.Endian, c.conf.MaxPacketSize)
 	// 创建 Client
 	clientLock.Lock()
 	defer clientLock.Unlock()
-	cli, err := gnet.NewClient(c, gnet.WithOptions(c.clientConf.Options))
+	cli, err := gnet.NewClient(c, gnet.WithOptions(c.conf.Options))
 	if err != nil {
 		nlog.Fatal("New Client Error", nlog.Err(err))
 	}
@@ -173,7 +174,7 @@ func (c *Client) GetServerOverload() (checker niface.IServerOverloadChecker) {
 
 // SetHeartBeat 设置当前 Client 的心跳检测器
 func (c *Client) SetHeartBeat(initiate bool, option ...*niface.HeartBeatOption) {
-	checker := nheartbeat.NewHeartBeatChecker(c.clientConf.HeartBeat, initiate)
+	checker := nheartbeat.NewHeartBeatChecker(c.conf.HeartBeat, initiate)
 	// 用户自定义
 	if len(option) > 0 {
 		opt := option[0]
@@ -196,9 +197,9 @@ func (c *Client) AddInterceptor(interceptor niface.IInterceptor) {
 
 // OnBoot 在引擎准备好接受连接时触发。参数 engine 包含信息和各种实用工具。
 func (c *Client) OnBoot(eng gnet.Engine) (action gnet.Action) {
-	nlog.Info("Client OnBoot", nlog.Reflect("ClientConf", c.clientConf))
+	nlog.Info("Client OnBoot", nlog.Reflect("ClientConf", c.conf))
 	// 连接服务器
-	if _, err := c.client.Dial(c.clientConf.Network, c.clientConf.Addr); err != nil {
+	if _, err := c.client.Dial(c.conf.Network, c.conf.Addr); err != nil {
 		nlog.Fatal("Client OnBoot Error", nlog.Err(err))
 	}
 	// 启动 Worker 工作池
@@ -220,7 +221,7 @@ func (c *Client) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
 func (c *Client) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	nlog.Info("Client OnOpen", nlog.Int("connID", conn.Fd()))
 	// 创建一个 Client 客户端特性的连接
-	c.conn = nconn.NewClientConn(c, conn, c.clientConf.MaxHeartBeat)
+	c.conn = nconn.NewClientConn(c, conn, c.conf.MaxHeartBeat)
 	// 启动连接
 	c.conn.Start()
 	return

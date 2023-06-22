@@ -2,18 +2,23 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-08 01:20:29
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-23 20:02:28
+ * @LastEditTime: 2023-06-21 18:02:03
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
  */
 package niface
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // IFuncRequest 函数消息接口
 type IFuncRequest interface {
-	CallFunc() // 调用函数
+	CallFunc()                         // 调用函数
+	GetConnection() (conn IConnection) // 获取请求连接信息
+	GetHandleTime() (d time.Duration)  // 获取函数处理的时间
 }
 
 // IRequest 请求接口
@@ -27,6 +32,7 @@ type IRequest interface {
 	SetSerializedData(resp IcResp)                                                   // 设置解析完后的序列化数据
 	BindRouter(handlers []RouterHandler)                                             // 绑定这次请求的业务处理器集合
 	RouterNext()                                                                     // 执行下一个业务处理器
+	GetHandleTime() (d time.Duration)                                                // 获取请求处理的时间
 	Resp(f MsgDataFunc, callback ...SendCallback) (err error)                        // 将数据返回给远程的对端
 	RespMsg(f MsgDataFunc, callback ...SendCallback) (err error)                     // 将 Message 数据返回给远程的对端（与请求共用消息ID）
 	RespMsgWithId(msgID uint16, f MsgDataFunc, callback ...SendCallback) (err error) // 将 Message 数据返回给远程的对端（与请求可不共用消息ID）
@@ -77,6 +83,11 @@ func (br *BaseRequest) BindRouter(handlers []RouterHandler) {
 
 // RouterNext 执行下一个业务处理器
 func (br *BaseRequest) RouterNext() {
+}
+
+// GetHandleTime 获取请求处理的时间
+func (br *BaseRequest) GetHandleTime() (d time.Duration) {
+	return time.Duration(0)
 }
 
 // Resp 将数据返回给远程的对端

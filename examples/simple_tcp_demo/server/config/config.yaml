@@ -11,6 +11,7 @@ server:
   maxPacketSize: 4096 # 数据包的最大值（单位:字节），默认 4096
   packetMethod: 1 # 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
   endian: 1 # 字节存储次序，1: 小端 2: 大端，默认 1
+  slowThreshold: "200ms" # 处理请求或执行操作时的慢速阈值
 
 # 日志配置
 logger:

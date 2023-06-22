@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-05-09 01:45:31
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-06-06 20:00:38
+ * @LastEditTime: 2023-06-22 11:18:09
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -58,6 +58,7 @@ type ServerConfig struct {
 	MaxPacketSize          int           // 数据包的最大值（单位:字节），默认 4096
 	PacketMethod           int           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
 	Endian                 int           // 字节存储次序，1: 小端 2: 大端，默认 1
+	SlowThreshold          time.Duration // 处理请求或执行操作时的慢速阈值
 }
 
 // ServerConfigOption 服务器配置选项
@@ -87,7 +88,7 @@ func NewServer(opts ...ServerConfigOption) (server niface.IServer) {
 	s := &Server{
 		serverConf: serCfg,
 		addr:       fmt.Sprintf("%s://:%d", serCfg.Network, serCfg.Port),
-		msgHandler: nmsghandler.NewMsgHandle(serCfg.WorkerPoolSize, serCfg.WorkerPoolSizeOverflow),
+		msgHandler: nmsghandler.NewMsgHandle(serCfg.WorkerPoolSize, serCfg.WorkerPoolSizeOverflow, serCfg.SlowThreshold),
 		connMgr:    nconn.NewConnManager(),
 		packet:     npack.NewPack(serCfg.PacketMethod, serCfg.Endian, serCfg.MaxPacketSize),
 	}

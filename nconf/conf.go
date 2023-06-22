@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-12 18:19:13
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-06-06 19:42:27
+ * @LastEditTime: 2023-06-22 11:24:00
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -346,6 +346,7 @@ func init() {
 	SetDefault("server.maxPacketSize", 4096)       // 数据包的最大值（单位:字节），默认 4096
 	SetDefault("server.packetMethod", 1)           // 封包和拆包方式，1: 消息ID(2字节)-消息体长度(4字节)-消息内容，默认 1
 	SetDefault("server.endian", 1)                 // 字节存储次序，1: 小端 2: 大端，默认 1
+	SetDefault("server.slowThreshold", "200ms")    // 处理请求或执行操作时的慢速阈值
 	// 日志配置
 	SetDefault("logger.path", "logs")             // 输出日志文件路径
 	SetDefault("logger.details.type", 0)          // 日志类型 0:打印所有级别 1:打印 DEBUG、INFO、WARN 级别 2:打印 ERROR、DPANIC、PANIC、FATAL 级别，默认0
