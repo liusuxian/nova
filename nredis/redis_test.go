@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-04 12:14:28
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 12:35:14
+ * @LastEditTime: 2023-10-10 12:00:22
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -47,27 +47,28 @@ func TestRedis(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(1, nconv.ToInt(actualObj))
 	}
-	actualObj, err = client.Pipeline(ctx, []any{"SET", "bbb", 2}, []any{"SADD", "ccc", 3})
+	var actualPipelineObj []*niface.PipelineResult
+	actualPipelineObj, err = client.Pipeline(ctx, []any{"SET", "bbb", 2}, []any{"SADD", "ccc", 3})
 	if assert.NoError(err) {
-		for k, v := range nconv.ToSlice(actualObj) {
+		for k, v := range actualPipelineObj {
 			assert.IsType(&niface.PipelineResult{}, v)
-			assert.NoError(v.(*niface.PipelineResult).Err)
+			assert.NoError(v.Err)
 			if k == 0 {
-				assert.Equal(&niface.PipelineResult{Val: "OK"}, v)
+				assert.Equal("OK", v.Val)
 			} else {
-				assert.Equal(&niface.PipelineResult{Val: int64(1)}, v)
+				assert.Equal(int64(1), v.Val)
 			}
 		}
 	}
-	actualObj, err = client.Pipeline(ctx, []any{"GET", "bbb"}, []any{"SMEMBERS", "ccc"})
+	actualPipelineObj, err = client.Pipeline(ctx, []any{"GET", "bbb"}, []any{"SMEMBERS", "ccc"})
 	if assert.NoError(err) {
-		for k, v := range nconv.ToSlice(actualObj) {
+		for k, v := range actualPipelineObj {
 			assert.IsType(&niface.PipelineResult{}, v)
-			assert.NoError(v.(*niface.PipelineResult).Err)
+			assert.NoError(v.Err)
 			if k == 0 {
-				assert.Equal(&niface.PipelineResult{Val: "2"}, v)
+				assert.Equal("2", v.Val)
 			} else {
-				assert.Equal(&niface.PipelineResult{Val: []any{"3"}}, v)
+				assert.Equal([]any{"3"}, v.Val)
 			}
 		}
 	}

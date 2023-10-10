@@ -2,7 +2,7 @@
  * @Author: liusuxian 382185882@qq.com
  * @Date: 2023-04-15 02:58:43
  * @LastEditors: liusuxian 382185882@qq.com
- * @LastEditTime: 2023-05-15 13:35:35
+ * @LastEditTime: 2023-10-10 11:27:46
  * @Description:
  *
  * Copyright (c) 2023 by liusuxian email: 382185882@qq.com, All Rights Reserved.
@@ -128,22 +128,24 @@ func (rc *RedisClient) Pipeline(ctx context.Context, cmdArgsList ...[]any) (resu
 func (rc *RedisClient) ScriptLoad(ctx context.Context, scriptFilePath string) (err error) {
 	script := nfile.GetContents(scriptFilePath)
 	if strings.EqualFold("", script) {
-		return errors.Errorf("[%s] script not found", scriptFilePath)
+		err = errors.Errorf("[%s] script not found", scriptFilePath)
+		return
 	}
-	evalsha, err := rc.redis.ScriptLoad(ctx, script).Result()
-	if err != nil {
-		return err
+	var evalsha string
+	if evalsha, err = rc.redis.ScriptLoad(ctx, script).Result(); err != nil {
+		return
 	}
 	scriptFileName := nfile.Name(scriptFilePath)
 	rc.luaScriptMap[scriptFileName] = evalsha
-	return nil
+	return
 }
 
 // EvalSha 执行 lua 脚本
 func (rc *RedisClient) EvalSha(ctx context.Context, scriptFileName string, keys []string, args ...any) (value any, err error) {
 	evalsha, ok := rc.luaScriptMap[scriptFileName]
 	if !ok {
-		return nil, errors.Errorf("[%s] Script Not Found", scriptFileName)
+		err = errors.Errorf("[%s] Script Not Found", scriptFileName)
+		return
 	}
 	value, err = rc.redis.EvalSha(ctx, evalsha, keys, args...).Result()
 	if err == redis.Nil {
